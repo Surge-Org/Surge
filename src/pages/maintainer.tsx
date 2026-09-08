@@ -256,3 +256,160 @@ export function RepoDashboard() {
   );
 }
 
+/* --------------------------------------------------- issues + proposal triage */
+
+export function RepoIssues() {
+  const { state, setState, notify } = useApp();
+  const repo = useRepo();
+  const [open, setOpen] = useState<string | null>(null);
+  if (!repo) return <Navigate to="/maintainer" replace />;
+
+  const issues = state.issues.filter(i => i.repoId === repo.id);
+  const proposalsFor = (id: string) => state.applications.filter(a => a.issueId === id);
+
+  const assign = (target: Application) => {
+    setState(s => ({
+      ...s,
+      applications: s.applications.map(a =>
+        a.issueId !== target.issueId ? a
+          : a.applicant === target.applicant ? { ...a, status: 'Assigned' }
+            : a.status === 'Applied' ? { ...a, status: 'Rejected' } : a),
+    }));
+    notify(`${applicantName(target, state.session.contributor ?? 'You')} assigned.`);
+  };
+
+  const decline = (target: Application) => {
+    setState(s => ({
+      ...s,
+      applications: s.applications.map(a =>
+        a.issueId === target.issueId && a.applicant === target.applicant ? { ...a, status: 'Rejected' } : a),
+    }));
+    notify('Proposal declined.');
+  };
+
+  return (
+    <Page>
+      <PageHead title="Issues & proposals" sub={`Every issue posted by ${repoName(repo)}.`} />
+      {issues.length ? (
+        <Stagger className="col" >
+          {issues.map(issue => {
+            const proposals = proposalsFor(issue.id);
+            const chosen = proposals.find(p => ['Assigned', 'PR submitted', 'Accepted'].includes(p.status));
+            const expanded = open === issue.id;
+            return (
+              <Item key={issue.id} className="card issue-block">
+                <button className="issue-block-head" aria-expanded={expanded}
+                  onClick={() => setOpen(expanded ? null : issue.id)}>
+                  <span className="mono dim issue-num">#{issue.id}</span>
+                  <span className="col" style={{ gap: 2, minWidth: 0, flex: 1, textAlign: 'left' }}>
+                    <span className="row-title">{issue.title}</span>
+                    <span className="row-sub">
+                      {chosen ? `Assigned to ${applicantName(chosen, 'you')}` :
+                        proposals.length ? `${proposals.length} ${proposals.length === 1 ? 'proposal' : 'proposals'}` : 'No proposals yet'}
+                    </span>
+                  </span>
+                  <Chip className="num">{pointsFor(issue.complexity)}</Chip>
+                  {chosen
+                    ? <Chip tone={chosen.status === 'Accepted' ? 'ok' : 'warn'}>{chosen.status}</Chip>
+                    : proposals.length > 0 && <Chip className="solid num">{proposals.length}</Chip>}
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {expanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.24, ease: EASE }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <div className="issue-block-body">
+                        <p className="muted">{issue.description}</p>
+                        {proposals.length ? proposals.map(p => (
+                          <div className="proposal" key={`${p.issueId}-${p.applicant ?? 'me'}`}>
+                            <div className="row" style={{ gap: 8 }}>
+                              <Avatar name={applicantName(p, state.session.contributor ?? '?')} />
+                              <strong className="row-title">{applicantName(p, 'You')}</strong>
+                              {isOwnApplication(p) && <Chip>You</Chip>}
+                              <span className="spacer" />
+                              <Chip tone={p.status === 'Accepted' ? 'ok' : p.status === 'Rejected' ? 'bad' : p.status === 'Applied' ? '' : 'warn'}>
+                                {p.status}
+                              </Chip>
+                            </div>
+                            <p className="muted proposal-body">{p.message}</p>
+                            {!chosen && p.status === 'Applied' && (
+                              <div className="row" style={{ gap: 6 }}>
+                                <button className="btn primary xs" onClick={() => assign(p)}>
+                                  <Check size={12} />Assign
+                                </button>
+                                <button className="btn ghost xs" onClick={() => decline(p)}>Decline</button>
+                              </div>
+                            )}
+                            {p.status === 'PR submitted' && (
+                              <button className="btn primary xs" onClick={() => {
+                                setState(s => ({
+                                  ...s,
+                                  applications: s.applications.map(a =>
+                                    a.issueId === p.issueId && a.applicant === p.applicant ? { ...a, status: 'Accepted' } : a),
+                                }));
+                                notify('Contribution accepted. Points recorded.');
+                              }}><Check size={12} />Accept work</button>
+                            )}
+                          </div>
+                        )) : <p className="hint">No proposals on this issue yet.</p>}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </Item>
+            );
+          })}
+        </Stagger>
+      ) : <Empty title="No issues yet">Issues posted for this repository appear here.</Empty>}
+    </Page>
+  );
+}
+
+export function RepoSettings() {
+  const { setState, notify } = useApp();
+  const navigate = useNavigate();
+  const repo = useRepo();
+  const [confirm, setConfirm] = useState(false);
+  if (!repo) return <Navigate to="/maintainer" replace />;
+
+  return (
+    <Page>
+      <PageHead title="Repository settings" sub={repoName(repo)} />
+      <div className="card submit-form">
+        <div className="row">
+          <span className="col" style={{ gap: 2 }}>
+            <strong className="row-title">Program status</strong>
+            <span className="row-sub">Submitted {repo.submitted ? dateLabel(repo.submitted) : 'with the program'}</span>
+          </span>
+          <span className="spacer" />
+          <Chip tone={STATUS_TONE[repo.status]}>{repo.status}</Chip>
+        </div>
+        <hr className="divider" />
+        <div className="row">
+          <span className="col" style={{ gap: 2 }}>
+            <strong className="row-title">Withdraw from the program</strong>
+            <span className="row-sub">Removes the repository and closes its dashboard.</span>
+          </span>
+          <span className="spacer" />
+          <button className="btn sm danger" onClick={() => setConfirm(true)}>Withdraw</button>
+        </div>
+      </div>
+
+      <ModalHost open={confirm} title="Withdraw this repository?" onClose={() => setConfirm(false)}>
+        <p>{repoName(repo)} will leave the program and its dashboard will close.</p>
+        <button className="btn primary block" onClick={() => {
+          setState(s => ({ ...s, repos: s.repos.filter(r => r.id !== repo.id) }));
+          setConfirm(false);
+          notify('Repository withdrawn.');
+          navigate('/maintainer');
+        }}>Withdraw repository</button>
+      </ModalHost>
+    </Page>
+  );
+}
+

@@ -103,3 +103,11 @@ export function Avatar({
 }
 
 /** Language dot in GitHub's colour for that language. */
+export function LangDot({ lang }: { lang: string }) {
+  return <span className="lang-dot" style={{ background: LANG_COLOR[lang] ?? 'var(--ink-4)' }} aria-hidden="true" />;
+}
+
+export function Chip({ children, tone = '', className = '' }: { children: ReactNode; tone?: string; className?: string }) {
+  return <span className={`chip ${tone} ${className}`.trim()}>{children}</span>;
+}
+

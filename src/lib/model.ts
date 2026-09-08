@@ -42,3 +42,19 @@ export interface Issue {
   created: string;
 }
 
+export interface Application {
+  issueId: string;
+  message: string;
+  status: ApplicationStatus;
+  pr?: string;
+  /** Sample contributor. Absent means the signed-in contributor. */
+  applicant?: string;
+}
+
+export interface Reward {
+  waveId: string;
+  points: number;
+  amount: number;
+}
+
+/** Contributor and maintainer are separate sessions — signing into one never grants the other. */

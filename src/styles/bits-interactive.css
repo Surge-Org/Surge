@@ -161,3 +161,85 @@
   .navpill-nav { margin-left: auto; }
 }
 
+/* ---------------------------------------------------------------- Lanyard */
+.lanyard {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-height: 340px;
+  padding-top: 4px;
+  touch-action: none;
+}
+.lanyard-cord {
+  position: absolute;
+  inset: 0 auto auto 50%;
+  translate: -50% 0;
+  width: 220px;
+  height: 120px;
+  overflow: visible;
+  pointer-events: none;
+}
+.lanyard-cord path {
+  fill: none;
+  stroke: var(--acc);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: .85;
+}
+.lanyard-clip {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  translate: -50% 0;
+  width: 26px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--ink-3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+}
+.lanyard-badge {
+  position: relative;
+  margin-top: 76px;
+  width: 232px;
+  cursor: grab;
+  will-change: transform;
+  user-select: none;
+}
+.lanyard.held .lanyard-badge { cursor: grabbing; }
+
+.badge-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--s5);
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--panel) 92%, transparent), color-mix(in srgb, var(--panel-2) 92%, transparent));
+  backdrop-filter: blur(10px);
+  box-shadow: var(--sh3);
+}
+.badge-hole {
+  width: 42px;
+  height: 6px;
+  margin: 0 auto var(--s4);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+}
+.badge-eyebrow { display: block; margin-bottom: var(--s3); }
+.badge-name { font-size: var(--t6); font-weight: 600; letter-spacing: -.02em; }
+.badge-role { margin-top: 3px; font-size: var(--t3); color: var(--ink-3); }
+.badge-rows { margin-top: var(--s4); display: flex; flex-direction: column; gap: 7px; }
+.badge-row { display: flex; align-items: center; justify-content: space-between; font-size: var(--t2); }
+.badge-row span:first-child { color: var(--ink-3); }
+.badge-row span:last-child { color: var(--ink); font-weight: 600; }
+.badge-strip {
+  margin: var(--s4) calc(var(--s5) * -1) calc(var(--s5) * -1);
+  padding: 9px var(--s5);
+  border-top: 1px solid var(--line);
+  background: var(--acc);
+  color: #fff;
+  font-size: var(--t1);
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-align: center;
+}
+

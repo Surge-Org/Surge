@@ -80,3 +80,7 @@
 }
 @keyframes bit-shine { to { background-position: -250% 0; } }
 
+/* -------------------------------------------------------------- SplitText */
+.bit-split-word { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.bit-split-inner { display: inline-block; will-change: transform; }
+

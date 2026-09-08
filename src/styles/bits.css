@@ -163,3 +163,18 @@
 .bit-rotate-sizer { visibility: hidden; white-space: nowrap; }
 .bit-rotate-word { position: absolute; inset: 0; white-space: nowrap; }
 
+/* ----------------------------------------------------------------- Marquee */
+.bit-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.bit-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: bit-scroll linear infinite;
+}
+.bit-marquee:hover .bit-marquee-track { animation-play-state: paused; }
+.bit-marquee-set { display: flex; align-items: center; gap: var(--s7); padding-right: var(--s7); }
+@keyframes bit-scroll { to { transform: translateX(-50%); } }
+

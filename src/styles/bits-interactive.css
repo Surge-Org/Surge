@@ -50,3 +50,39 @@
       var(--bg) 100%);
 }
 
+/* ------------------------------------------------------------- GooeyNav */
+.goo { position: relative; display: inline-flex; }
+.goo-defs { position: absolute; width: 0; height: 0; }
+.goo-layer { position: absolute; inset: 0; pointer-events: none; }
+.goo-blob {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 30px;
+  translate: 0 -50%;
+  background: var(--acc);
+  border-radius: 999px;
+}
+.goo-burst { position: absolute; top: 50%; width: 0; height: 0; }
+.goo-burst i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--acc);
+  display: block;
+}
+.goo-items { position: relative; z-index: 1; display: flex; align-items: center; gap: 2px; }
+.goo-items a {
+  position: relative;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: var(--t3);
+  font-weight: 500;
+  color: var(--ink-3);
+  transition: color var(--base) var(--ease);
+}
+.goo-items a:hover { color: var(--ink); }
+.goo-items a.on { color: #fff; font-weight: 600; }
+

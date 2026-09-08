@@ -146,3 +146,21 @@ a.row-title:hover { text-decoration: underline; text-underline-offset: 2px; }
 .side-link { gap: 8px; font-size: var(--t3); }
 .side-link:hover .row-title { text-decoration: underline; text-underline-offset: 2px; }
 
+/* ============================================================
+   Auth
+   ============================================================ */
+.auth { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+.auth-bar { height: var(--bar); display: flex; align-items: center; padding: 0 var(--s5); border-bottom: 1px solid var(--line); }
+.auth-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s4); padding: var(--s7) var(--s4); }
+.auth-card { width: min(400px, 100%); padding: var(--s6); display: flex; flex-direction: column; gap: 6px; box-shadow: var(--sh2); }
+.auth-mark {
+  display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: var(--s3);
+  border-radius: var(--r2); background: var(--solid); color: var(--inverse);
+}
+.auth-card h1 { font-size: var(--t6); margin-top: 2px; }
+.auth-sub { font-size: var(--t3); line-height: 1.55; margin-top: 4px; }
+.auth-form { display: flex; flex-direction: column; gap: var(--s3); margin-top: var(--s4); }
+.auth-note { margin-top: var(--s4); }
+.auth-foot { font-size: var(--t2); color: var(--ink-3); }
+.auth-foot a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+

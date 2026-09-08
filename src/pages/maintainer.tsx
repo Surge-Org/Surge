@@ -119,3 +119,67 @@ export function MaintainerHome() {
   );
 }
 
+/* --------------------------------------------------------------- submission */
+
+export function MaintainerSubmit() {
+  const { state, setState, notify } = useApp();
+  const navigate = useNavigate();
+  const me = state.session.maintainer!;
+  const [url, setUrl] = useState('');
+  const [desc, setDesc] = useState('');
+  const [err, setErr] = useState('');
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    const match = url.trim().match(/^(?:https:\/\/github\.com\/)?([\w.-]+)\/([\w.-]+)\/?$/);
+    if (!match) { setErr('Enter owner/repository, or a GitHub repository URL.'); return; }
+    const [, org, name] = match;
+    if (state.repos.some(r => r.org.toLowerCase() === org.toLowerCase() && r.name.toLowerCase() === name.toLowerCase())) {
+      setErr('That repository is already in the program.');
+      return;
+    }
+    const repo: Repo = {
+      id: crypto.randomUUID(),
+      org, name,
+      description: desc.trim() || 'Submitted for program review.',
+      languages: ['TypeScript'],
+      stars: 0, forks: 0,
+      ownerId: me,
+      status: 'Pending',
+      submitted: new Date().toISOString().slice(0, 10),
+    };
+    setState(s => ({ ...s, repos: [repo, ...s.repos] }));
+    notify('Submitted for review.');
+    navigate('/maintainer');
+  };
+
+  return (
+    <Page>
+      <PageHead title="Submit a repository" sub={`Reviewed before it joins the ${PROGRAM.full}. You get a dashboard once it is accepted.`} />
+      <form className="card submit-form" onSubmit={submit}>
+        <label className="field">
+          <span>GitHub repository</span>
+          <input className="input" aria-label="GitHub repository" autoFocus required
+            placeholder="organization/repository" value={url}
+            onChange={e => { setUrl(e.target.value); if (err) setErr(''); }} />
+        </label>
+        <label className="field">
+          <span>What does it do?</span>
+          <textarea className="textarea" rows={4} maxLength={500} aria-label="What does it do?"
+            placeholder="One or two sentences a reviewer can act on."
+            value={desc} onChange={e => setDesc(e.target.value)} />
+        </label>
+        {err && <p className="err" role="alert">{err}</p>}
+        <div className="row" style={{ gap: 8 }}>
+          <button className="btn primary" type="submit">Submit for review</button>
+          <Link className="btn ghost" to="/maintainer">Cancel</Link>
+        </div>
+      </form>
+      <div className="note submit-note">
+        <ShieldCheck size={14} />
+        <span>Submission does not open a dashboard. The repository has to be accepted first.</span>
+      </div>
+    </Page>
+  );
+}
+

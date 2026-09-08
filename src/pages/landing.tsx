@@ -254,3 +254,30 @@ export function Landing() {
       </section>
 
       <FanSection />
+
+      {/* ------------------------------------------------------------ four steps */}
+      <section className="band alt">
+        <div className="band-inner">
+          <AnimatedContent>
+            <div className="sec">
+              <div>
+                <h2>From scoping to settlement</h2>
+                <p>Four steps, and the rules do not change once a wave is open.</p>
+              </div>
+            </div>
+          </AnimatedContent>
+          <div className="bento">
+            {STEPS.map((step, i) => (
+              <AnimatedContent className="box w3" key={step.n} delay={i * 0.07}>
+                <div className="row">
+                  <span className="box-icon"><step.icon size={18} /></span>
+                  <span className="spacer" />
+                  <span className="big-num step-num">{step.n}</span>
+                </div>
+                <h3>{step.t}</h3>
+                <p>{step.d}</p>
+              </AnimatedContent>
+            ))}
+          </div>
+        </div>
+      </section>

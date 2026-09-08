@@ -139,3 +139,27 @@ export function CountUp({
   );
 }
 
+/* ----------------------------------------------------------- SpotlightCard */
+/** Radial highlight that tracks the cursor across the card. */
+export function SpotlightCard({
+  children, className = '', as = 'div',
+}: {
+  children: ReactNode; className?: string; as?: 'div' | 'article';
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const onMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--sx', `${e.clientX - r.left}px`);
+    el.style.setProperty('--sy', `${e.clientY - r.top}px`);
+  }, []);
+  const Tag = as as 'div';
+  return (
+    <Tag ref={ref} className={`bit-spotlight ${className}`} onPointerMove={onMove}>
+      <span className="bit-spotlight-glow" aria-hidden="true" />
+      <span className="bit-spotlight-body">{children}</span>
+    </Tag>
+  );
+}
+

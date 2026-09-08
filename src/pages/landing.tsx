@@ -332,3 +332,60 @@ export function Landing() {
       </section>
 
       <SpiralSection repos={accepted} />
+
+      {/* ----------------------------------------------------------- maintainers */}
+      <section className="band alt">
+        <div className="band-inner">
+          <AnimatedContent>
+            <div className="sec">
+              <div>
+                <h2>For maintainers</h2>
+                <p>A separate area, a review step, and one dashboard per accepted repository.</p>
+              </div>
+              <Magnet>
+                <Link className="btn primary glow" to="/maintainer/login">
+                  Submit your repo<ArrowRight size={14} />
+                </Link>
+              </Magnet>
+            </div>
+          </AnimatedContent>
+
+          <div className="bento">
+            <AnimatedContent className="box w3 pad-lg">
+              <h3>Your backlog, in front of the right people</h3>
+              <p>
+                Submit a repository, get it reviewed, and you get a dashboard for that repository
+                alone — its issues, its proposals, its assignments. Nothing else in the way.
+              </p>
+              <ul className="ticks">
+                {[
+                  'A maintainer area separate from the contributor side',
+                  'Reviewed before any dashboard opens',
+                  'One dashboard per accepted repository',
+                  'Pick one candidate per issue; the rest decline automatically',
+                ].map(t => <li key={t}><Check size={14} />{t}</li>)}
+              </ul>
+            </AnimatedContent>
+
+            <AnimatedContent className="box w3 pad-lg" delay={0.08}>
+              <span className="label">Accepted repositories</span>
+              <div className="box-preview">
+                {accepted.slice(0, 5).map(r => (
+                  <div className="mini-row" key={r.id}>
+                    <Avatar name={r.org} org={r.org} square />
+                    <span className="col" style={{ gap: 1, minWidth: 0, flex: 1 }}>
+                      <span className="row-title">{r.name}</span>
+                      <span className="row-sub">
+                        {r.updated ? `Updated ${relativeDate(r.updated)}` : r.org}
+                      </span>
+                    </span>
+                    <Chip tone="ok">Accepted</Chip>
+                  </div>
+                ))}
+              </div>
+            </AnimatedContent>
+          </div>
+        </div>
+      </section>
+
+      <TeamSection repos={accepted} />

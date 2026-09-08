@@ -389,3 +389,41 @@ export function Landing() {
       </section>
 
       <TeamSection repos={accepted} />
+
+      {/* ------------------------------------------------------------------ faq */}
+      <section className="band">
+        <div className="band-inner narrow">
+          <AnimatedContent>
+            <div className="sec">
+              <div>
+                <h2>Questions</h2>
+                <p>The mechanics that decide how work is claimed and paid.</p>
+              </div>
+            </div>
+          </AnimatedContent>
+          <div className="faq">
+            {FAQS.map((f, i) => (
+              <AnimatedContent key={f.q} delay={i * 0.04}>
+                <div className={openFaq === i ? 'faq-item open' : 'faq-item'}>
+                  <button
+                    className="faq-q"
+                    aria-expanded={openFaq === i}
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  >
+                    <span>{f.q}</span>
+                    <ChevronDown size={16} className="faq-chev" />
+                  </button>
+                  <motion.div
+                    className="faq-a"
+                    initial={false}
+                    animate={{ height: openFaq === i ? 'auto' : 0, opacity: openFaq === i ? 1 : 0 }}
+                    transition={{ duration: 0.26, ease: EASE }}
+                  >
+                    <p className="muted">{f.a}</p>
+                  </motion.div>
+                </div>
+              </AnimatedContent>
+            ))}
+          </div>
+        </div>
+      </section>

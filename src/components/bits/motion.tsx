@@ -318,3 +318,23 @@ export function AnimatedContent({
   );
 }
 
+/* ----------------------------------------------------------------- Marquee */
+/** Seamless infinite strip. Content is duplicated so the loop never gaps. */
+export function Marquee({
+  children, speed = 34, reverse = false, className = '',
+}: {
+  children: ReactNode; speed?: number; reverse?: boolean; className?: string;
+}) {
+  return (
+    <div className={`bit-marquee ${className}`}>
+      <div
+        className="bit-marquee-track"
+        style={{ animationDuration: `${speed}s`, animationDirection: reverse ? 'reverse' : 'normal' } as CSSProperties}
+      >
+        <div className="bit-marquee-set">{children}</div>
+        <div className="bit-marquee-set" aria-hidden="true">{children}</div>
+      </div>
+    </div>
+  );
+}
+

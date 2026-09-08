@@ -450,3 +450,25 @@ p  { line-height: 1.6; }
   box-shadow: var(--sh3);
 }
 
+/* ---------------------------------------------------------- data */
+.grid { display: grid; gap: var(--s3); }
+.grid.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid > * { min-width: 0; }
+
+.stat { padding: var(--s4); }
+.stat .label { margin-bottom: 7px; }
+.stat strong { display: block; font-size: var(--t7); font-weight: 560; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+.stat small { display: block; margin-top: 3px; font-size: var(--t2); color: var(--ink-3); }
+
+.list { border: 1px solid var(--line); border-radius: var(--r3); overflow: hidden; background: var(--panel); }
+.list > * + * { border-top: 1px solid var(--line-soft); }
+.list-row {
+  display: flex; align-items: center; gap: var(--s3);
+  width: 100%; padding: 11px var(--s4);
+  text-align: left;
+  transition: background var(--fast) var(--ease);
+}
+.list-row:hover { background: var(--panel-2); }
+

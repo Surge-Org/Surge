@@ -68,3 +68,15 @@
 }
 @keyframes bit-pan { to { background-position: 220% 0; } }
 
+/* ------------------------------------------------------------- ShinyText */
+.bit-shiny {
+  position: relative;
+  background: linear-gradient(110deg, var(--ink-3) 40%, var(--ink) 50%, var(--ink-3) 60%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: bit-shine 4.5s linear infinite;
+}
+@keyframes bit-shine { to { background-position: -250% 0; } }
+

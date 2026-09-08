@@ -289,3 +289,55 @@ export function BounceCards({
   );
 }
 
+/* ==========================================================================
+   ProfileCard
+   Tilts toward the pointer with a holographic sheen tracking the same point.
+   ========================================================================== */
+
+export function ProfileCard({
+  name, role, handle, avatar, stat,
+}: {
+  name: string;
+  role: string;
+  handle: string;
+  avatar: ReactNode;
+  stat?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el || reduced()) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    el.style.setProperty('--rx', `${(0.5 - py) * 14}deg`);
+    el.style.setProperty('--ry', `${(px - 0.5) * 16}deg`);
+    el.style.setProperty('--mx', `${px * 100}%`);
+    el.style.setProperty('--my', `${py * 100}%`);
+  };
+
+  const reset = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty('--rx', '0deg');
+    el.style.setProperty('--ry', '0deg');
+  };
+
+  return (
+    <div className="pcard" ref={ref} onPointerMove={onMove} onPointerLeave={reset}>
+      <span className="pcard-holo" aria-hidden="true" />
+      <span className="pcard-shine" aria-hidden="true" />
+      <div className="pcard-in">
+        <div className="pcard-avatar">{avatar}</div>
+        <h3 className="pcard-name">{name}</h3>
+        <p className="pcard-role">{role}</p>
+        <div className="pcard-foot">
+          <span className="mono pcard-handle">{handle}</span>
+          {stat && <span className="pcard-stat">{stat}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+

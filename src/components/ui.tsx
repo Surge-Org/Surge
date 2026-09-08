@@ -111,3 +111,16 @@ export function Chip({ children, tone = '', className = '' }: { children: ReactN
   return <span className={`chip ${tone} ${className}`.trim()}>{children}</span>;
 }
 
+export function Crumbs({ items }: { items: { label: string; to?: string }[] }) {
+  return (
+    <nav className="crumbs" aria-label="Breadcrumb">
+      {items.map((item, i) => (
+        <span key={i} className="row" style={{ gap: 5 }}>
+          {i > 0 && <span className="sep">/</span>}
+          {item.to ? <Link to={item.to}>{item.label}</Link> : <strong>{item.label}</strong>}
+        </span>
+      ))}
+    </nav>
+  );
+}
+

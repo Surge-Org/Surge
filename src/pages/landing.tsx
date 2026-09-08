@@ -149,3 +149,72 @@ export function Landing() {
           ))}
         </LogoLoop>
       </section>
+
+      {/* ------------------------------------------- bento: what a wave runs on */}
+      <section className="band alt">
+        <div className="band-inner">
+          <AnimatedContent>
+            <div className="sec">
+              <div>
+                <h2>Everything a wave runs on</h2>
+                <p>Scoping, claiming, review and settlement — each with its own guarantee.</p>
+              </div>
+              <Link className="btn" to="/explore">Explore issues<ArrowRight size={14} /></Link>
+            </div>
+          </AnimatedContent>
+
+          <div className="bento">
+            <AnimatedContent className="box w4 tall pad-lg">
+              <span className="box-icon"><Layers size={18} /></span>
+              <h3>A funded sprint, opened on a schedule</h3>
+              <p>
+                Every wave runs for one week against a fixed {PROGRAM.asset} pool. Nothing is
+                renegotiated mid-flight — the pool, the window and the point values are all
+                published before the first issue is claimed.
+              </p>
+              <span className="spacer" />
+              <div className="box-preview">
+                {state.waves.slice().reverse().slice(1).map(w => (
+                  <div className="mini-row" key={w.id}>
+                    <span className={`wave-dot ${w.status.toLowerCase()}`} />
+                    <span className="col" style={{ gap: 1, minWidth: 0, flex: 1 }}>
+                      <span className="row-title">Wave {w.number}</span>
+                      <span className="row-sub">{dateLabel(w.start)} – {dateLabel(w.end)}</span>
+                    </span>
+                    <span className="row-title num hide-sm">${formatMoney(w.budget)}</span>
+                    <Chip tone={w.status === 'Active' ? 'ok' : ''}>{w.status}</Chip>
+                  </div>
+                ))}
+              </div>
+            </AnimatedContent>
+
+            <AnimatedContent className="box w2 tall" delay={0.06}>
+              <span className="big-num acc"><CountUp to={state.issues.length} /></span>
+              <h3>Scoped issues</h3>
+              <p>Each carries acceptance criteria and a fixed point value before it is listed.</p>
+              <span className="spacer" />
+              <Link className="btn sm" to="/explore">Browse<ArrowRight size={13} /></Link>
+            </AnimatedContent>
+
+            <AnimatedContent className="box w2" delay={0.1}>
+              <span className="big-num"><CountUp to={accepted.length} /></span>
+              <h3>Repositories</h3>
+              <p>Reviewed and accepted into the program.</p>
+            </AnimatedContent>
+
+            <AnimatedContent className="box w2" delay={0.14}>
+              <span className="big-num">{formatCount(totalStars)}</span>
+              <h3>Stars</h3>
+              <p>Across every participating repository.</p>
+            </AnimatedContent>
+
+            <AnimatedContent className="box w2" delay={0.18}>
+              <span className="big-num acc"><CountUp to={pool} prefix="$" /></span>
+              <h3>{PROGRAM.asset} scheduled</h3>
+              <p>Committed across the currently open waves.</p>
+            </AnimatedContent>
+          </div>
+        </div>
+      </section>
+
+      <LiveStackSection issues={state.issues} repos={state.repos} />

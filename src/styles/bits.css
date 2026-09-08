@@ -190,3 +190,20 @@
 }
 .bit-glare:hover .bit-glare-sheen { transform: translateX(120%); }
 
+/* ------------------------------------------------------------ ScrollProgress */
+.bit-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  z-index: 60;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--acc-2), var(--acc), var(--acc-3));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bit-aurora span,
+  .bit-gradient,
+  .bit-shiny,
+  .bit-starborder-ring,
+  .bit-marquee-track { animation: none !important; }
+}

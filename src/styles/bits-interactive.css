@@ -1,0 +1,17 @@
+/* ============================================================
+   React Bits — gooey nav, molten metal, lanyard, card swap,
+   bounce cards, profile card, spiral, logo loop.
+   ============================================================ */
+
+:root {
+  /* Fed into the MoltenMetal shader. */
+  --metal-a: #0a0812;
+  --metal-b: #2f1a63;
+  --metal-c: #a855f7;
+}
+:root[data-theme='dark'] {
+  --metal-a: #07060c;
+  --metal-b: #2a1558;
+  --metal-c: #b06cf9;
+}
+

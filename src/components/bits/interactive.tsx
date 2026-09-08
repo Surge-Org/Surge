@@ -205,3 +205,46 @@ export function Lanyard({ children, className = '' }: { children: ReactNode; cla
   );
 }
 
+/* ==========================================================================
+   CardSwap
+   A stack whose front card retires to the back on a timer.
+   ========================================================================== */
+
+export function CardSwap({
+  cards, interval = 3200, className = '',
+}: {
+  cards: { id: string; node: ReactNode }[];
+  interval?: number;
+  className?: string;
+}) {
+  const [order, setOrder] = useState(() => cards.map((_, i) => i));
+
+  useEffect(() => {
+    if (reduced() || cards.length < 2) return;
+    const t = window.setInterval(() => setOrder(o => [...o.slice(1), o[0]]), interval);
+    return () => window.clearInterval(t);
+  }, [cards.length, interval]);
+
+  return (
+    <div className={`swap ${className}`}>
+      {order.map((cardIdx, pos) => (
+        <motion.div
+          key={cards[cardIdx].id}
+          className="swap-card"
+          animate={{
+            y: pos * 14,
+            x: pos * 10,
+            scale: 1 - pos * 0.05,
+            opacity: pos > 2 ? 0 : 1 - pos * 0.12,
+            zIndex: cards.length - pos,
+          }}
+          transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+          style={{ zIndex: cards.length - pos }}
+        >
+          {cards[cardIdx].node}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+

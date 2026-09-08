@@ -134,3 +134,6 @@
   width: 100%;
 }
 
+/* ------------------------------------------------------------------ Magnet */
+.bit-magnet { display: inline-flex; will-change: transform; }
+

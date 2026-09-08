@@ -136,3 +136,101 @@ export function PageHead({ title, sub, action }: { title: string; sub?: ReactNod
   );
 }
 
+export function Empty({ title, children }: { title: string; children?: ReactNode }) {
+  return (
+    <div className="empty">
+      <h3>{title}</h3>
+      {children && <p>{children}</p>}
+    </div>
+  );
+}
+
+/** Sliding segmented control. The pill animates between options via a shared layoutId. */
+export function Segmented<T extends string>({
+  value, options, onChange, idPrefix,
+}: {
+  value: T;
+  options: readonly { value: T; label: string }[];
+  onChange: (v: T) => void;
+  idPrefix: string;
+}) {
+  return (
+    <div className="seg" role="tablist">
+      {options.map(opt => (
+        <button
+          key={opt.value}
+          role="tab"
+          aria-selected={value === opt.value}
+          data-on={value === opt.value}
+          onClick={() => onChange(opt.value)}
+        >
+          {value === opt.value && (
+            <motion.span
+              layoutId={`${idPrefix}-pill`}
+              className="seg-pill"
+              transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+            />
+          )}
+          <span>{opt.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <motion.div
+      className="modal-scrim"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.16 }}
+      onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 6, scale: 0.99 }}
+        transition={{ duration: 0.22, ease: EASE }}
+      >
+        <div className="modal-head">
+          <h2>{title}</h2>
+          <button className="btn ghost icon sm" aria-label="Close dialog" onClick={onClose}>
+            <X size={15} />
+          </button>
+        </div>
+        <div className="modal-body">{children}</div>
+      </motion.div>
+    </motion.div>,
+    document.body,
+  );
+}
+
+export function ModalHost({ open, ...rest }: { open: boolean; title: string; children: ReactNode; onClose: () => void }) {
+  return <AnimatePresence>{open && <Modal {...rest} />}</AnimatePresence>;
+}
+
+/** GitHub glyph for the navbar. */
+export function GithubMark({ size = 14 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 16 16" width={size} height={size} fill="currentColor" aria-hidden="true">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+    </svg>
+  );
+}

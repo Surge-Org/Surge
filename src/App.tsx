@@ -335,3 +335,58 @@ function RepoShell({ children }: { children: ReactNode }) {
   );
 }
 
+/* --------------------------------------------------------------------- app */
+
+function Routed() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
+
+  // ⌘K / "/" jumps to explore search from anywhere public.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target as HTMLElement)?.tagName ?? '');
+      if (!typing && ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || e.key === '/')) {
+        e.preventDefault();
+        navigate('/explore?focus=1');
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [navigate]);
+
+  return (
+    <Routes location={location} key={location.pathname}>
+      <Route path="/" element={<PublicShell><Landing /></PublicShell>} />
+      <Route path="/explore" element={<PublicShell><Explore tab="issues" /></PublicShell>} />
+      <Route path="/explore/repos" element={<PublicShell><Explore tab="repos" /></PublicShell>} />
+      <Route path="/explore/orgs" element={<PublicShell><Explore tab="orgs" /></PublicShell>} />
+      <Route path="/issue/:issueId" element={<PublicShell><IssuePage /></PublicShell>} />
+
+      <Route path="/login" element={<ContributorLogin />} />
+      <Route path="/maintainer/login" element={<MaintainerLogin />} />
+
+      <Route path="/me" element={<ContributorShell><ContributorWork /></ContributorShell>} />
+      <Route path="/me/points" element={<ContributorShell><ContributorPoints /></ContributorShell>} />
+      <Route path="/me/settings" element={<ContributorShell><ContributorSettings /></ContributorShell>} />
+
+      <Route path="/maintainer" element={<MaintainerShell><MaintainerHome /></MaintainerShell>} />
+      <Route path="/maintainer/submit" element={<MaintainerShell><MaintainerSubmit /></MaintainerShell>} />
+      <Route path="/maintainer/repo/:repoId" element={<RepoShell><RepoDashboard /></RepoShell>} />
+      <Route path="/maintainer/repo/:repoId/issues" element={<RepoShell><RepoIssues /></RepoShell>} />
+      <Route path="/maintainer/repo/:repoId/settings" element={<RepoShell><RepoSettings /></RepoShell>} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <Provider>
+      <a className="skip" href="#main">Skip to content</a>
+      <Routed />
+    </Provider>
+  );
+}

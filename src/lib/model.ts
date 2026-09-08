@@ -22,3 +22,23 @@ export interface Repo {
   reviewNote?: string;
 }
 
+export interface Wave {
+  id: string;
+  number: number;
+  start: string;
+  end: string;
+  budget: number;
+  status: 'Active' | 'Upcoming' | 'Completed';
+}
+
+export interface Issue {
+  id: string;
+  repoId: string;
+  waveId: string;
+  title: string;
+  description: string;
+  criteria: string[];
+  complexity: Complexity;
+  created: string;
+}
+

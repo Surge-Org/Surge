@@ -163,3 +163,16 @@ export function SpotlightCard({
   );
 }
 
+/* -------------------------------------------------------------- StarBorder */
+/** Conic gradient that travels around the border. */
+export function StarBorder({
+  children, className = '', ...rest
+}: { children: ReactNode; className?: string } & React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className={`bit-starborder ${className}`} {...rest}>
+      <span className="bit-starborder-ring" aria-hidden="true" />
+      <span className="bit-starborder-inner">{children}</span>
+    </span>
+  );
+}
+

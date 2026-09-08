@@ -401,3 +401,148 @@ a.row-title:hover { text-decoration: underline; text-underline-offset: 2px; }
   .number strong { font-size: var(--t7); }
 }
 
+/* ============================================================
+   Bento — large, generous boxes
+   Replaces the small uniform cards on the landing page.
+   ============================================================ */
+
+/* Section header: heading left, action pinned right. */
+.sec {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s5);
+  margin-bottom: var(--s6);
+  flex-wrap: wrap;
+}
+.sec h2 {
+  font-size: clamp(24px, 3vw, 34px);
+  letter-spacing: -.03em;
+  line-height: 1.12;
+  font-weight: 600;
+}
+.sec p { margin-top: 8px; font-size: var(--t4); color: var(--ink-2); max-width: 56ch; }
+.sec .btn { flex-shrink: 0; }
+
+/* 6-column bento. Boxes claim spans instead of all being identical. */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s4);
+}
+.box {
+  position: relative;
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  padding: var(--s6);
+  min-height: 220px;
+  border-radius: var(--r5);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  overflow: hidden;
+}
+.box.w3 { grid-column: span 3; }
+.box.w4 { grid-column: span 4; }
+.box.w6 { grid-column: span 6; }
+.box.tall { min-height: 320px; }
+.box.pad-lg { padding: var(--s7); }
+
+.box h3 { font-size: var(--t6); letter-spacing: -.02em; font-weight: 580; }
+.box p { font-size: var(--t4); color: var(--ink-2); line-height: 1.62; }
+.box .spacer { flex: 1; }
+
+/* Huge display figure, the 134 / 238 / 300 treatment. */
+.big-num {
+  font-size: clamp(38px, 5vw, var(--t10));
+  font-weight: 600;
+  letter-spacing: -.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(170deg, var(--ink) 30%, var(--ink-3) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.big-num.acc {
+  background: linear-gradient(170deg, var(--acc-3) 10%, var(--acc) 60%, var(--acc-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.box-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 0;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  font-size: var(--t2);
+  font-weight: 540;
+  color: var(--ink-2);
+}
+.box-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r3);
+  background: var(--acc-soft);
+  border: 1px solid var(--acc-line);
+  color: var(--acc);
+}
+
+/* Inset preview surface inside a box. */
+.box-preview {
+  margin: var(--s2) calc(var(--s6) * -1) calc(var(--s6) * -1);
+  padding: var(--s4) var(--s6) var(--s6);
+  border-top: 1px solid var(--line-soft);
+  background: linear-gradient(180deg, transparent, var(--panel-2));
+}
+.box.pad-lg .box-preview { margin: var(--s2) calc(var(--s7) * -1) calc(var(--s7) * -1); padding: var(--s4) var(--s7) var(--s7); }
+
+.mini-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r2);
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+.mini-row + .mini-row { margin-top: 8px; }
+
+@media (max-width: 1020px) {
+  .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .box, .box.w3 { grid-column: span 2; }
+  .box.w4, .box.w6 { grid-column: span 4; }
+}
+@media (max-width: 720px) {
+  .bento { grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+  .box, .box.w3, .box.w4, .box.w6 { grid-column: span 1; }
+  .box { padding: var(--s5); min-height: 0; }
+  .box.pad-lg { padding: var(--s5); }
+  .box.tall { min-height: 0; }
+  .box-preview, .box.pad-lg .box-preview {
+    margin: var(--s2) calc(var(--s5) * -1) calc(var(--s5) * -1);
+    padding: var(--s4) var(--s5) var(--s5);
+  }
+}
+
+/* box internals */
+.step-num { font-size: var(--t8) !important; opacity: .55; }
+.box:hover { border-color: var(--acc-line); }
+.box .tier-bar { margin-top: 2px; }
+.box .ticks { margin-bottom: 0; gap: 11px; }
+.box .ticks li { font-size: var(--t3); }
+.box .formula { margin: var(--s2) 0 var(--s4); padding: var(--s5); }
+.box .formula-part { font-size: var(--t3); padding: 7px 11px; }
+.box .label { margin-bottom: 2px; }
+
+/* standalone wave dot (outside .wave-node) */
+.mini-row > .wave-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); flex-shrink: 0; }
+.mini-row > .wave-dot.active { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-bg); }
+.mini-row > .wave-dot.upcoming { border: 1px solid var(--ink-4); background: transparent; }
+

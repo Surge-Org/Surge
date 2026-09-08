@@ -53,3 +53,116 @@ function ThemeToggle() {
   );
 }
 
+/* ------------------------------------------------------- public top-nav shell */
+
+function AnnounceBar() {
+  const { state } = useApp();
+  const [open, setOpen] = useState(true);
+  const wave = state.waves.find(w => w.status === 'Active');
+  if (!open || !wave) return null;
+  return (
+    <div className="announce">
+      <Link className="announce-in" to="/explore">
+        <span className="announce-tag">New</span>
+        <span className="announce-text">
+          Wave {wave.number} is open — ${formatMoney(wave.budget)} {PROGRAM.asset} across{' '}
+          {state.issues.length} scoped issues
+        </span>
+        <ArrowRight size={12} />
+      </Link>
+      <button className="announce-x" aria-label="Dismiss announcement" onClick={() => setOpen(false)}>
+        <X size={13} />
+      </button>
+    </div>
+  );
+}
+
+function PublicShell({ children }: { children: ReactNode }) {
+  const { state } = useApp();
+  const location = useLocation();
+  const [menu, setMenu] = useState(false);
+  const [lifted, setLifted] = useState(false);
+  const topRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setMenu(false); }, [location.pathname]);
+  useEffect(() => {
+    const onScroll = () => setLifted(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // The announcement bar is dismissible, so the header height is measured
+  // rather than hard-coded; the hero fills whatever is left of the viewport.
+  useEffect(() => {
+    const el = topRef.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const set = () => root.style.setProperty('--top-h', `${el.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => { ro.disconnect(); root.style.removeProperty('--top-h'); };
+  }, []);
+
+  const nav = [
+    { to: '/explore', label: 'Explore', end: true },
+    { to: '/explore/repos', label: 'Repositories' },
+    { to: '/explore/orgs', label: 'Organizations' },
+  ];
+
+  return (
+    <div className="public">
+      <div className="public-top" ref={topRef}>
+      <AnnounceBar />
+      <div className="navpill-wrap">
+        <header className={lifted ? 'navpill lifted' : 'navpill'}>
+          <Brand />
+          <div className="navpill-nav"><GooeyNav items={nav} /></div>
+          <div className="navpill-right">
+            <ThemeToggle />
+            <Link className="btn sm" to="/maintainer/login">Submit your repo</Link>
+            {state.session.contributor ? (
+              <Link className="btn sm navpill-cta" to="/me">
+                <Avatar name={state.session.contributor} />
+                <span className="hide-sm">{state.session.contributor}</span>
+              </Link>
+            ) : (
+              <Link className="btn sm navpill-cta" to={`/login?next=${encodeURIComponent(location.pathname)}`}>
+                Sign up
+              </Link>
+            )}
+            <button className="btn ghost icon sm navpill-burger" aria-label="Open menu" onClick={() => setMenu(m => !m)}>
+              {menu ? <X size={16} /> : <Menu size={16} />}
+            </button>
+          </div>
+        </header>
+
+        <AnimatePresence>
+          {menu && (
+            <motion.nav
+              className="navpill-sheet"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22, ease: EASE }}
+            >
+              <div className="navpill-sheet-in">
+                {nav.map(n => (
+                  <NavLink key={n.to} to={n.to} end={n.end}
+                    className={({ isActive }) => (isActive ? 'on' : '')}>
+                    {n.label}
+                  </NavLink>
+                ))}
+                <Link to="/maintainer/login">Submit your repo</Link>
+              </div>
+            </motion.nav>
+          )}
+        </AnimatePresence>
+      </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+

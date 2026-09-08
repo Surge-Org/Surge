@@ -281,3 +281,54 @@ export function Landing() {
           </div>
         </div>
       </section>
+
+      {/* ----------------------------------------------------------- point tiers */}
+      <section className="band">
+        <div className="band-inner">
+          <AnimatedContent>
+            <div className="sec">
+              <div>
+                <h2>Points, not negotiation</h2>
+                <p>Complexity sets the points. Points set your share of the pool.</p>
+              </div>
+              <Link className="btn" to="/explore">See open issues<ArrowRight size={14} /></Link>
+            </div>
+          </AnimatedContent>
+
+          <div className="bento">
+            {TIERS.map((t, i) => (
+              <AnimatedContent className="box w2" key={t.level} delay={i * 0.07}>
+                <span className="box-kicker">{t.level}</span>
+                <span className="big-num acc"><CountUp to={pointsFor(t.level)} /></span>
+                <div className="tier-bar">
+                  <motion.span
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: pointsFor(t.level) / pointsFor('High') }}
+                    viewport={{ once: true, margin: '-10% 0px' }}
+                    transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+                  />
+                </div>
+                <p>{t.blurb}</p>
+              </AnimatedContent>
+            ))}
+
+            <AnimatedContent className="box w6 pad-lg" delay={0.1}>
+              <span className="label">How your share is calculated</span>
+              <div className="formula">
+                <span className="formula-part acc">your accepted points</span>
+                <span className="formula-op">÷</span>
+                <span className="formula-part">total accepted points</span>
+                <span className="formula-op">×</span>
+                <span className="formula-part">wave pool</span>
+              </div>
+              <ul className="ticks">
+                <li><Check size={14} />Every issue starts at 100 base points, plus a complexity bonus.</li>
+                <li><Check size={14} />Points credit only once a maintainer accepts the work.</li>
+                <li><Check size={14} />Your share settles as a grant when the wave closes.</li>
+              </ul>
+            </AnimatedContent>
+          </div>
+        </div>
+      </section>
+
+      <SpiralSection repos={accepted} />

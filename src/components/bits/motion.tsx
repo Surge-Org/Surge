@@ -338,3 +338,14 @@ export function Marquee({
   );
 }
 
+/* -------------------------------------------------------------- GlareHover */
+/** Diagonal sheen that sweeps once on hover. */
+export function GlareHover({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <span className={`bit-glare ${className}`}>
+      {children}
+      <span className="bit-glare-sheen" aria-hidden="true" />
+    </span>
+  );
+}
+

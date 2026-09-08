@@ -152,3 +152,14 @@
   display: block;
 }
 
+/* ------------------------------------------------------------ RotatingText */
+.bit-rotate {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+/* Reserves the width of the longest word so the line never reflows. */
+.bit-rotate-sizer { visibility: hidden; white-space: nowrap; }
+.bit-rotate-word { position: absolute; inset: 0; white-space: nowrap; }
+

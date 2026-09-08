@@ -254,3 +254,42 @@ export function ClickSpark({ children }: { children: ReactNode }) {
   );
 }
 
+/* ------------------------------------------------------------ RotatingText */
+/**
+ * Cycles words in place. A hidden sizer holds the width of the longest word so
+ * the line never reflows, and the swap uses mode="wait" so two words are never
+ * legible at once.
+ */
+export function RotatingText({ words, interval = 2400, className = '' }: { words: string[]; interval?: number; className?: string }) {
+  const [i, setI] = useState(0);
+  const reduced = useReducedMotion();
+  const longest = useMemo(
+    () => words.reduce((a, b) => (b.length > a.length ? b : a), ''),
+    [words],
+  );
+
+  useEffect(() => {
+    if (reduced) return;
+    const t = window.setInterval(() => setI(v => (v + 1) % words.length), interval);
+    return () => window.clearInterval(t);
+  }, [words.length, interval, reduced]);
+
+  return (
+    <span className={`bit-rotate ${className}`}>
+      <span className="bit-rotate-sizer" aria-hidden="true">{longest}</span>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={words[i]}
+          className="bit-rotate-word"
+          initial={{ y: 12, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -12, opacity: 0 }}
+          transition={{ duration: 0.16, ease: EASE }}
+        >
+          {words[i]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+

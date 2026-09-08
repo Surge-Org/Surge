@@ -1,0 +1,92 @@
+/* ============================================================
+   Public surfaces — top nav, no dashboard chrome
+   ============================================================ */
+.skip {
+  position: fixed; left: 12px; top: -60px; z-index: 200;
+  padding: 8px 14px; border-radius: var(--r2);
+  background: var(--solid); color: var(--inverse);
+  font-size: var(--t3); font-weight: 540;
+}
+.skip:focus { top: 12px; }
+
+.public-bar {
+  position: sticky; top: 0; z-index: 30;
+  height: var(--bar);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.public-bar-inner {
+  max-width: var(--page); margin: 0 auto; height: 100%;
+  display: flex; align-items: center; gap: var(--s5); padding: 0 var(--s5);
+}
+.public-nav { display: flex; gap: 2px; margin-right: auto; }
+.public-nav a {
+  padding: 5px 9px; border-radius: var(--r1);
+  font-size: var(--t3); font-weight: 480; color: var(--ink-3);
+  transition: color var(--fast) var(--ease), background var(--fast) var(--ease);
+}
+.public-nav a:hover { color: var(--ink); background: var(--panel-2); }
+.public-nav a.on { color: var(--ink); font-weight: 540; background: var(--panel-2); }
+
+/* hero */
+.hero { border-bottom: 1px solid var(--line); }
+.hero-inner {
+  width: 100%;
+  max-width: var(--page); margin: 0 auto; padding: var(--s8) var(--s5);
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: var(--s8); align-items: center;
+}
+.hero-copy { min-width: 0; }
+.hero-art { min-width: 0; }
+.hero-tag { margin-bottom: var(--s5); }
+.hero-tag .dot { background: var(--ok); }
+.hero-title {
+  font-size: clamp(34px, 5.2vw, 62px);
+  line-height: 1.04;
+  letter-spacing: -.035em;
+  font-weight: 600;
+}
+.hero-sub { margin-top: var(--s5); max-width: 52ch; font-size: var(--t5); color: var(--ink-2); line-height: 1.6; }
+.hero-cta { margin-top: var(--s6); gap: var(--s2); }
+.hero-meta { margin-top: var(--s6); display: flex; flex-wrap: wrap; gap: 8px; font-size: var(--t3); color: var(--ink-3); }
+.hero-meta strong { color: var(--ink); font-weight: 560; }
+.hero-meta .sep { color: var(--ink-4); }
+
+.band { border-bottom: 1px solid var(--line); }
+.band.alt { background: var(--panel-2); }
+.band-inner { max-width: var(--page); margin: 0 auto; padding: var(--s8) var(--s5); }
+.band-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); margin-bottom: var(--s4); }
+.band-copy { margin: var(--s3) 0 var(--s4); max-width: 46ch; font-size: var(--t4); }
+.band-inner.split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s8); align-items: center; }
+
+.step { padding: var(--s4); display: flex; flex-direction: column; gap: 6px; }
+.step .label { color: var(--ink-4); }
+.step p { font-size: var(--t3); }
+
+.ticks { display: flex; flex-direction: column; gap: 9px; margin-bottom: var(--s5); }
+.ticks li { display: flex; gap: 8px; align-items: flex-start; font-size: var(--t3); color: var(--ink-2); }
+.ticks svg { color: var(--ink); margin-top: 2px; }
+
+.panel-preview { overflow: hidden; }
+.pp-bar { display: flex; gap: 5px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+.pp-bar span { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.pp-body { padding: 6px; }
+.pp-row { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: var(--r2); }
+.pp-row > .col { flex: 1; min-width: 0; }
+.pp-row + .pp-row { border-top: 1px solid var(--line-soft); }
+
+.foot { background: var(--panel); }
+.foot-inner {
+  max-width: var(--page); margin: 0 auto; padding: var(--s6) var(--s5);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
+  flex-wrap: wrap; font-size: var(--t2);
+}
+.foot a:hover { color: var(--ink); }
+
+/* shared row typography */
+.row-title { font-size: var(--t3); font-weight: 540; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-sub { font-size: var(--t2); color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+a.row-title:hover { text-decoration: underline; text-underline-offset: 2px; }
+.issue-num { font-size: var(--t2); width: 40px; flex-shrink: 0; }
+

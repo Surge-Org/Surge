@@ -58,3 +58,8 @@ export function DotGrid({ className = '' }: { className?: string }) {
   return <div ref={ref} className={`bit-dotgrid ${className}`} aria-hidden="true" />;
 }
 
+/* ------------------------------------------------------------ GradientText */
+export function GradientText({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <span className={`bit-gradient ${className}`}>{children}</span>;
+}
+

@@ -78,3 +78,9 @@ export const storageKey = 'surge-preview-v4';
 export const pointsFor = (complexity: Complexity) =>
   ({ Trivial: 100, Medium: 150, High: 200 })[complexity];
 
+export const formatMoney = (amount: number) =>
+  new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(amount);
+
+export const formatCount = (n: number) =>
+  n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '')}k` : String(n);
+

@@ -387,3 +387,31 @@ export function InfiniteSpiral({
   );
 }
 
+/* ==========================================================================
+   LogoLoop
+   Seamless logo rail. Content is duplicated so the wrap never shows a gap.
+   ========================================================================== */
+
+export function LogoLoop({
+  children, speed = 32, reverse = false, fade = true, className = '',
+}: {
+  children: ReactNode;
+  speed?: number;
+  reverse?: boolean;
+  fade?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={`logoloop ${fade ? 'faded' : ''} ${className}`}>
+      <div
+        className="logoloop-track"
+        style={{ animationDuration: `${speed}s`, animationDirection: reverse ? 'reverse' : 'normal' }}
+      >
+        <div className="logoloop-set">{children}</div>
+        <div className="logoloop-set" aria-hidden="true">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+export { EASE };

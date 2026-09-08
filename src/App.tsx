@@ -280,3 +280,58 @@ function ContributorShell({ children }: { children: ReactNode }) {
   );
 }
 
+/* ---------------------------------------------------------- maintainer area */
+
+function MaintainerShell({ children }: { children: ReactNode }) {
+  const { state } = useApp();
+  const me = state.session.maintainer;
+  if (!me) return <Navigate to="/maintainer/login" replace />;
+  const mine = reposOwnedBy(state.repos, me);
+  return (
+    <WorkspaceShell
+      title="Maintainer"
+      sub={me}
+      groups={[{
+        heading: 'Repositories',
+        items: [
+          { to: '/maintainer', label: 'Your repositories', icon: FolderGit2, end: true, count: mine.length },
+          { to: '/maintainer/submit', label: 'Submit a repo', icon: LayoutGrid },
+        ],
+      }]}
+      footer={<Link className="btn ghost sm block" to="/">Leave maintainer area</Link>}
+    >
+      {children}
+    </WorkspaceShell>
+  );
+}
+
+/** Per-repo workspace. The gate lives here: wrong owner or not accepted never renders. */
+function RepoShell({ children }: { children: ReactNode }) {
+  const { state } = useApp();
+  const { repoId } = useParams();
+  const me = state.session.maintainer;
+  const repo = state.repos.find(r => r.id === repoId);
+
+  if (!me) return <Navigate to="/maintainer/login" replace />;
+  if (!canOpenRepoDashboard(repo, me)) return <Navigate to="/maintainer" replace />;
+
+  const open = state.issues.filter(i => i.repoId === repo!.id).length;
+  return (
+    <WorkspaceShell
+      title="Repository"
+      sub={repoName(repo!)}
+      groups={[{
+        heading: repo!.name,
+        items: [
+          { to: `/maintainer/repo/${repo!.id}`, label: 'Overview', icon: LayoutGrid, end: true },
+          { to: `/maintainer/repo/${repo!.id}/issues`, label: 'Issues & proposals', icon: ListChecks, count: open },
+          { to: `/maintainer/repo/${repo!.id}/settings`, label: 'Settings', icon: Settings },
+        ],
+      }]}
+      footer={<Link className="btn ghost sm block" to="/maintainer"><Wrench size={14} />All repositories</Link>}
+    >
+      {children}
+    </WorkspaceShell>
+  );
+}
+

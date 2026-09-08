@@ -56,3 +56,17 @@ export function Mark({ size = 13 }: { size?: number }) {
   );
 }
 
+export function Brand({ to = '/', label = 'Surge' }: { to?: string; label?: string }) {
+  return (
+    <Link to={to} className="brand" aria-label={`${label} home`}>
+      <span className="brand-mark"><Mark /></span>
+      <span className="brand-name">{label}</span>
+    </Link>
+  );
+}
+
+/**
+ * Real GitHub organization avatar. The letter tile always renders underneath and
+ * the image fades in over it, so the slot is never blank while the fetch is in
+ * flight and a 404 simply leaves the tile in place.
+ */

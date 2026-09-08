@@ -248,3 +248,44 @@ export function CardSwap({
   );
 }
 
+/* ==========================================================================
+   BounceCards
+   Cards fan out from a stack with a spring overshoot as they enter view.
+   ========================================================================== */
+
+export function BounceCards({
+  children, className = '',
+}: {
+  children: ReactNode[];
+  className?: string;
+}) {
+  const n = children.length;
+  // Cards are ~230px wide, so the horizontal step has to clear most of that
+  // or the fan overlaps into an unreadable stack.
+  const spread = 7;
+  const step = 210;
+  return (
+    <div className={`bounce ${className}`}>
+      {children.map((child, i) => {
+        const mid = (n - 1) / 2;
+        const rot = (i - mid) * spread;
+        const dx = (i - mid) * step;
+        return (
+          <motion.div
+            key={i}
+            className="bounce-card"
+            initial={{ opacity: 0, y: 40, rotate: 0, x: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, y: Math.abs(i - mid) * 14, rotate: rot, x: dx, scale: 1 }}
+            viewport={{ once: true, margin: '-12% 0px' }}
+            transition={{ type: 'spring', stiffness: 210, damping: 14, delay: i * 0.075 }}
+            whileHover={{ y: -8, rotate: 0, scale: 1.04, zIndex: 10 }}
+            style={{ zIndex: n - Math.abs(i - mid) }}
+          >
+            {child}
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+

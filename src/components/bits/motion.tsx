@@ -349,3 +349,30 @@ export function GlareHover({ children, className = '' }: { children: ReactNode; 
   );
 }
 
+/* ------------------------------------------------------------- TiltedCard */
+/** Subtle 3D tilt following the pointer. */
+export function TiltedCard({ children, className = '', max = 7 }: { children: ReactNode; className?: string; max?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rx = useSpring(useTransform(my, [-0.5, 0.5], [max, -max]), { stiffness: 220, damping: 20 });
+  const ry = useSpring(useTransform(mx, [-0.5, 0.5], [-max, max]), { stiffness: 220, damping: 20 });
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      style={{ rotateX: rx, rotateY: ry, transformPerspective: 900 }}
+      onPointerMove={e => {
+        const r = ref.current?.getBoundingClientRect();
+        if (!r) return;
+        mx.set((e.clientX - r.left) / r.width - 0.5);
+        my.set((e.clientY - r.top) / r.height - 0.5);
+      }}
+      onPointerLeave={() => { mx.set(0); my.set(0); }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+

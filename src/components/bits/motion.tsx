@@ -63,3 +63,9 @@ export function GradientText({ children, className = '' }: { children: ReactNode
   return <span className={`bit-gradient ${className}`}>{children}</span>;
 }
 
+/* --------------------------------------------------------------- ShinyText */
+/** Light sweeps across the text on a loop. */
+export function ShinyText({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <span className={`bit-shiny ${className}`}>{children}</span>;
+}
+

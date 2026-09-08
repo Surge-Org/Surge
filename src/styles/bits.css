@@ -57,3 +57,14 @@
 }
 :root[data-theme='dark'] .bit-dotgrid { opacity: .4; }
 
+/* ---------------------------------------------------------- GradientText */
+.bit-gradient {
+  background: linear-gradient(96deg, var(--acc-3) 0%, var(--acc) 42%, var(--acc-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 220% 100%;
+  animation: bit-pan 7s linear infinite;
+}
+@keyframes bit-pan { to { background-position: 220% 0; } }
+

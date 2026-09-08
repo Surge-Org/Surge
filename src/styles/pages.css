@@ -122,3 +122,27 @@ a.row-title:hover { text-decoration: underline; text-underline-offset: 2px; }
 }
 .repo-foot { padding-top: var(--s3); border-top: 1px solid var(--line-soft); }
 
+/* ============================================================
+   Issue detail
+   ============================================================ */
+.detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: var(--s7); align-items: start; }
+.detail-head { padding-bottom: var(--s4); border-bottom: 1px solid var(--line); margin-bottom: var(--s5); }
+.detail-head h1 { margin: var(--s3) 0 var(--s3); font-size: var(--t7); line-height: 1.25; }
+.prose h2 { font-size: var(--t5); margin-bottom: var(--s2); }
+.prose h2 + p { font-size: var(--t4); color: var(--ink-2); }
+.prose > * + h2 { margin-top: var(--s5); }
+.criteria { display: flex; flex-direction: column; gap: 8px; }
+.criteria li { display: flex; gap: 8px; align-items: flex-start; font-size: var(--t3); color: var(--ink-2); line-height: 1.55; }
+.criteria svg { color: var(--ink); margin-top: 2px; }
+.proposals { margin-top: var(--s7); }
+.proposal { display: flex; flex-direction: column; gap: 8px; padding: var(--s4); }
+.proposal + .proposal { border-top: 1px solid var(--line-soft); }
+.proposal-body { font-size: var(--t3); line-height: 1.6; }
+
+.detail-side { display: flex; flex-direction: column; gap: var(--s3); position: sticky; top: calc(var(--bar) + var(--s4)); }
+.side-card { padding: var(--s4); display: flex; flex-direction: column; gap: 8px; }
+.side-row { display: flex; justify-content: space-between; font-size: var(--t3); }
+.side-row.total { padding-top: 8px; border-top: 1px solid var(--line-soft); font-weight: 560; }
+.side-link { gap: 8px; font-size: var(--t3); }
+.side-link:hover .row-title { text-decoration: underline; text-underline-offset: 2px; }
+

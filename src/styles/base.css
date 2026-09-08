@@ -1,0 +1,122 @@
+/* ============================================================
+   Surge — monochrome design system
+   Black and white. Small type, hairline borders, quiet motion.
+   ============================================================ */
+
+:root {
+  /* Neutral ramp — the entire palette. Colour appears only in
+     semantic states, and even then it stays desaturated. */
+  --n0:  #ffffff;
+  --n1:  #fcfcfc;
+  --n2:  #f6f6f6;
+  --n3:  #efefef;
+  --n4:  #e4e4e4;
+  --n5:  #d4d4d4;
+  --n6:  #a3a3a3;
+  --n7:  #737373;
+  --n8:  #525252;
+  --n9:  #262626;
+  --n10: #171717;
+  --n11: #0a0a0a;
+
+  --bg:        var(--n1);
+  --panel:     var(--n0);
+  --panel-2:   var(--n2);
+  --line:      var(--n4);
+  --line-soft: var(--n3);
+  --ink:       var(--n11);
+  --ink-2:     var(--n8);
+  --ink-3:     var(--n7);
+  --ink-4:     var(--n6);
+  --inverse:   var(--n0);
+  --solid:     var(--n11);
+  --solid-hi:  var(--n9);
+
+  --ok:      #1a7f4b;  --ok-bg:   #eaf6ef;
+  --warn:    #8a6100;  --warn-bg: #fdf4e3;
+  --bad:     #b3261e;  --bad-bg:  #fdeceb;
+
+  --focus: var(--n11);
+
+  /* Accent — React Bits violet. Used for emphasis, never for body text. */
+  --acc:      #a855f7;
+  --acc-2:    #7c3aed;
+  --acc-3:    #c084fc;
+  --acc-soft: rgba(168, 85, 247, .10);
+  --acc-line: rgba(168, 85, 247, .28);
+  --glow:     0 0 0 1px rgba(168,85,247,.30), 0 8px 30px -8px rgba(168,85,247,.45);
+
+  /* Type — small by default. Eight steps, nothing in between. */
+  --t1: 10.5px;
+  --t2: 11.5px;
+  --t3: 12.5px;
+  --t4: 13.5px;
+  --t5: 15px;
+  --t6: 18px;
+  --t7: 22px;
+  --t8: 30px;
+  --t9: 40px;
+  --t10: 56px;
+
+  /* Space — 4px grid. */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s7: 32px; --s8: 48px; --s9: 64px;
+
+  /* Sharp edges: every box-shaped surface sits at 0. Dots stay circular. */
+  --r1: 0; --r2: 0; --r3: 0; --r4: 0; --r5: 0; --r6: 0;
+
+  --h-xs: 26px; --h-sm: 30px; --h-md: 34px; --h-lg: 40px;
+
+  --rail: 232px;
+  --bar: 48px;
+  --page: 1180px;
+
+  --sh1: 0 1px 2px rgba(0,0,0,.05);
+  --sh2: 0 2px 4px rgba(0,0,0,.04), 0 8px 24px -12px rgba(0,0,0,.14);
+  --sh3: 0 12px 48px -16px rgba(0,0,0,.24), 0 2px 8px rgba(0,0,0,.06);
+
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --fast: 110ms;
+  --base: 190ms;
+
+  color-scheme: light;
+  font-family: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: var(--t4);
+  font-weight: 450;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme='dark'] {
+  --bg:        #08070c;
+  --panel:     #0f0e15;
+  --panel-2:   #16151f;
+  --line:      #232130;
+  --line-soft: #1b1a25;
+  --ink:       #fafafa;
+  --ink-2:     #a3a3a3;
+  --ink-3:     #808080;
+  --ink-4:     #5c5c5c;
+  --inverse:   #0a0a0a;
+  --solid:     #fafafa;
+  --solid-hi:  #e5e5e5;
+
+  --ok:   #4ade80; --ok-bg:   rgba(74,222,128,.13);
+  --warn: #fbbf24; --warn-bg: rgba(251,191,36,.13);
+  --bad:  #f87171; --bad-bg:  rgba(248,113,113,.13);
+
+  --focus: #fafafa;
+  --acc:      #a855f7;
+  --acc-2:    #8b5cf6;
+  --acc-3:    #d8b4fe;
+  --acc-soft: rgba(168, 85, 247, .14);
+  --acc-line: rgba(168, 85, 247, .36);
+  --glow:     0 0 0 1px rgba(168,85,247,.35), 0 10px 40px -10px rgba(168,85,247,.55);
+  --sh1: 0 1px 2px rgba(0,0,0,.4);
+  --sh2: 0 2px 4px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+  --sh3: 0 12px 48px -16px rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.4);
+  color-scheme: dark;
+}
+

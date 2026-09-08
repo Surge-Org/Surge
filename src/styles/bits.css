@@ -42,3 +42,18 @@
 @keyframes bit-drift-b { to { transform: translate3d(-11%, 8%, 0) scale(1.08); } }
 @keyframes bit-drift-c { to { transform: translate3d(6%, -12%, 0) scale(1.16); } }
 
+/* --------------------------------------------------------------- DotGrid */
+.bit-dotgrid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  --mx: 50%; --my: 50%;
+  background-image: radial-gradient(circle at center, var(--ink-4) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: .22;
+  -webkit-mask-image: radial-gradient(320px circle at var(--mx) var(--my), #000 0%, rgba(0,0,0,.35) 45%, transparent 78%);
+  mask-image: radial-gradient(320px circle at var(--mx) var(--my), #000 0%, rgba(0,0,0,.35) 45%, transparent 78%);
+}
+:root[data-theme='dark'] .bit-dotgrid { opacity: .4; }
+

@@ -108,3 +108,29 @@
 .bit-spotlight:hover .bit-spotlight-glow { opacity: 1; }
 .bit-spotlight-body { position: relative; z-index: 1; display: block; }
 
+/* -------------------------------------------------------------- StarBorder */
+.bit-starborder {
+  position: relative;
+  display: inline-flex;
+  padding: 1px;
+  border-radius: var(--r3);
+  overflow: hidden;
+  isolation: isolate;
+}
+.bit-starborder-ring {
+  position: absolute;
+  inset: -140%;
+  z-index: 0;
+  background: conic-gradient(from 0deg, transparent 0deg, var(--acc) 40deg, var(--acc-3) 70deg, transparent 130deg);
+  animation: bit-spin 3.6s linear infinite;
+}
+@keyframes bit-spin { to { transform: rotate(1turn); } }
+.bit-starborder-inner {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  border-radius: calc(var(--r3) - 1px);
+  background: var(--panel);
+  width: 100%;
+}
+

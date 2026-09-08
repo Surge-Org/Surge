@@ -21,3 +21,17 @@ export function Page({ children, className = '' }: { children: ReactNode; classN
   );
 }
 
+/** Staggered list container — children fade up in sequence. */
+export function Stagger({ children, className = '', delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+  return (
+    <motion.div
+      className={className}
+      initial="hide"
+      animate="show"
+      variants={{ show: { transition: { staggerChildren: 0.035, delayChildren: delay } } }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+

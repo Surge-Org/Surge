@@ -69,3 +69,39 @@ export function ShinyText({ children, className = '' }: { children: ReactNode; c
   return <span className={`bit-shiny ${className}`}>{children}</span>;
 }
 
+/* ---------------------------------------------------------------- SplitText */
+/** Reveals per word, staggered, once the element scrolls into view. */
+export function SplitText({
+  text, className = '', delay = 0, as: Tag = 'span',
+}: {
+  text: string;
+  className?: string;
+  delay?: number;
+  as?: 'span' | 'h1' | 'h2' | 'p';
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-10% 0px' });
+  const reduced = useReducedMotion();
+  const show = inView || reduced;
+  const words = useMemo(() => text.split(' '), [text]);
+  const MotionTag = motion[Tag] as typeof motion.span;
+
+  return (
+    <MotionTag ref={ref as never} className={className} aria-label={text}>
+      {words.map((w, i) => (
+        <span key={`${w}-${i}`} className="bit-split-word" aria-hidden="true">
+          <motion.span
+            className="bit-split-inner"
+            initial={reduced ? false : { y: '110%', opacity: 0 }}
+            animate={show ? { y: '0%', opacity: 1 } : undefined}
+            transition={{ duration: 0.55, ease: EASE, delay: delay + i * 0.045 }}
+          >
+            {w}
+          </motion.span>
+          {i < words.length - 1 ? ' ' : ''}
+        </span>
+      ))}
+    </MotionTag>
+  );
+}
+

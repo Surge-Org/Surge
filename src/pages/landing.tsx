@@ -133,3 +133,19 @@ export function Landing() {
           </motion.div>
         </div>
       </section>
+
+      {/* --------------------------------------------------- repository strip */}
+      <section className="strip">
+        <p className="label strip-label">Repositories in the program</p>
+        <LogoLoop speed={34}>
+          {accepted.map(r => (
+            <Link className="strip-item" to={`/explore?q=${encodeURIComponent(r.name)}`} key={r.id}>
+              <Avatar name={r.org} org={r.org} square />
+              <span className="col" style={{ gap: 0, minWidth: 0 }}>
+                <span className="row-title">{r.name}</span>
+                <span className="row-sub">{r.org}</span>
+              </span>
+            </Link>
+          ))}
+        </LogoLoop>
+      </section>

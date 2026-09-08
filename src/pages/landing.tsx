@@ -218,3 +218,39 @@ export function Landing() {
       </section>
 
       <LiveStackSection issues={state.issues} repos={state.repos} />
+
+      {/* -------------------------------------------------------- open right now */}
+      <section className="band">
+        <div className="band-inner">
+          <AnimatedContent>
+            <div className="sec">
+              <div>
+                <h2>Open right now</h2>
+                <p>Every issue is scoped by its maintainer before it reaches this list.</p>
+              </div>
+              <Link className="btn" to="/explore">All issues<ArrowRight size={14} /></Link>
+            </div>
+          </AnimatedContent>
+          <Stagger className="list">
+            {featured.map(issue => {
+              const repo = state.repos.find(r => r.id === issue.repoId);
+              return (
+                <Item key={issue.id}>
+                  <Link className="list-row" to={`/issue/${issue.id}`}>
+                    <span className="mono dim issue-num">#{issue.id}</span>
+                    <span className="col" style={{ gap: 2, minWidth: 0, flex: 1 }}>
+                      <span className="row-title">{issue.title}</span>
+                      <span className="row-sub">{repo ? repoName(repo) : ''}</span>
+                    </span>
+                    <Chip className="hide-sm">{issue.complexity}</Chip>
+                    <Chip className="solid num">{pointsFor(issue.complexity)}</Chip>
+                    <ArrowUpRight size={14} className="dim" />
+                  </Link>
+                </Item>
+              );
+            })}
+          </Stagger>
+        </div>
+      </section>
+
+      <FanSection />

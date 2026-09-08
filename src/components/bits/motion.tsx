@@ -176,3 +176,42 @@ export function StarBorder({
   );
 }
 
+/* ------------------------------------------------------------------ Magnet */
+/** Element drifts toward the pointer while it is nearby. */
+export function Magnet({
+  children, strength = 0.35, radius = 90, className = '',
+}: {
+  children: ReactNode; strength?: number; radius?: number; className?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const x = useSpring(useMotionValue(0), { stiffness: 260, damping: 22 });
+  const y = useSpring(useMotionValue(0), { stiffness: 260, damping: 22 });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onMove = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      if (Math.hypot(dx, dy) < r.width / 2 + radius) {
+        x.set(dx * strength);
+        y.set(dy * strength);
+      } else {
+        x.set(0);
+        y.set(0);
+      }
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onMove);
+  }, [x, y, strength, radius]);
+
+  return (
+    <motion.span ref={ref} className={`bit-magnet ${className}`} style={{ x, y }}>
+      {children}
+    </motion.span>
+  );
+}
+

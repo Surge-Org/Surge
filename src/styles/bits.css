@@ -178,3 +178,15 @@
 .bit-marquee-set { display: flex; align-items: center; gap: var(--s7); padding-right: var(--s7); }
 @keyframes bit-scroll { to { transform: translateX(-50%); } }
 
+/* -------------------------------------------------------------- GlareHover */
+.bit-glare { position: relative; display: inline-flex; overflow: hidden; border-radius: inherit; }
+.bit-glare-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.22) 50%, transparent 62%);
+  transform: translateX(-120%);
+  transition: transform 620ms var(--ease);
+}
+.bit-glare:hover .bit-glare-sheen { transform: translateX(120%); }
+

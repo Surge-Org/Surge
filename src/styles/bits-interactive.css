@@ -320,3 +320,8 @@
 .pcard-handle { font-size: var(--t2); color: var(--ink-3); }
 .pcard-stat { font-size: var(--t2); font-weight: 600; color: var(--acc); }
 
+/* ---------------------------------------------------------- InfiniteSpiral */
+.spiral { position: relative; height: 360px; }
+.spiral-stage { position: absolute; inset: 0; }
+.spiral-item { position: absolute; translate: -50% -50%; }
+

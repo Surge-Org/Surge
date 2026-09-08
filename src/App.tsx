@@ -166,3 +166,91 @@ function PublicShell({ children }: { children: ReactNode }) {
   );
 }
 
+/* ----------------------------------------------------------- workspace shell */
+
+interface NavEntry { to: string; label: string; icon: React.ElementType; end?: boolean; count?: number }
+
+function Rail({ title, sub, groups, open, onClose, footer }: {
+  title: string;
+  sub?: string;
+  groups: { heading: string; items: NavEntry[] }[];
+  open: boolean;
+  onClose: () => void;
+  footer?: ReactNode;
+}) {
+  return (
+    <aside className={open ? 'rail open' : 'rail'} aria-label="Workspace navigation">
+      <div className="rail-head">
+        <Brand to="/" />
+        <span className="spacer" />
+        <button className="btn ghost icon xs rail-close" aria-label="Close menu" onClick={onClose}>
+          <X size={14} />
+        </button>
+      </div>
+      <div className="rail-scope">
+        <p className="label">{title}</p>
+        {sub && <p className="rail-scope-sub">{sub}</p>}
+      </div>
+      <div className="rail-body">
+        {groups.map(g => (
+          <div className="rail-group" key={g.heading}>
+            <p className="label">{g.heading}</p>
+            {g.items.map(item => (
+              <NavLink key={item.to} to={item.to} end={item.end} onClick={onClose}
+                className={({ isActive }) => (isActive ? 'nav-item on' : 'nav-item')}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <motion.span layoutId="nav-bg" className="nav-bg"
+                        transition={{ type: 'spring', stiffness: 460, damping: 38 }} />
+                    )}
+                    <item.icon />
+                    <span>{item.label}</span>
+                    {item.count !== undefined && <span className="nav-count">{item.count}</span>}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </div>
+        ))}
+      </div>
+      {footer && <div className="rail-foot">{footer}</div>}
+    </aside>
+  );
+}
+
+function WorkspaceShell({ title, sub, groups, footer, children }: {
+  title: string;
+  sub?: string;
+  groups: { heading: string; items: NavEntry[] }[];
+  footer?: ReactNode;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  useEffect(() => { setOpen(false); }, [location.pathname]);
+
+  return (
+    <div className="shell with-rail">
+      <Rail title={title} sub={sub} groups={groups} open={open} onClose={() => setOpen(false)} footer={footer} />
+      <AnimatePresence>
+        {open && (
+          <motion.button className="scrim" aria-label="Close menu" onClick={() => setOpen(false)}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} />
+        )}
+      </AnimatePresence>
+      <header className="topbar">
+        <button className="btn ghost icon sm menu-btn" aria-label="Open menu" onClick={() => setOpen(true)}>
+          <Menu size={16} />
+        </button>
+        <span className="topbar-title">{sub ?? title}</span>
+        <span className="spacer" />
+        <ThemeToggle />
+      </header>
+      <main id="main" className="main">
+        <div className="main-inner">{children}</div>
+      </main>
+    </div>
+  );
+}
+

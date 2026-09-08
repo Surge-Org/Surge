@@ -84,3 +84,17 @@ export const formatMoney = (amount: number) =>
 export const formatCount = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '')}k` : String(n);
 
+export const dateLabel = (date: string) =>
+  new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+/** "3 days ago" style relative label for repository freshness. */
+export function relativeDate(date: string, now = new Date()): string {
+  const then = new Date(date + 'T12:00:00');
+  const days = Math.round((now.getTime() - then.getTime()) / 86_400_000);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 30) return `${days} days ago`;
+  const months = Math.round(days / 30);
+  return months === 1 ? 'last month' : `${months} months ago`;
+}
+

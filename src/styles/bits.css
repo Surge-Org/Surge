@@ -3,3 +3,42 @@
    Each block pairs with a component in src/bits.tsx.
    ============================================================ */
 
+/* ---------------------------------------------------------------- Aurora */
+.bit-aurora {
+  position: absolute;
+  inset: -30% -10% auto -10%;
+  height: 140%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(70px);
+  opacity: .5;
+}
+:root[data-theme='dark'] .bit-aurora { opacity: .85; }
+.bit-aurora span {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  mix-blend-mode: normal;
+}
+.bit-aurora-a {
+  width: 46vw; height: 46vw; max-width: 620px; max-height: 620px;
+  left: 4%; top: 6%;
+  background: radial-gradient(circle, var(--acc) 0%, transparent 68%);
+  animation: bit-drift-a 19s var(--ease) infinite alternate;
+}
+.bit-aurora-b {
+  width: 40vw; height: 40vw; max-width: 540px; max-height: 540px;
+  right: 6%; top: 0%;
+  background: radial-gradient(circle, var(--acc-2) 0%, transparent 68%);
+  animation: bit-drift-b 23s var(--ease) infinite alternate;
+}
+.bit-aurora-c {
+  width: 34vw; height: 34vw; max-width: 460px; max-height: 460px;
+  left: 42%; top: 34%;
+  background: radial-gradient(circle, var(--acc-3) 0%, transparent 70%);
+  animation: bit-drift-c 27s var(--ease) infinite alternate;
+}
+@keyframes bit-drift-a { to { transform: translate3d(9%, 10%, 0) scale(1.12); } }
+@keyframes bit-drift-b { to { transform: translate3d(-11%, 8%, 0) scale(1.08); } }
+@keyframes bit-drift-c { to { transform: translate3d(6%, -12%, 0) scale(1.16); } }
+

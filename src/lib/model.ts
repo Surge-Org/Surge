@@ -58,3 +58,23 @@ export interface Reward {
 }
 
 /** Contributor and maintainer are separate sessions — signing into one never grants the other. */
+export interface Session {
+  contributor: string | null;
+  maintainer: string | null;
+}
+
+export interface State {
+  version: 4;
+  session: Session;
+  repos: Repo[];
+  waves: Wave[];
+  issues: Issue[];
+  applications: Application[];
+  rewards: Reward[];
+}
+
+export const storageKey = 'surge-preview-v4';
+
+export const pointsFor = (complexity: Complexity) =>
+  ({ Trivial: 100, Medium: 150, High: 200 })[complexity];
+

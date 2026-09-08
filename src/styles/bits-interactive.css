@@ -262,3 +262,61 @@
   will-change: transform;
 }
 
+/* ------------------------------------------------------------ ProfileCard */
+.pcard {
+  position: relative;
+  --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
+  padding: 1px;
+  background: linear-gradient(150deg, var(--acc-line), transparent 45%, var(--acc-line));
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+  transition: transform 220ms var(--ease);
+  overflow: hidden;
+}
+.pcard-holo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: .5;
+  background:
+    conic-gradient(from 210deg at var(--mx) var(--my),
+      #a855f7 0deg, #22d3ee 70deg, #f472b6 140deg, #facc15 210deg, #a855f7 300deg, #a855f7 360deg);
+  filter: blur(22px);
+  transition: opacity var(--base) var(--ease);
+}
+.pcard:hover .pcard-holo { opacity: .85; }
+.pcard-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(220px circle at var(--mx) var(--my), rgba(255, 255, 255, .16), transparent 60%);
+}
+.pcard-in {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--s6) var(--s5) var(--s5);
+  background: var(--panel);
+  text-align: center;
+}
+.pcard-avatar { margin-bottom: var(--s3); }
+.pcard-avatar .avatar { width: 64px; height: 64px; font-size: var(--t7); }
+.pcard-name { font-size: var(--t5); font-weight: 600; }
+.pcard-role { font-size: var(--t3); color: var(--ink-3); }
+.pcard-foot {
+  margin-top: var(--s4);
+  padding-top: var(--s3);
+  width: 100%;
+  border-top: 1px solid var(--line-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+.pcard-handle { font-size: var(--t2); color: var(--ink-3); }
+.pcard-stat { font-size: var(--t2); font-weight: 600; color: var(--acc); }
+

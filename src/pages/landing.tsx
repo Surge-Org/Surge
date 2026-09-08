@@ -427,3 +427,44 @@ export function Landing() {
           </div>
         </div>
       </section>
+
+      {/* ------------------------------------------------------------ final cta */}
+      <section className="band cta-band">
+        <Aurora className="cta-aurora" />
+        <div className="band-inner">
+          <AnimatedContent>
+            <div className="cta">
+              <Chip className="cta-chip"><Sparkles size={11} />Wave {wave?.number ?? '—'} is open</Chip>
+              <h2 className="cta-title">
+                Pick an issue, <GradientText>send a plan.</GradientText>
+              </h2>
+              <p className="muted">
+                {state.issues.length} scoped issues are open across {accepted.length} repositories right now.
+              </p>
+              <div className="row wrap cta-actions">
+                <Magnet>
+                  <Link className="btn lg primary glow" to="/explore">
+                    <GlareHover><span className="row" style={{ gap: 6 }}>Explore issues<ArrowRight size={15} /></span></GlareHover>
+                  </Link>
+                </Magnet>
+                <Link className="btn lg" to="/maintainer/login">Submit your repo</Link>
+              </div>
+            </div>
+          </AnimatedContent>
+        </div>
+      </section>
+
+      <footer className="foot">
+        <div className="foot-inner">
+          <span className="dim">
+            Surge — a preview of the {PROGRAM.full}. No GitHub, wallet, or funds are connected.
+          </span>
+          <div className="row" style={{ gap: 14 }}>
+            <Link className="dim" to="/explore">Explore</Link>
+            <Link className="dim" to="/maintainer/login">Submit your repo</Link>
+          </div>
+        </div>
+      </footer>
+    </ClickSpark>
+  );
+}

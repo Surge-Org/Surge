@@ -293,3 +293,28 @@ export function RotatingText({ words, interval = 2400, className = '' }: { words
   );
 }
 
+/* ---------------------------------------------------------- AnimatedContent */
+/** Scroll-triggered reveal with configurable direction and distance. */
+export function AnimatedContent({
+  children, delay = 0, distance = 24, direction = 'y', className = '',
+}: {
+  children: ReactNode; delay?: number; distance?: number; direction?: 'x' | 'y'; className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-8% 0px' });
+  const reduced = useReducedMotion();
+  const show = inView || reduced;
+  const from = direction === 'y' ? { y: distance } : { x: distance };
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={reduced ? false : { opacity: 0, ...from }}
+      animate={show ? { opacity: 1, x: 0, y: 0 } : undefined}
+      transition={{ duration: 0.55, ease: EASE, delay }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+

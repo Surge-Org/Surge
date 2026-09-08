@@ -341,3 +341,49 @@ export function ProfileCard({
   );
 }
 
+/* ==========================================================================
+   InfiniteSpiral
+   Items placed on an Archimedean spiral, rotating forever.
+   ========================================================================== */
+
+export function InfiniteSpiral({
+  items, className = '',
+}: {
+  items: ReactNode[];
+  className?: string;
+}) {
+  const n = items.length;
+  return (
+    <div className={`spiral ${className}`}>
+      <motion.div
+        className="spiral-stage"
+        animate={reduced() ? undefined : { rotate: 360 }}
+        transition={{ duration: 46, ease: 'linear', repeat: Infinity }}
+      >
+        {items.map((item, i) => {
+          // Archimedean: radius grows linearly with the angle.
+          const turns = 1.6;
+          const t = (i / Math.max(n - 1, 1)) * turns * Math.PI * 2;
+          const radius = 34 + (t / (turns * Math.PI * 2)) * 128;
+          const angle = t;
+          return (
+            <motion.div
+              key={i}
+              className="spiral-item"
+              style={{
+                left: `calc(50% + ${Math.cos(angle) * radius}px)`,
+                top: `calc(50% + ${Math.sin(angle) * radius}px)`,
+                zIndex: n - i,
+              }}
+              animate={reduced() ? undefined : { rotate: -360 }}
+              transition={{ duration: 46, ease: 'linear', repeat: Infinity }}
+            >
+              {item}
+            </motion.div>
+          );
+        })}
+      </motion.div>
+    </div>
+  );
+}
+

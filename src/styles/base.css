@@ -494,3 +494,26 @@ p  { line-height: 1.6; }
 .modal-body { padding: 0 var(--s4) var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
 .modal-body > p { font-size: var(--t3); color: var(--ink-2); }
 
+/* ---------------------------------------------------------- responsive */
+@media (max-width: 1020px) {
+  .grid.c4, .grid.c3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 820px) {
+  .shell.with-rail { padding-left: 0; }
+  .rail { transform: translateX(-100%); transition: transform var(--base) var(--ease); box-shadow: var(--sh3); }
+  .rail.open { transform: none; }
+  .topbar .menu-btn { display: inline-flex; }
+  .topbar { padding: 0 var(--s4); }
+  .main { padding: var(--s5) var(--s4) var(--s8); }
+}
+@media (max-width: 620px) {
+  .grid.c2, .grid.c3, .grid.c4 { grid-template-columns: minmax(0, 1fr); }
+  .page-head h1 { font-size: var(--t6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

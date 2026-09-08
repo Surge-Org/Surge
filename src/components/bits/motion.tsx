@@ -215,3 +215,42 @@ export function Magnet({
   );
 }
 
+/* -------------------------------------------------------------- ClickSpark */
+/** Emits a short burst of rays wherever the user clicks inside. */
+export function ClickSpark({ children }: { children: ReactNode }) {
+  const [sparks, setSparks] = useState<{ id: number; x: number; y: number }[]>([]);
+  const ref = useRef<HTMLDivElement>(null);
+  const next = useRef(0);
+
+  const onClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const id = next.current++;
+    setSparks(s => [...s, { id, x: e.clientX - r.left, y: e.clientY - r.top }]);
+    window.setTimeout(() => setSparks(s => s.filter(k => k.id !== id)), 520);
+  };
+
+  return (
+    <div ref={ref} className="bit-spark-host" onClick={onClick}>
+      {children}
+      <AnimatePresence>
+        {sparks.map(s => (
+          <span key={s.id} className="bit-spark" style={{ left: s.x, top: s.y }} aria-hidden="true">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <motion.i
+                key={i}
+                style={{ rotate: `${i * 45}deg` }}
+                initial={{ scaleY: 0.2, opacity: 1 }}
+                animate={{ scaleY: 1, opacity: 0, translateY: -14 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+              />
+            ))}
+          </span>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+

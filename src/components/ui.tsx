@@ -124,3 +124,15 @@ export function Crumbs({ items }: { items: { label: string; to?: string }[] }) {
   );
 }
 
+export function PageHead({ title, sub, action }: { title: string; sub?: ReactNode; action?: ReactNode }) {
+  return (
+    <header className="page-head">
+      <div>
+        <h1>{title}</h1>
+        {sub && <p>{sub}</p>}
+      </div>
+      {action}
+    </header>
+  );
+}
+

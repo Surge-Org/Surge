@@ -340,3 +340,81 @@
   .logoloop-track { animation: none !important; }
 }
 
+/* ---------------------------------------------- landing section furniture */
+.band-inner.split-wide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s8);
+  align-items: center;
+}
+.sec-h { font-size: clamp(24px, 3vw, 34px); letter-spacing: -.03em; line-height: 1.12; font-weight: 600; }
+.sec.centered-sec { justify-content: center; text-align: center; }
+.sec.centered-sec > div { margin: 0 auto; }
+
+/* CardSwap cards */
+.stack-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  height: 100%;
+  padding: var(--s5);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--sh2);
+  transition: border-color var(--fast) var(--ease);
+}
+.stack-card:hover { border-color: var(--acc-line); }
+.stack-title { font-size: var(--t5); font-weight: 600; line-height: 1.3; }
+.stack-desc {
+  font-size: var(--t3); color: var(--ink-2); line-height: 1.55; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.stack-foot { padding-top: var(--s3); border-top: 1px solid var(--line-soft); gap: 8px; }
+
+/* BounceCards faces */
+.fan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--s5);
+  min-height: 190px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--sh2);
+}
+.fan-card h3 { font-size: var(--t5); font-weight: 600; }
+.fan-card p { font-size: var(--t3); color: var(--ink-2); line-height: 1.55; }
+.fan-icon {
+  display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 4px;
+  background: var(--acc-soft); border: 1px solid var(--acc-line); color: var(--acc);
+}
+.fan-card.tone-b .fan-icon { background: rgba(34, 211, 238, .12); border-color: rgba(34, 211, 238, .3); color: #22d3ee; }
+.fan-card.tone-c .fan-icon { background: var(--ok-bg); border-color: transparent; color: var(--ok); }
+
+/* Spiral chips */
+.spiral-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+  transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.spiral-chip:hover { border-color: var(--acc-line); transform: scale(1.05); }
+
+/* Team */
+.team-grid { gap: var(--s4); }
+.team-note { text-align: center; margin-top: var(--s5); }
+
+@media (max-width: 940px) {
+  .band-inner.split-wide { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+  .spiral { height: 300px; }
+}
+@media (max-width: 620px) {
+  .swap { height: 300px; }
+  .swap-card { inset: 0 24px 24px 0; }
+  .bounce { min-height: 420px; flex-direction: column; }
+  .bounce-card { position: relative; width: 100%; }
+  .lanyard { min-height: 300px; }
+}

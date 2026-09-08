@@ -120,3 +120,88 @@ export function GooeyNav({ items }: { items: GooItem[] }) {
   );
 }
 
+/* ==========================================================================
+   Lanyard
+   A badge hanging from a cord. Verlet-style spring on the pivot, draggable,
+   settles back on release. 2D rather than 3D, but the physics is real.
+   ========================================================================== */
+
+export function Lanyard({ children, className = '' }: { children: ReactNode; className?: string }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const cordRef = useRef<SVGPathElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // Simulation state kept out of React so the frame loop stays allocation-free.
+  const sim = useRef({ x: 0, y: 0, vx: 0, vy: 0, dragging: false, tx: 0, ty: 0 });
+  const [held, setHeld] = useState(false);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as HTMLElement;
+      if (!t.closest('.lanyard-badge')) return;
+      sim.current.dragging = true;
+      setHeld(true);
+      host.setPointerCapture(e.pointerId);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!sim.current.dragging) return;
+      const r = host.getBoundingClientRect();
+      sim.current.tx = e.clientX - r.left - r.width / 2;
+      sim.current.ty = Math.max(0, e.clientY - r.top - 40);
+    };
+    const onUp = () => { sim.current.dragging = false; setHeld(false); };
+    host.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    return () => {
+      host.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+  }, []);
+
+  useAnimationFrame((t, delta) => {
+    const s = sim.current;
+    const dt = Math.min(delta, 32) / 16.67;
+
+    if (s.dragging) {
+      s.vx += (s.tx - s.x) * 0.22 * dt;
+      s.vy += (s.ty - s.y) * 0.22 * dt;
+    } else {
+      // Gravity pulls the badge back to rest; a slow breeze keeps it alive.
+      const breeze = reduced() ? 0 : Math.sin(t / 1400) * 5;
+      s.vx += (breeze - s.x) * 0.035 * dt;
+      s.vy += (0 - s.y) * 0.05 * dt;
+    }
+    s.vx *= 0.9;
+    s.vy *= 0.9;
+    s.x += s.vx * dt;
+    s.y += s.vy * dt;
+
+    x.set(s.x);
+    y.set(s.y);
+
+    // Cord follows as a quadratic curve that slackens with distance.
+    const cord = cordRef.current;
+    if (cord) {
+      const sag = 18 + Math.abs(s.x) * 0.16;
+      cord.setAttribute('d', `M 110 0 Q ${110 + s.x * 0.45} ${44 + sag} ${110 + s.x} ${76 + s.y}`);
+    }
+  });
+
+  return (
+    <div ref={hostRef} className={`lanyard ${held ? 'held' : ''} ${className}`}>
+      <svg className="lanyard-cord" viewBox="0 0 220 120" preserveAspectRatio="none" aria-hidden="true">
+        <path ref={cordRef} d="M 110 0 Q 110 62 110 76" />
+      </svg>
+      <span className="lanyard-clip" aria-hidden="true" />
+      <motion.div className="lanyard-badge" style={{ x, y }}>
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+

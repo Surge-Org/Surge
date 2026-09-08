@@ -137,3 +137,18 @@
 /* ------------------------------------------------------------------ Magnet */
 .bit-magnet { display: inline-flex; will-change: transform; }
 
+/* -------------------------------------------------------------- ClickSpark */
+.bit-spark-host { position: relative; }
+.bit-spark { position: absolute; width: 0; height: 0; pointer-events: none; z-index: 5; }
+.bit-spark i {
+  position: absolute;
+  left: -1px;
+  top: -10px;
+  width: 2px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--acc);
+  transform-origin: 50% 100%;
+  display: block;
+}
+

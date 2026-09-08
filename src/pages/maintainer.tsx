@@ -183,3 +183,76 @@ export function MaintainerSubmit() {
   );
 }
 
+/* -------------------------------------------------------- per-repo dashboard */
+
+function useRepo() {
+  const { repoId } = useParams();
+  const { state } = useApp();
+  return state.repos.find(r => r.id === repoId);
+}
+
+export function RepoDashboard() {
+  const { state } = useApp();
+  const repo = useRepo();
+  if (!repo) return <Navigate to="/maintainer" replace />;
+
+  const issues = state.issues.filter(i => i.repoId === repo.id);
+  const ids = new Set(issues.map(i => i.id));
+  const proposals = state.applications.filter(a => ids.has(a.issueId));
+  const waiting = proposals.filter(a => a.status === 'Applied').length;
+  const assigned = proposals.filter(a => ['Assigned', 'PR submitted'].includes(a.status)).length;
+  const done = proposals.filter(a => a.status === 'Accepted').length;
+
+  return (
+    <Page>
+      <PageHead
+        title={repo.name}
+        sub={<>Dashboard for <strong>{repoName(repo)}</strong> only.</>}
+        action={<Link className="btn sm" to={`/maintainer/repo/${repo.id}/issues`}>Issues &amp; proposals<ArrowRight size={13} /></Link>}
+      />
+
+      <Stagger className="grid c4">
+        {[
+          { label: 'Issues', value: issues.length, note: 'Posted to a wave' },
+          { label: 'Awaiting review', value: waiting, note: 'Proposals to triage' },
+          { label: 'In progress', value: assigned, note: 'Assigned contributors' },
+          { label: 'Accepted', value: done, note: 'Completed this cycle' },
+        ].map(s => (
+          <Item key={s.label} className="card stat">
+            <p className="label">{s.label}</p>
+            <strong className="num">{s.value}</strong>
+            <small>{s.note}</small>
+          </Item>
+        ))}
+      </Stagger>
+
+      <section className="section">
+        <div className="row section-head">
+          <h2>Needs your attention</h2>
+          <span className="spacer" />
+          <Link className="btn xs ghost" to={`/maintainer/repo/${repo.id}/issues`}>View all</Link>
+        </div>
+        {waiting ? (
+          <Stagger className="list">
+            {issues.filter(i => proposals.some(p => p.issueId === i.id && p.status === 'Applied')).map(issue => {
+              const n = proposals.filter(p => p.issueId === issue.id && p.status === 'Applied').length;
+              return (
+                <Item key={issue.id}>
+                  <Link className="list-row" to={`/maintainer/repo/${repo.id}/issues?issue=${issue.id}`}>
+                    <span className="mono dim issue-num">#{issue.id}</span>
+                    <span className="col" style={{ gap: 2, minWidth: 0, flex: 1 }}>
+                      <span className="row-title">{issue.title}</span>
+                      <span className="row-sub">{n} {n === 1 ? 'proposal' : 'proposals'} waiting</span>
+                    </span>
+                    <Chip className="solid num">{n}</Chip>
+                  </Link>
+                </Item>
+              );
+            })}
+          </Stagger>
+        ) : <Empty title="Nothing waiting">Proposals appear here as contributors apply.</Empty>}
+      </section>
+    </Page>
+  );
+}
+

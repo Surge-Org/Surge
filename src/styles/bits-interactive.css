@@ -15,3 +15,38 @@
   --metal-c: #b06cf9;
 }
 
+/* ---------------------------------------------------------- MoltenMetal */
+.bit-metal {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  /* Shown until (or instead of) WebGL. */
+  background:
+    radial-gradient(120% 90% at 20% 10%, var(--metal-b) 0%, transparent 55%),
+    radial-gradient(90% 80% at 85% 20%, var(--metal-c) 0%, transparent 50%),
+    var(--metal-a);
+}
+/* The shader is beautiful but low-contrast under type, so the veil does real
+   work: a heavy scrim over the copy column, lighter over the lanyard. */
+.metal-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--bg) 92%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 82%, transparent) 34%,
+      color-mix(in srgb, var(--bg) 42%, transparent) 62%,
+      color-mix(in srgb, var(--bg) 30%, transparent) 100%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--bg) 55%, transparent) 0%,
+      transparent 22%,
+      transparent 62%,
+      var(--bg) 100%);
+}
+

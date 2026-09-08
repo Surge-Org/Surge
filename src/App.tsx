@@ -254,3 +254,29 @@ function WorkspaceShell({ title, sub, groups, footer, children }: {
   );
 }
 
+/* --------------------------------------------------------- contributor area */
+
+function ContributorShell({ children }: { children: ReactNode }) {
+  const { state } = useApp();
+  const me = state.session.contributor;
+  const active = state.applications.filter(a => !a.applicant && ['Assigned', 'PR submitted'].includes(a.status)).length;
+  if (!me) return <Navigate to="/login?next=/me" replace />;
+  return (
+    <WorkspaceShell
+      title="Contributor"
+      sub={me}
+      groups={[{
+        heading: 'Your work',
+        items: [
+          { to: '/me', label: 'Assignments', icon: GitPullRequest, end: true, count: active },
+          { to: '/me/points', label: 'Points', icon: Trophy },
+          { to: '/me/settings', label: 'Settings', icon: Settings },
+        ],
+      }]}
+      footer={<Link className="btn ghost sm block" to="/explore"><Compass size={14} />Back to explore</Link>}
+    >
+      {children}
+    </WorkspaceShell>
+  );
+}
+

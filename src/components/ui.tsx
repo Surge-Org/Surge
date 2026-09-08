@@ -70,3 +70,36 @@ export function Brand({ to = '/', label = 'Surge' }: { to?: string; label?: stri
  * the image fades in over it, so the slot is never blank while the fetch is in
  * flight and a 404 simply leaves the tile in place.
  */
+export function Avatar({
+  name, size = '', square = false, org,
+}: {
+  name: string;
+  size?: string;
+  square?: boolean;
+  /** GitHub org to pull the real avatar for. Omit for people. */
+  org?: string;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const initial = (name || '?').slice(0, 1).toUpperCase();
+  const cls = `avatar ${square ? 'sq' : ''} ${size}`.trim();
+
+  if (!org || failed) return <span className={cls}>{initial}</span>;
+
+  return (
+    <span className={`${cls} img`}>
+      <span className="avatar-fallback" aria-hidden={loaded}>{initial}</span>
+      <img
+        src={orgAvatar(org, 96)}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        data-loaded={loaded}
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+      />
+    </span>
+  );
+}
+
+/** Language dot in GitHub's colour for that language. */

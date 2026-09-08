@@ -164,3 +164,48 @@ a.row-title:hover { text-decoration: underline; text-underline-offset: 2px; }
 .auth-foot { font-size: var(--t2); color: var(--ink-3); }
 .auth-foot a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
 
+/* ============================================================
+   Workspaces
+   ============================================================ */
+.rail-scope { padding: 0 var(--s3) var(--s3); border-bottom: 1px solid var(--line); }
+.rail-scope-sub { font-size: var(--t3); font-weight: 540; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rail-close { display: none; }
+.topbar-title { font-size: var(--t3); font-weight: 540; }
+
+.section { margin-top: var(--s7); }
+.section-head { margin-bottom: var(--s3); }
+.section-head h2 { font-size: var(--t5); }
+
+.gate {
+  display: flex; flex-direction: column; align-items: center; gap: var(--s3);
+  padding: var(--s9) var(--s5); text-align: center;
+  border: 1px dashed var(--line); border-radius: var(--r4); background: var(--panel);
+}
+.gate-icon {
+  display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 4px;
+  border: 1px dashed var(--line); color: var(--ink-3);
+}
+.gate h2 { font-size: var(--t6); }
+.gate p { max-width: 46ch; font-size: var(--t3); }
+.gate .btn { margin-top: var(--s2); }
+.gate-hint { margin-top: var(--s4); text-align: center; }
+
+.repo-card { padding: var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
+.repo-card.gated { background: var(--panel-2); }
+.repo-stats { gap: var(--s4); font-size: var(--t2); }
+
+.submit-form { padding: var(--s5); display: flex; flex-direction: column; gap: var(--s4); max-width: 560px; }
+.submit-form + .submit-form { margin-top: var(--s3); }
+.submit-note { max-width: 560px; margin-top: var(--s3); }
+
+.issue-block { overflow: hidden; }
+.issue-block + .issue-block { margin-top: var(--s2); }
+.issue-block-head {
+  display: flex; align-items: center; gap: var(--s3); width: 100%; padding: var(--s3) var(--s4);
+  transition: background var(--fast) var(--ease);
+}
+.issue-block-head:hover { background: var(--panel-2); }
+.issue-block-body { padding: var(--s3) var(--s4) var(--s4); display: flex; flex-direction: column; gap: var(--s3); border-top: 1px solid var(--line-soft); }
+.issue-block-body .proposal { padding: var(--s3); border: 1px solid var(--line); border-radius: var(--r2); }
+.issue-block-body .proposal + .proposal { border-top: 1px solid var(--line); }
+

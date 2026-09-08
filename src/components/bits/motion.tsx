@@ -40,3 +40,21 @@ export function Aurora({ className = '' }: { className?: string }) {
   );
 }
 
+/* ----------------------------------------------------------------- DotGrid */
+/** Dot lattice that brightens around the cursor. */
+export function DotGrid({ className = '' }: { className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onMove = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onMove);
+  }, []);
+  return <div ref={ref} className={`bit-dotgrid ${className}`} aria-hidden="true" />;
+}
+

@@ -376,3 +376,18 @@ export function TiltedCard({ children, className = '', max = 7 }: { children: Re
   );
 }
 
+/* -------------------------------------------------------------- ScrollLine */
+/** Reading-progress bar pinned to the top of the viewport. */
+export function ScrollProgress() {
+  const [p, setP] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      setP(h > 0 ? window.scrollY / h : 0);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return <div className="bit-progress" style={{ scale: `${p} 1` } as CSSProperties} aria-hidden="true" />;
+}

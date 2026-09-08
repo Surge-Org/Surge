@@ -35,3 +35,24 @@ export function Stagger({ children, className = '', delay = 0 }: { children: Rea
   );
 }
 
+export function Item({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <motion.div
+      className={className}
+      variants={{ hide: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+      transition={{ duration: 0.3, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export function Mark({ size = 13 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" aria-hidden="true">
+      <path d="M5 15.5 12 4l7 11.5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8.5 20h7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+

@@ -243,3 +243,7 @@
   text-align: center;
 }
 
+/* --------------------------------------------------------------- CardSwap */
+.swap { position: relative; height: 260px; }
+.swap-card { position: absolute; inset: 0 40px 40px 0; will-change: transform; }
+

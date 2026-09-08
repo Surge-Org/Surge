@@ -247,3 +247,18 @@
 .swap { position: relative; height: 260px; }
 .swap-card { position: absolute; inset: 0 40px 40px 0; will-change: transform; }
 
+/* ------------------------------------------------------------ BounceCards */
+.bounce {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+.bounce-card {
+  position: absolute;
+  width: min(240px, 76vw);
+  cursor: default;
+  will-change: transform;
+}
+

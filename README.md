@@ -1,6 +1,6 @@
 # Surge
 
-A local preview of the **Arc Ecosystem Program** — a scoped open-source contribution program.
+A local preview of the **Stellar Ecosystem Program** — a scoped open-source contribution program.
 Maintainers submit repositories for review; accepted repositories get their own dashboard where
 the maintainer posts issues and picks one contributor per issue. Contributors browse, apply with
 a plan, and earn points that split the wave pool in USDC.

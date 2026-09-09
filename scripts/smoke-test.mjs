@@ -64,6 +64,12 @@ try {
   const orgCount = await page.evaluate(() => new Set(
     JSON.parse(localStorage.getItem('surge-preview-v4')).repos
       .filter(r => r.status === 'Accepted').map(r => r.org)).size);
+  // Repository and organization tiles share a class, so the repositories from
+  // the previous tab satisfy the wait above. Let the grid actually swap before
+  // counting, and let the assertion — not a timeout — report a wrong count.
+  await page
+    .waitForFunction(n => document.querySelectorAll('.repo-tile').length === n, orgCount, { timeout: 5000 })
+    .catch(() => {});
   assert.equal(await page.locator('.repo-tile').count(), orgCount,
     'organizations tab lists every distinct accepted org');
 

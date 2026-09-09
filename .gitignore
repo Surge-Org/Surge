@@ -7,3 +7,4 @@ dist/
 *.local
 .final-snapshot/
 _history.py
+reference/

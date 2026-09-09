@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # One PR per ecosystem instead of a flood of single-package bumps.
+      react:
+        patterns: ['react', 'react-dom', '@types/react', '@types/react-dom', 'react-router-dom']
+      tooling:
+        patterns: ['vite', '@vitejs/*', 'typescript', 'eslint*', '@eslint/*', 'typescript-eslint', 'globals']
+      playwright:
+        patterns: ['playwright', 'playwright-core']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday

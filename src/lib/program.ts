@@ -4,12 +4,12 @@
  */
 export const PROGRAM = {
   /** Short name used in headings and chips. */
-  name: 'Arc',
+  name: 'Stellar',
   /** Full name used once, in the landing copy. */
-  full: 'Arc Ecosystem Program',
+  full: 'Stellar Ecosystem Program',
   /** How the chain is described in prose. */
-  chain: 'Arc',
-  descriptor: 'the stablecoin-native L1',
+  chain: 'Stellar',
+  descriptor: 'the open network for payments',
   /** Reward asset. */
   asset: 'USDC',
 } as const;
@@ -24,6 +24,8 @@ export const LANG_COLOR: Record<string, string> = {
   Python: '#3572a5',
   MDX: '#fcb32c',
   CSS: '#663399',
+  'C++': '#f34b7d',
+  Dart: '#00b4ab',
 };
 
 /** Real GitHub avatar for an organization. Falls back to a letter tile on error. */

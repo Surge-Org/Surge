@@ -92,7 +92,7 @@ jobs:
       # vite preview, so it exercises what actually ships rather than the dev
       # server's on-the-fly transforms.
       - name: Download dist
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist

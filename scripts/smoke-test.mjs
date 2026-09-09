@@ -17,7 +17,7 @@ const settle = () => page.waitForTimeout(350);
 try {
   // ---------------------------------------------------------- public surfaces
   await go('/');
-  await page.getByRole('heading', { name: /Build Arc/ }).waitFor();
+  await page.getByRole('heading', { name: /Build Stellar/ }).waitFor();
   assert.equal(await page.locator('.rail').count(), 0, 'landing has no dashboard rail');
   assert.equal(await page.locator('.lanyard-badge').count(), 1, 'hero lanyard renders');
   assert.ok(await page.evaluate(() => {
@@ -58,7 +58,11 @@ try {
   await page.getByRole('tab', { name: 'Organizations' }).click();
   await page.waitForURL('**/explore/orgs');
   await page.locator('.repo-tile').first().waitFor();
-  assert.equal(await page.locator('.repo-tile').count(), 6);
+  const orgCount = await page.evaluate(() => new Set(
+    JSON.parse(localStorage.getItem('surge-preview-v4')).repos
+      .filter(r => r.status === 'Accepted').map(r => r.org)).size);
+  assert.equal(await page.locator('.repo-tile').count(), orgCount,
+    'organizations tab lists every distinct accepted org');
 
   // filters
   await page.getByRole('tab', { name: 'Issues' }).click();
@@ -74,14 +78,14 @@ try {
 
   // ------------------------------------------------------- contributor apply
   await go('/issue/412');
-  await page.getByRole('heading', { name: 'Normalise revert reasons across transfer paths' }).waitFor();
+  await page.getByRole('heading', { name: 'Normalise contract error reporting across host calls' }).waitFor();
   await page.getByRole('button', { name: 'Apply to this issue' }).click();
   await page.waitForURL('**/login?**');
   await page.getByLabel('Display name').fill('Casey Contributor');
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.waitForURL('**/issue/412');
   await page.getByRole('button', { name: 'Apply to this issue' }).click();
-  await page.getByLabel('Your plan').fill('I would move every revert in the transfer surface onto shared custom errors, keep the selectors stable, and assert each one in tests.');
+  await page.getByLabel('Your plan').fill('I would move every fallible host call onto a shared error enum, keep the discriminants stable, and assert each variant in tests.');
   await page.getByRole('button', { name: 'Send proposal' }).click();
   await settle();
   assert.equal(await page.locator('.proposal').count(), 1);
@@ -150,11 +154,11 @@ try {
   await page.waitForURL('**/maintainer');
   await page.evaluate(() => {
     const s = JSON.parse(localStorage.getItem('surge-preview-v4'));
-    s.repos = s.repos.map(r => (r.id === 'alloy' ? { ...r, ownerId: 'ada-org' } : r));
+    s.repos = s.repos.map(r => (r.id === 'jssdk' ? { ...r, ownerId: 'ada-org' } : r));
     localStorage.setItem('surge-preview-v4', JSON.stringify(s));
   });
-  await go('/maintainer/repo/alloy/issues');
-  await page.getByRole('button', { name: /Add a resilient log subscription/ }).click();
+  await go('/maintainer/repo/jssdk/issues');
+  await page.getByRole('button', { name: /Add a resilient event subscription/ }).click();
   await settle();
   assert.equal(await page.locator('.issue-block-body .proposal').count(), 2, 'two seeded proposals');
   await page.locator('.issue-block-body .proposal').first().getByRole('button', { name: 'Assign' }).click();
@@ -180,8 +184,8 @@ try {
   const routes = [
     '/', '/explore', '/explore/repos', '/explore/orgs', '/issue/707',
     '/login', '/maintainer/login', '/maintainer', '/maintainer/submit',
-    '/maintainer/repo/alloy', '/maintainer/repo/alloy/issues',
-    '/maintainer/repo/alloy/settings', '/me', '/me/points', '/me/settings',
+    '/maintainer/repo/jssdk', '/maintainer/repo/jssdk/issues',
+    '/maintainer/repo/jssdk/settings', '/me', '/me/points', '/me/settings',
   ];
   for (const width of [1440, 1024, 820, 640, 390]) {
     await page.setViewportSize({ width, height: 900 });

@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
-import { chromium } from 'playwright-core';
+import { chromium } from 'playwright';
 
 const base = process.argv[2] ?? 'http://localhost:3000';
+// With no executablePath, Playwright launches its own managed Chromium — what
+// CI installs. CHROME_PATH points at a local browser instead, so the suite can
+// run against an already-installed Chrome without a download.
 const browser = await chromium.launch({
-  executablePath: process.env.CHROME_PATH ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
   headless: true,
+  ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
 });
 const page = await browser.newPage({ viewport: { width: 1440, height: 940 } });
 const errors = [];

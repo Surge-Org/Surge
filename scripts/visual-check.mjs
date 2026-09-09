@@ -1,15 +1,15 @@
-import { chromium } from "playwright-core";
+import { chromium } from "playwright";
 
 const url = process.argv[2] ?? "http://127.0.0.1:3000/";
 const output = process.argv[3] ?? "visual-check.png";
 const width = Number(process.argv[4] ?? 1440);
 const height = Number(process.argv[5] ?? 1000);
-const executablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 
+// Playwright's managed Chromium by default; CHROME_PATH overrides it.
 const browser = await chromium.launch({
-  executablePath,
   headless: true,
   args: ["--disable-extensions", "--no-first-run"],
+  ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
 });
 
 const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });

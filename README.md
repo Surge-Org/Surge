@@ -92,14 +92,33 @@ spans) — large boxes with generous padding and display-scale figures, rather t
 
 ## Checks
 
-With the dev server running:
+[![CI](https://github.com/Surge-Org/Surge/actions/workflows/ci.yml/badge.svg)](https://github.com/Surge-Org/Surge/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Surge-Org/Surge/actions/workflows/codeql.yml/badge.svg)](https://github.com/Surge-Org/Surge/actions/workflows/codeql.yml)
+
+Four checks run on every push and pull request, defined in
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+
+| Check | Command |
+| --- | --- |
+| Typecheck | `npm run typecheck` |
+| Lint | `npm run lint` |
+| Build | `npm run build` |
+| End-to-end | `npm run test:e2e -- <url>` |
+
+CodeQL analyses the source weekly and on every pull request, and Dependabot groups dependency
+bumps into one pull request per ecosystem.
+
+Locally, the end-to-end suite needs a running server and a browser. It uses Playwright's own
+Chromium (`npx playwright install chromium`), or an installed browser if `CHROME_PATH` is set:
 
 ```powershell
 npm.cmd run build
-npm.cmd run test:smoke -- http://localhost:3000
+npm.cmd run preview -- --port 4173
+npm.cmd run test:e2e -- http://localhost:4173
 ```
 
-The smoke test covers the public explore surface, search/tabs/filters, the contributor apply and
+CI runs it against the built artifact on the preview server, not the dev server, so it exercises
+what actually ships. The suite covers the public explore surface, search/tabs/filters, the contributor apply and
 persistence path, the separate maintainer sign-in, the submit-then-review gate, per-repo dashboards
 scoped by owner and acceptance, proposal assignment, theme persistence, the mobile drawer, and
 horizontal overflow across 15 routes at five widths.

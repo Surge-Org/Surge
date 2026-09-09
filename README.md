@@ -123,6 +123,15 @@ persistence path, the separate maintainer sign-in, the submit-then-review gate, 
 scoped by owner and acceptance, proposal assignment, theme persistence, the mobile drawer, and
 horizontal overflow across 15 routes at five widths.
 
+### Branch protection
+
+`main` is covered by the **Protect main** ruleset. For contributors it means: open a pull request,
+and land it once Typecheck, Lint, Build and End-to-end are green. Force-pushes and branch deletion
+are refused outright, and review threads must be resolved before merging. No approving review is
+required, so a maintainer can merge their own pull request.
+
+Repository admins bypass the ruleset and can push to `main` directly.
+
 ## Repository images
 
 Organization avatars are the real ones, pulled from `https://github.com/<org>.png`. An org that

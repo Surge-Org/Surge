@@ -8,6 +8,7 @@ import {
   Settings, Sun, Trophy, Wrench, X,
 } from 'lucide-react';
 import { Provider, useApp } from './lib/store';
+import { useRouteMenu } from './lib/hooks';
 import { canOpenRepoDashboard, formatMoney, repoName, reposOwnedBy } from './lib/model';
 import { PROGRAM } from './lib/program';
 import { Avatar, Brand, EASE } from './components/ui';
@@ -80,11 +81,10 @@ function AnnounceBar() {
 function PublicShell({ children }: { children: ReactNode }) {
   const { state } = useApp();
   const location = useLocation();
-  const [menu, setMenu] = useState(false);
+  const [menu, setMenu] = useRouteMenu();
   const [lifted, setLifted] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setMenu(false); }, [location.pathname]);
   useEffect(() => {
     const onScroll = () => setLifted(window.scrollY > 8);
     onScroll();
@@ -226,9 +226,7 @@ function WorkspaceShell({ title, sub, groups, footer, children }: {
   footer?: ReactNode;
   children: ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
-  const location = useLocation();
-  useEffect(() => { setOpen(false); }, [location.pathname]);
+  const [open, setOpen] = useRouteMenu();
 
   return (
     <div className="shell with-rail">

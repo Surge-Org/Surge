@@ -20,3 +20,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Workflow action bumps move together or not at all.
+      actions:
+        patterns: ['*']

@@ -22,22 +22,20 @@ jobs:
       - name: Format check
         working-directory: contracts
         run: |
-          cargo fmt --all
-          git diff -- . > formatting.patch
+          cargo fmt --all -- --check
       - name: Contract tests and property tests
         working-directory: contracts
         run: |
           set -o pipefail
-          cargo test --workspace -- --nocapture 2>&1 | tee test-output.txt
+          cargo test --locked --workspace -- --nocapture 2>&1 | tee test-output.txt
       - name: Compile deployable Wasm
         working-directory: contracts
-        run: cargo build --target wasm32v1-none --release
+        run: cargo build --locked --target wasm32v1-none --release
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: wave-escrow-evidence
           path: |
             contracts/test-output.txt
-            contracts/formatting.patch
             contracts/target/wasm32v1-none/release/wave_escrow.wasm
             contracts/Cargo.lock

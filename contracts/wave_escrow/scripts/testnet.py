@@ -28,6 +28,8 @@ def main():
     parser.add_argument('--report', required=True)
     args = parser.parse_args()
     output = pathlib.Path(args.report)
+    if output.exists():
+        parser.error('Report already exists; use a new report path and fresh test identities')
     output.parent.mkdir(parents=True, exist_ok=True)
     report = {'network': 'Stellar testnet', 'asset': 'Circle test USDC', 'asset_has_financial_value': False,
               'usdc_contract': USDC, 'issuer': ISSUER, 'wasm_sha256': hashlib.sha256(pathlib.Path(args.wasm).read_bytes()).hexdigest(),
@@ -43,7 +45,7 @@ def main():
         public_command = ['stellar', '--config-dir', '<private-config>', *argv]
         record = {'label': label, 'command': public_command, 'returncode': result.returncode,
                   'stdout': result.stdout, 'stderr': result.stderr,
-                  'transaction_hashes': re.findall(r'(?:Signing transaction: |/tx/)([0-9a-f]{64})', result.stderr)}
+                  'transaction_hashes': list(dict.fromkeys(re.findall(r'(?:Signing transaction: |/tx/)([0-9a-f]{64})', result.stderr)))}
         report['steps'].append(record)
         save()
         if expected_error:

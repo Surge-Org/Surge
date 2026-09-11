@@ -75,16 +75,58 @@ claim/refund events include their recipient, amount and running paid/refunded
 total. These events contain the identities and values needed to rebuild state,
 without querying private data or guessing point distributions.
 
-## Validation status
+## Validation
 
-Run `cargo test --workspace -- --nocapture` from `contracts`. Property tests
-exercise 4,096 random distributions, including zero-point recipients and large
-pool values. Contract tests cover SAC balances, distinct missing-trustline
-failure and retry, cancellation, expiry, duplicate claims, illegal transitions,
-failed funding rollback, registry isolation and a hostile callback.
+From `contracts`, run:
 
-`resource_measurements_at_maximum_size` prints native host estimates at one and
-64 recipients under SDK limits. These are not Wasm measurements: they exclude
-VM instantiation and execution. A compiled-Wasm resource run and testnet E2E
-receipt are still required before this contribution satisfies issue #1. No
-successful deployment or resource result is claimed until its evidence exists.
+```sh
+cargo fmt --all -- --check
+cargo build --locked --target wasm32v1-none --release
+cargo test --locked --workspace --features wasm-tests -- --nocapture
+```
+
+The 14 unit/property tests and one compiled-Wasm resource test passed in
+[GitHub Actions run 34626598795](https://github.com/farouklaaroussi07/Surge/actions/runs/34626598795).
+Property testing covers 4,096 distributions over the full u64 point range,
+including zero-point recipients and large pools. Other tests cover SAC balances,
+missing-trustline failure/retry, cancellation, expiry, duplicate claims, illegal
+transitions, authentication, failed funding rollback, registry isolation, events
+and a hostile token callback. The Wasm test includes 64 active sponsors, 64 point
+recipients and a separate dust recipient. See [RESOURCES.md](RESOURCES.md) for
+measurements and their limits.
+
+The identical 35,414-byte Wasm was deployed and exercised on Stellar testnet on
+2026-09-11. The completed receipt is [evidence/testnet.json](evidence/testnet.json).
+This used valueless Circle test USDC, not real money or bounty earnings.
+
+Contract ID: `CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF`
+
+Wasm SHA-256: `552c564a54c1a03979c42dc8d80e6cf40b3a9f555db02db37482efabdca5941e`
+
+The receipt verifies funding, Open top-up, closure, proportional settlement,
+failed claim without trustline with the distinct typed error, unchanged allocation,
+trustline creation and retry, dust claim, cancellation/refund and expiry/refund.
+Final escrow balance was zero and sponsor plus recipient balances conserved the
+starting 200,000,000 atomic test-USDC units.
+
+## Repeat the testnet exercise
+
+Install Stellar CLI, create two fresh testnet identities and fund their XLM using
+Friendbot. Create a Circle test-USDC trustline for the sponsor and fund it using
+[Circle's testnet faucet](https://faucet.circle.com/). Leave the recipient without
+a USDC trustline: the script deliberately verifies that failure before creating
+its trustline. Keep the CLI configuration outside the repository.
+
+```sh
+python3 wave_escrow/scripts/testnet.py \
+  --config-dir /path/to/private-testnet-config \
+  --wasm target/wasm32v1-none/release/wave_escrow.wasm \
+  --sponsor fresh-sponsor --recipient fresh-recipient \
+  --report /path/to/new-testnet-report.json
+```
+
+The script requires at least 1.3 test USDC, hard-codes testnet and verifies Circle's
+asset binding before deployment. It records public transaction hashes and command
+results, never secret keys. It uses an unoptimized deployment so the deployed hash
+matches the measured release artifact. Testnet resets and ledger archival can make
+this deployment unavailable later; use the script to repeat the evidence.

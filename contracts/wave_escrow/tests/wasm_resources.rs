@@ -1,7 +1,7 @@
 #![cfg(feature = "wasm-tests")]
 use soroban_sdk::{
     testutils::{Address as _, Ledger as _},
-    token, Address, Env, Vec,
+    token, xdr::ScAddress, Address, Env, TryFromVal, Vec,
 };
 use wave_escrow::{Share, WaveEscrowClient, MAX_RECIPIENTS};
 
@@ -47,10 +47,23 @@ fn compiled_wasm_fits_network_limits_and_claim_footprint_is_constant() {
             "RESOURCE wasm settle n={count}: {:?}",
             env.cost_estimate().resources()
         );
-        assert_eq!(c.claim(&id, &shares.get(0).unwrap().recipient), 10_000);
+        // A network transaction starts with a fresh host. Reload ledger state so
+        // prior funding/settlement host objects do not inflate the claim estimate.
+        let escrow_xdr = ScAddress::from(&escrow);
+        let recipient_xdr = ScAddress::from(shares.get(0).unwrap().recipient);
+        let sponsor_xdr = ScAddress::from(&sponsor);
+        let env = Env::from_snapshot(env.to_snapshot());
+        env.mock_all_auths();
+        let escrow = Address::try_from_val(&env, &escrow_xdr).unwrap();
+        let recipient = Address::try_from_val(&env, &recipient_xdr).unwrap();
+        let sponsor = Address::try_from_val(&env, &sponsor_xdr).unwrap();
+        let c = WaveEscrowClient::new(&env, &escrow);
+        assert_eq!(c.claim(&id, &recipient), 10_000);
         let resources = env.cost_estimate().resources();
         println!("RESOURCE wasm claim n={count}: {resources:?}");
         let footprint = (
+            resources.instructions,
+            resources.mem_bytes,
             resources.disk_read_entries,
             resources.memory_read_entries,
             resources.write_entries,

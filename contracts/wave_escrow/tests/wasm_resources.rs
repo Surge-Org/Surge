@@ -22,10 +22,16 @@ fn compiled_wasm_fits_network_limits_and_claim_footprint_is_constant() {
         let c = WaveEscrowClient::new(&env, &escrow);
         let id = c.create(&sponsor, &200, &50, &sponsor);
         c.fund(&id, &sponsor, &(i128::from(count) * 10_000));
+        for _ in 1..count {
+            let extra_sponsor = Address::generate(&env);
+            token::StellarAssetClient::new(&env, &token).mint(&extra_sponsor, &1);
+            c.fund(&id, &extra_sponsor, &1);
+        }
         println!(
             "RESOURCE wasm fund n={count}: {:?}",
             env.cost_estimate().resources()
         );
+        assert_eq!(c.get_wave(&id).sponsors, count);
         c.open(&id);
         env.ledger().set_timestamp(200);
         c.close(&id);
@@ -57,6 +63,7 @@ fn compiled_wasm_fits_network_limits_and_claim_footprint_is_constant() {
         } else {
             small_claim = Some(footprint);
         }
+        assert_eq!(c.allocation(&id, &sponsor), i128::from(count - 1));
         // Env enforces SDK network limits on each real Wasm invocation, not just native contract calls.
     }
 }

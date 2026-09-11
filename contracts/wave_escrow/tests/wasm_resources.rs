@@ -1,7 +1,9 @@
 #![cfg(feature = "wasm-tests")]
 use soroban_sdk::{
     testutils::{Address as _, Ledger as _},
-    token, xdr::ScAddress, Address, Env, TryFromVal, Vec,
+    token,
+    xdr::ScAddress,
+    Address, Env, TryFromVal, Vec,
 };
 use wave_escrow::{Share, WaveEscrowClient, MAX_RECIPIENTS};
 

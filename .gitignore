@@ -8,3 +8,8 @@ dist/
 .final-snapshot/
 _history.py
 reference/
+
+# Soroban workspace build and test output
+contracts/target/
+contracts/**/test_snapshots/
+contracts/test-output.txt

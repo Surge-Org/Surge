@@ -8,9 +8,10 @@ use soroban_sdk::{
 /// Settlement and active-sponsor bounds are part of the public contract.
 pub const MAX_RECIPIENTS: u32 = 64;
 pub const MAX_SPONSORS: u32 = 64;
-pub const MAX_POINTS: i128 = 1_000_000_000_000;
-/// Keeps pool * points representable in i128 for every admitted distribution.
-pub const MAX_POOL: i128 = i128::MAX / MAX_POINTS;
+pub const MAX_POINTS: i128 = MAX_RECIPIENTS as i128 * u64::MAX as i128;
+/// A classic SAC trustline uses i64. Every whole award must fit an empty trustline.
+/// This bound also keeps pool * any u64 points representable in i128.
+pub const MAX_POOL: i128 = i64::MAX as i128;
 pub const MAX_GRACE_SECONDS: u64 = 31 * 24 * 60 * 60;
 
 #[contracterror]

@@ -23,19 +23,20 @@ jobs:
         working-directory: contracts
         run: |
           cargo fmt --all -- --check
+      - name: Compile deployable Wasm
+        working-directory: contracts
+        run: cargo build --locked --target wasm32v1-none --release
       - name: Contract tests and property tests
         working-directory: contracts
         run: |
           set -o pipefail
-          cargo test --locked --workspace -- --nocapture 2>&1 | tee test-output.txt
-      - name: Compile deployable Wasm
-        working-directory: contracts
-        run: cargo build --locked --target wasm32v1-none --release
+          cargo test --locked --workspace --features wasm-tests -- --nocapture 2>&1 | tee test-output.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: wave-escrow-evidence
           path: |
+            contracts/formatting.patch
             contracts/test-output.txt
             contracts/target/wasm32v1-none/release/wave_escrow.wasm
             contracts/Cargo.lock

@@ -24,10 +24,10 @@ so these alternatives never overlap. Claims after settlement do not expire.
 
 ## Accounting and rounding
 
-Amounts are integer token units, not dollars. Accepted point totals must be
-positive and at most 10^12. Each pool is at most `i128::MAX / 10^12`. This admits
-very large pools while making every `pool * points` multiplication representable
-in i128. No unchecked wrapping arithmetic or floating point enters allocation.
+Amounts are integer token units, not dollars. Each point value spans the full u64 range and the total must be positive.
+Each pool is at most `i64::MAX` token units, matching a classic SAC trustline
+balance limit: even a sole recipient must be able to receive the whole award.
+Multiplying this pool by any u64 point value is representable in i128. No unchecked wrapping arithmetic or floating point enters allocation.
 At most 64 unique recipients and 64 active sponsors are supported per wave.
 Zero-point recipients receive zero; duplicate recipients are rejected.
 

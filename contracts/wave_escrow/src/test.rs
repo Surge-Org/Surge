@@ -71,7 +71,7 @@ impl Fixture {
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(4096))]
     #[test]
-    fn conservation_and_rounding(pool in 1_i128..=MAX_POOL, points in prop::collection::vec(0_u64..1_000_000, 1..=64)) {
+    fn conservation_and_rounding(pool in 1_i128..=MAX_POOL, points in prop::collection::vec(0_u64..=u64::MAX, 1..=64)) {
         prop_assume!(points.iter().any(|p| *p != 0));
         let (allocations, dust) = split(pool, &points).unwrap();
         let total: i128 = points.iter().map(|p| i128::from(*p)).sum();
@@ -220,10 +220,6 @@ fn rejects_invalid_lifecycle_deadlines_points_and_duplicates() {
     );
     assert_eq!(
         c.try_settle(&id, &f.shares(&[0, 0])),
-        Err(Ok(EscrowError::InvalidPoints))
-    );
-    assert_eq!(
-        c.try_settle(&id, &f.shares(&[u64::MAX])),
         Err(Ok(EscrowError::InvalidPoints))
     );
     assert_eq!(
@@ -475,4 +471,24 @@ fn resource_measurements_at_maximum_size() {
             f.env.cost_estimate().resources()
         );
     }
+}
+
+#[test]
+fn full_u64_point_range_and_classic_account_amount_limit() {
+    let (values, dust) = split(MAX_POOL, &[u64::MAX; 64]).unwrap();
+    assert_eq!(values.iter().sum::<i128>() + dust, MAX_POOL);
+    assert_eq!(split(MAX_POOL, &[u64::MAX]).unwrap().0[0], MAX_POOL);
+    assert_eq!(split(MAX_POOL + 1, &[1]), Err(EscrowError::PoolLimit));
+}
+
+#[test]
+fn unauthenticated_mutations_do_not_change_a_wave() {
+    let f = Fixture::new();
+    let id = f.funded(100);
+    let before = f.client().get_wave(&id);
+    f.env.mock_auths(&[]);
+    assert!(f.client().try_open(&id).is_err());
+    assert!(f.client().try_cancel(&id).is_err());
+    assert!(f.client().try_fund(&id, &f.sponsor, &10).is_err());
+    assert_eq!(f.client().get_wave(&id), before);
 }

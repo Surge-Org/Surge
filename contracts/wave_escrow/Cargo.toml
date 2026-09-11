@@ -8,6 +8,9 @@ publish = false
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[features]
+wasm-tests = []
+
 [dependencies]
 soroban-sdk = "=27.0.6"
 

@@ -9,10 +9,10 @@ positive dust allocation. The one-recipient comparison has one sponsor and no du
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | fund | 1 / 1 | 873,577 | 1,275,770 | 1 | 9 | 5 | 92 | 1,208 | 428 |
 | settle | 1 / 1 | 819,846 | 1,254,894 | 0 | 6 | 3 | 0 | 764 | 688 |
-| claim | 1 / 1 | 888,130 | 1,279,927 | 1 | 9 | 5 | 92 | 1,212 | 408 |
+| claim | 1 / 1 | 864,865 | 1,272,069 | 1 | 9 | 5 | 0 | 1,212 | 408 |
 | fund | 64 / 64 | 1,351,570 | 1,489,634 | 0 | 9 | 5 | 0 | 1,208 | 428 |
 | settle | 64 / 64 | 16,522,468 | 4,864,258 | 0 | 70 | 67 | 0 | 11,004 | 11,408 |
-| claim | 64 / 64 | 1,568,004 | 1,563,419 | 1 | 9 | 5 | 92 | 1,212 | 408 |
+| claim | 64 / 64 | 864,865 | 1,272,069 | 1 | 9 | 5 | 0 | 1,212 | 408 |
 
 The SDK enforces its default mainnet resource-limit snapshot on every invocation.
 A live `stellar network settings --network testnet` reading on 2026-09-11 is stored
@@ -23,13 +23,15 @@ All measured calls fit. The deployed Wasm is 35,414 bytes against the 131,072-by
 contract-code limit. This is a stated 64-recipient bound, not a claim of unbounded
 settlement capacity.
 
-Claim has no recipient or sponsor iteration. Its contract reads/writes and full
-ledger footprint are constant between the one- and 64-recipient cases; the test
-asserts equality of read/write counts, disk bytes, write bytes and event bytes.
-CPU and memory estimates are not numerically identical between these test
-histories, so these measurements establish a constant ledger footprint and an
-O(1) claim algorithm, not an identical fee for every invocation. Expiration,
-restoration, account state and network fees can also affect total transaction cost.
+Claim has no recipient or sponsor iteration. To compare transaction costs fairly,
+the test snapshots the settled ledger and reloads it into a fresh Env before each
+claim, just as each network transaction starts in a new host. This excludes the
+previous funding/settlement calls' accumulated host objects. CPU, memory,
+read/write counts, disk bytes, write bytes and event bytes are exactly equal at
+one and 64 recipients; the test asserts all of them. Both claims transfer the
+same amount. This establishes constant claim resource usage with respect to wave
+size. Expiration, restoration, account state and network fees can still affect
+total transaction cost outside that controlled comparison.
 
 The SDK does not model complete transaction-envelope size or all network fees.
 The committed testnet receipt provides actual network acceptance of the full

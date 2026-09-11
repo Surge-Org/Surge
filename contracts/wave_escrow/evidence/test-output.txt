@@ -49,9 +49,9 @@
 [1m[94m420[0m [1m[94m|[0m         env.events().publish(
     [1m[94m|[0m                      [1m[33m^^^^^^^[0m
 
-[1m[33mwarning[0m: `wave-escrow` (lib) generated 8 warnings (2 duplicates)
-[1m[33mwarning[0m: `wave-escrow` (lib test) generated 8 warnings (6 duplicates)
-[1m[92m    Finished[0m `test` profile [unoptimized] target(s) in 5.11s
+[1m[33mwarning[0m: `wave-escrow` (lib) generated 8 warnings (7 duplicates)
+[1m[33mwarning[0m: `wave-escrow` (lib test) generated 8 warnings (1 duplicate)
+[1m[92m    Finished[0m `test` profile [unoptimized] target(s) in 4.33s
 [1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/wave_escrow-ffd44a208e738f8c)
 
 running 14 tests
@@ -64,49 +64,51 @@ test test::full_u64_point_range_and_classic_account_amount_limit ... ok
 Writing test snapshot file for test "test::expiry_is_permissionless_and_never_settled_waves_do_not_lock_sponsors" to "test_snapshots/test/expiry_is_permissionless_and_never_settled_waves_do_not_lock_sponsors.2.json".
 Writing test snapshot file for test "test::failed_funding_rolls_back_pool_and_sponsor_entry" to "test_snapshots/test/failed_funding_rolls_back_pool_and_sponsor_entry.1.json".
 Writing test snapshot file for test "test::hostile::hostile_token_cannot_reenter_and_double_claim" to "test_snapshots/test/hostile/hostile_token_cannot_reenter_and_double_claim.1.json".
+test test::hostile::hostile_token_cannot_reenter_and_double_claim ... ok
 test test::failed_funding_rolls_back_pool_and_sponsor_entry ... ok
 Writing test snapshot file for test "test::expiry_is_permissionless_and_never_settled_waves_do_not_lock_sponsors" to "test_snapshots/test/expiry_is_permissionless_and_never_settled_waves_do_not_lock_sponsors.3.json".
-test test::hostile::hostile_token_cannot_reenter_and_double_claim ... ok
 test test::expiry_is_permissionless_and_never_settled_waves_do_not_lock_sponsors ... ok
-Writing test snapshot file for test "test::lifecycle_claims_and_dust_conserve_real_token_balance" to "test_snapshots/test/lifecycle_claims_and_dust_conserve_real_token_balance.1.json".
-Writing test snapshot file for test "test::rejects_invalid_lifecycle_deadlines_points_and_duplicates" to "test_snapshots/test/rejects_invalid_lifecycle_deadlines_points_and_duplicates.1.json".
 Writing test snapshot file for test "test::missing_trustline_has_distinct_error_and_retry_preserves_allocation" to "test_snapshots/test/missing_trustline_has_distinct_error_and_retry_preserves_allocation.1.json".
-test test::rejects_invalid_lifecycle_deadlines_points_and_duplicates ... ok
-test test::lifecycle_claims_and_dust_conserve_real_token_balance ... ok
-RESOURCE native fund n=1: InvocationResources { instructions: 277489, mem_bytes: 41312, disk_read_entries: 1, memory_read_entries: 8, write_entries: 5, disk_read_bytes: 92, write_bytes: 1208, contract_events_size_bytes: 428, persistent_rent_ledger_bytes: 116760420, persistent_entry_rent_bumps: 2, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
+Writing test snapshot file for test "test::lifecycle_claims_and_dust_conserve_real_token_balance" to "test_snapshots/test/lifecycle_claims_and_dust_conserve_real_token_balance.1.json".
 test test::missing_trustline_has_distinct_error_and_retry_preserves_allocation ... ok
+Writing test snapshot file for test "test::rejects_invalid_lifecycle_deadlines_points_and_duplicates" to "test_snapshots/test/rejects_invalid_lifecycle_deadlines_points_and_duplicates.1.json".
+RESOURCE native fund n=1: InvocationResources { instructions: 277489, mem_bytes: 41312, disk_read_entries: 1, memory_read_entries: 8, write_entries: 5, disk_read_bytes: 92, write_bytes: 1208, contract_events_size_bytes: 428, persistent_rent_ledger_bytes: 116760420, persistent_entry_rent_bumps: 2, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
 RESOURCE native settle n=1: InvocationResources { instructions: 113846, mem_bytes: 19994, disk_read_entries: 0, memory_read_entries: 5, write_entries: 3, disk_read_bytes: 0, write_bytes: 764, contract_events_size_bytes: 688, persistent_rent_ledger_bytes: 655200, persistent_entry_rent_bumps: 1, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
 RESOURCE native claim n=1: InvocationResources { instructions: 298398, mem_bytes: 45157, disk_read_entries: 1, memory_read_entries: 8, write_entries: 5, disk_read_bytes: 92, write_bytes: 1212, contract_events_size_bytes: 408, persistent_rent_ledger_bytes: 116121600, persistent_entry_rent_bumps: 1, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
+test test::rejects_invalid_lifecycle_deadlines_points_and_duplicates ... ok
 Writing test snapshot file for test "test::resource_measurements_at_maximum_size" to "test_snapshots/test/resource_measurements_at_maximum_size.1.json".
+test test::lifecycle_claims_and_dust_conserve_real_token_balance ... ok
 Writing test snapshot file for test "test::unauthenticated_mutations_do_not_change_a_wave" to "test_snapshots/test/unauthenticated_mutations_do_not_change_a_wave.1.json".
-test test::unauthenticated_mutations_do_not_change_a_wave ... ok
-Writing test snapshot file for test "test::topups_withdrawal_and_cancellation_refund_actual_contributions" to "test_snapshots/test/topups_withdrawal_and_cancellation_refund_actual_contributions.1.json".
 RESOURCE native fund n=64: InvocationResources { instructions: 277489, mem_bytes: 41312, disk_read_entries: 1, memory_read_entries: 8, write_entries: 5, disk_read_bytes: 92, write_bytes: 1208, contract_events_size_bytes: 428, persistent_rent_ledger_bytes: 116760420, persistent_entry_rent_bumps: 2, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
+Writing test snapshot file for test "test::topups_withdrawal_and_cancellation_refund_actual_contributions" to "test_snapshots/test/topups_withdrawal_and_cancellation_refund_actual_contributions.1.json".
+test test::unauthenticated_mutations_do_not_change_a_wave ... ok
 Writing test snapshot file for test "test::waves_remain_isolated" to "test_snapshots/test/waves_remain_isolated.1.json".
 test test::topups_withdrawal_and_cancellation_refund_actual_contributions ... ok
-test test::waves_remain_isolated ... ok
 RESOURCE native settle n=64: InvocationResources { instructions: 5088061, mem_bytes: 725405, disk_read_entries: 0, memory_read_entries: 68, write_entries: 66, disk_read_bytes: 0, write_bytes: 10844, contract_events_size_bytes: 11272, persistent_rent_ledger_bytes: 41932800, persistent_entry_rent_bumps: 64, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
 RESOURCE native claim n=64: InvocationResources { instructions: 487715, mem_bytes: 92281, disk_read_entries: 1, memory_read_entries: 8, write_entries: 5, disk_read_bytes: 92, write_bytes: 1212, contract_events_size_bytes: 408, persistent_rent_ledger_bytes: 116121600, persistent_entry_rent_bumps: 1, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
 Writing test snapshot file for test "test::resource_measurements_at_maximum_size" to "test_snapshots/test/resource_measurements_at_maximum_size.2.json".
+test test::waves_remain_isolated ... ok
 test test::conservation_and_rounding ... ok
 test test::resource_measurements_at_maximum_size ... ok
 
-test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
 
 [1m[92m     Running[0m tests/wasm_resources.rs (target/debug/deps/wasm_resources-46d8ad2291f54fa0)
 
 running 1 test
 RESOURCE wasm fund n=1: InvocationResources { instructions: 873577, mem_bytes: 1275770, disk_read_entries: 1, memory_read_entries: 9, write_entries: 5, disk_read_bytes: 92, write_bytes: 1208, contract_events_size_bytes: 428, persistent_rent_ledger_bytes: 116760420, persistent_entry_rent_bumps: 2, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
 RESOURCE wasm settle n=1: InvocationResources { instructions: 819846, mem_bytes: 1254894, disk_read_entries: 0, memory_read_entries: 6, write_entries: 3, disk_read_bytes: 0, write_bytes: 764, contract_events_size_bytes: 688, persistent_rent_ledger_bytes: 655200, persistent_entry_rent_bumps: 1, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
-RESOURCE wasm claim n=1: InvocationResources { instructions: 888130, mem_bytes: 1279927, disk_read_entries: 1, memory_read_entries: 9, write_entries: 5, disk_read_bytes: 92, write_bytes: 1212, contract_events_size_bytes: 408, persistent_rent_ledger_bytes: 116121600, persistent_entry_rent_bumps: 1, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
+RESOURCE wasm claim n=1: InvocationResources { instructions: 864865, mem_bytes: 1272069, disk_read_entries: 1, memory_read_entries: 9, write_entries: 5, disk_read_bytes: 0, write_bytes: 1212, contract_events_size_bytes: 408, persistent_rent_ledger_bytes: 3562837740, persistent_entry_rent_bumps: 7, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
+Writing test snapshot file for test "compiled_wasm_fits_network_limits_and_claim_footprint_is_constant" to "test_snapshots/compiled_wasm_fits_network_limits_and_claim_footprint_is_constant.2.json".
 Writing test snapshot file for test "compiled_wasm_fits_network_limits_and_claim_footprint_is_constant" to "test_snapshots/compiled_wasm_fits_network_limits_and_claim_footprint_is_constant.1.json".
 RESOURCE wasm fund n=64: InvocationResources { instructions: 1351570, mem_bytes: 1489634, disk_read_entries: 0, memory_read_entries: 9, write_entries: 5, disk_read_bytes: 0, write_bytes: 1208, contract_events_size_bytes: 428, persistent_rent_ledger_bytes: 638820, persistent_entry_rent_bumps: 1, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
 RESOURCE wasm settle n=64: InvocationResources { instructions: 16522468, mem_bytes: 4864258, disk_read_entries: 0, memory_read_entries: 70, write_entries: 67, disk_read_bytes: 0, write_bytes: 11004, contract_events_size_bytes: 11408, persistent_rent_ledger_bytes: 42588000, persistent_entry_rent_bumps: 65, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
-RESOURCE wasm claim n=64: InvocationResources { instructions: 1568004, mem_bytes: 1563419, disk_read_entries: 1, memory_read_entries: 9, write_entries: 5, disk_read_bytes: 92, write_bytes: 1212, contract_events_size_bytes: 408, persistent_rent_ledger_bytes: 116121600, persistent_entry_rent_bumps: 1, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
-Writing test snapshot file for test "compiled_wasm_fits_network_limits_and_claim_footprint_is_constant" to "test_snapshots/compiled_wasm_fits_network_limits_and_claim_footprint_is_constant.2.json".
+RESOURCE wasm claim n=64: InvocationResources { instructions: 864865, mem_bytes: 1272069, disk_read_entries: 1, memory_read_entries: 9, write_entries: 5, disk_read_bytes: 0, write_bytes: 1212, contract_events_size_bytes: 408, persistent_rent_ledger_bytes: 3562837740, persistent_entry_rent_bumps: 7, temporary_rent_ledger_bytes: 454463928, temporary_entry_rent_bumps: 1 }
+Writing test snapshot file for test "compiled_wasm_fits_network_limits_and_claim_footprint_is_constant" to "test_snapshots/compiled_wasm_fits_network_limits_and_claim_footprint_is_constant.4.json".
+Writing test snapshot file for test "compiled_wasm_fits_network_limits_and_claim_footprint_is_constant" to "test_snapshots/compiled_wasm_fits_network_limits_and_claim_footprint_is_constant.3.json".
 test compiled_wasm_fits_network_limits_and_claim_footprint_is_constant ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.27s
 
 [1m[92m   Doc-tests[0m wave_escrow
 

@@ -86,14 +86,15 @@ cargo test --locked --workspace --features wasm-tests -- --nocapture
 ```
 
 The 14 unit/property tests and one compiled-Wasm resource test passed in
-[GitHub Actions run 34626598795](https://github.com/farouklaaroussi07/Surge/actions/runs/34626598795).
+[GitHub Actions run 34628318758](https://github.com/farouklaaroussi07/Surge/actions/runs/34628318758).
 Property testing covers 4,096 distributions over the full u64 point range,
 including zero-point recipients and large pools. Other tests cover SAC balances,
 missing-trustline failure/retry, cancellation, expiry, duplicate claims, illegal
 transitions, authentication, failed funding rollback, registry isolation, events
 and a hostile token callback. The Wasm test includes 64 active sponsors, 64 point
 recipients and a separate dust recipient. See [RESOURCES.md](RESOURCES.md) for
-measurements and their limits.
+measurements and their limits. Claims are compared in fresh transaction hosts;
+CPU, memory and ledger footprint are exactly equal at one and 64 recipients.
 
 The identical 35,414-byte Wasm was deployed and exercised on Stellar testnet on
 2026-09-11. The completed receipt is [evidence/testnet.json](evidence/testnet.json).

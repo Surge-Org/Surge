@@ -50,6 +50,29 @@
   --acc-line: rgba(43, 111, 255, .28);
   --glow:     0 0 0 1px rgba(43,111,255,.30), 0 8px 30px -8px rgba(43,111,255,.45);
 
+  /* Chain — the only other colour allowed on the page, and only on chrome that
+     is about the network itself: asset chips, network badges, the starfield.
+     USDC uses the issuer's own blue so the chip is recognisable at a glance;
+     everything else is ours. */
+  --usdc:      #2775ca;
+  --usdc-soft: rgba(39, 117, 202, .10);
+  --usdc-line: rgba(39, 117, 202, .30);
+
+  /* Network badges. Live is a warning, not a decoration — the one place the
+     interface should raise its voice is when funds are real. */
+  --net-live:      #b3261e;
+  --net-live-bg:   rgba(179, 38, 30, .10);
+  --net-test:      var(--ink-3);
+  --net-test-bg:   var(--n3);
+
+  /* Starfield. Three weights so a field reads as depth rather than noise. */
+  --star-1: rgba(10, 10, 10, .30);
+  --star-2: rgba(10, 10, 10, .16);
+  --star-3: rgba(10, 10, 10, .08);
+  --void:   transparent;
+
+  --beam: linear-gradient(100deg, var(--acc-2), var(--acc) 45%, var(--acc-3));
+
   /* Type — small by default. Eight steps, nothing in between. */
   --t1: 10.5px;
   --t2: 11.5px;
@@ -118,6 +141,22 @@
   --acc-soft: rgba(77, 140, 255, .14);
   --acc-line: rgba(77, 140, 255, .36);
   --glow:     0 0 0 1px rgba(77,140,255,.35), 0 10px 40px -10px rgba(77,140,255,.55);
+
+  --usdc:      #4d94e8;
+  --usdc-soft: rgba(77, 148, 232, .14);
+  --usdc-line: rgba(77, 148, 232, .36);
+
+  --net-live:    #f87171;
+  --net-live-bg: rgba(248, 113, 113, .13);
+  --net-test:    var(--ink-3);
+  --net-test-bg: rgba(255, 255, 255, .05);
+
+  /* Inverted: on a near-black page the stars are the light, so they carry real
+     luminance rather than being a tint of the ink. */
+  --star-1: rgba(255, 255, 255, .70);
+  --star-2: rgba(255, 255, 255, .34);
+  --star-3: rgba(255, 255, 255, .14);
+  --void:   #05050a;
   --sh1: 0 1px 2px rgba(0,0,0,.4);
   --sh2: 0 2px 4px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
   --sh3: 0 12px 48px -16px rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.4);

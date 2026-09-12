@@ -7,8 +7,11 @@
  * primitives stay usable on a page that has nothing to do with a chain.
  */
 
+import { useState } from 'react';
+import { Check, Copy, ShieldAlert } from 'lucide-react';
 import {
-  NETWORK, REWARD_ASSET, formatAmount, formatStroops, type Asset, type Network,
+  NETWORK, REWARD_ASSET, addressKind, addressUrl, formatAmount, formatStroops,
+  isSecret, shortAddress, type Asset, type Network,
 } from '../lib/stellar';
 
 /**
@@ -101,6 +104,90 @@ export function Stroops({ stroops }: { stroops: bigint }) {
     <span className="amt num">
       {formatStroops(stroops)}
       <span className="amt-code">stroops</span>
+    </span>
+  );
+}
+
+/**
+ * A strkey, truncated, with a copy button and an explorer link where one exists.
+ *
+ * **Refuses to render a secret seed.** A seed is the same length and shape as an
+ * account id, so any component that displays "an address" will display one
+ * happily — and a seed that has been on screen, in a screenshot, or in a shared
+ * preview is unrecoverable. The check is here rather than at the call sites
+ * because it only takes one call site forgetting.
+ *
+ * The full key is always in `title` and always what gets copied. Truncation is a
+ * display choice, and a component that truncated what it copied would be actively
+ * dangerous — a half address that looks plausible is worse than an obvious error.
+ */
+export function AddressPill({
+  value, kind: kindLabel, lead = 6, tail = 6,
+}: {
+  value: string;
+  /** Overrides the label derived from the prefix, e.g. 'Admin', 'Token'. */
+  kind?: string;
+  lead?: number;
+  tail?: number;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  if (isSecret(value)) {
+    return (
+      <span className="addr-refused" role="alert">
+        <ShieldAlert size={12} aria-hidden="true" />
+        Secret key — not shown
+      </span>
+    );
+  }
+
+  const kind = addressKind(value);
+  const url = addressUrl(value);
+  const short = shortAddress(value, lead, tail);
+  const label = kindLabel ?? (kind === 'contract' ? 'Contract' : kind === 'account' ? 'Account' : '');
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch {
+      /* Clipboard is unavailable over plain http and in some embeds. The key is
+         in the title either way, so selecting it by hand still works. */
+    }
+  };
+
+  const body = (
+    <>
+      {label && <span className="addr-kind">{label}</span>}
+      <span>{short}</span>
+    </>
+  );
+
+  return (
+    <span className="addr">
+      {url ? (
+        <a
+          className="addr-key"
+          href={url}
+          target="_blank"
+          rel="noreferrer noopener"
+          title={`${value} — open in stellar.expert`}
+        >
+          {body}
+        </a>
+      ) : (
+        <span className="addr-key" title={value}>{body}</span>
+      )}
+      <button
+        className="addr-copy"
+        type="button"
+        onClick={copy}
+        data-done={copied}
+        aria-label={copied ? 'Copied' : 'Copy full address'}
+      >
+        {copied ? <Check size={12} /> : <Copy size={12} />}
+      </button>
     </span>
   );
 }

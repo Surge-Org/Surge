@@ -94,3 +94,63 @@
    decimal places are precision you should be able to check but not have to read. */
 .amt-frac { color: var(--ink-3); }
 .amt[data-zero='true'] { color: var(--ink-3); }
+
+/* ---------------------------------------------------------- address */
+.addr {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  height: var(--h-xs);
+  max-width: 100%;
+}
+
+.addr-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  height: 100%;
+  font-family: 'JetBrains Mono Variable', ui-monospace, monospace;
+  font-size: var(--t2);
+  color: var(--ink-2);
+  min-width: 0;
+}
+a.addr-key:hover { color: var(--acc); }
+
+.addr-kind {
+  font-family: 'Inter Variable', sans-serif;
+  font-size: var(--t1);
+  font-weight: 560;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.addr-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--h-xs);
+  height: 100%;
+  border-left: 1px solid var(--line);
+  color: var(--ink-3);
+  transition: color var(--fast) var(--ease), background var(--fast) var(--ease);
+}
+.addr-copy:hover { color: var(--ink); background: var(--panel); }
+.addr-copy[data-done='true'] { color: var(--ok); }
+
+/* A seed must never be shown, so the component renders this instead. */
+.addr-refused {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--h-xs);
+  padding: 0 8px;
+  border: 1px solid var(--bad);
+  background: var(--bad-bg);
+  color: var(--bad);
+  font-size: var(--t2);
+  font-weight: 560;
+}

@@ -66,7 +66,7 @@ jobs:
       run:
         working-directory: contracts
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # rustup ships on the runner image; the toolchain file pins the channel and
       # the wasm target, so this only has to make sure the target is present.
@@ -76,7 +76,7 @@ jobs:
       # A cold Soroban SDK build is minutes of compile time, and the dependency
       # set only moves when the lockfile does.
       - name: Cache cargo
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry/index
@@ -100,7 +100,7 @@ jobs:
       - name: Build wasm
         run: cargo build --target wasm32v1-none --release
       - name: Upload wasm
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: wave-pool-wasm
           path: contracts/target/wasm32v1-none/release/wave_pool.wasm

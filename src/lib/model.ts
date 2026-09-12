@@ -42,6 +42,17 @@ export interface Wave {
   escrowed: number;
   /** Paid out to contributors so far. Only moves once the wave has closed. */
   paid: number;
+  /**
+   * Points recorded against this wave, which is the divisor every share is
+   * computed from.
+   *
+   * Held on the wave rather than counted from applications, because the contract
+   * holds it that way: `award` is a call the maintainer makes, and the running
+   * total is the contract's, not something reconstructed from review history. For
+   * the active wave the signed-in contributor's own accepted work is added on top,
+   * so the projection moves as they earn — see `awardedPoints`.
+   */
+  points: number;
   /** Seconds a contributor has to claim after the wave closes. */
   claimWindow: number;
 }
@@ -118,6 +129,26 @@ export function relativeDate(date: string, now = new Date()): string {
 
 export const repoName = (repo: Repo) => `${repo.org}/${repo.name}`;
 
+/**
+ * Points recorded against a wave, including the signed-in contributor's own
+ * accepted work.
+ *
+ * The wave carries what the program has already awarded; anything the visitor gets
+ * accepted during the preview is added on top. Only the *open* wave accumulates —
+ * the contract refuses `award` on a closed one, and a projection that grew after
+ * close would be showing a denominator the contract would not accept.
+ */
+export function awardedPoints(wave: Wave, state: State): number {
+  if (wave.status === 'Completed') return wave.points;
+  const mine = state.applications
+    .filter(a => isOwnApplication(a) && a.status === 'Accepted')
+    .reduce((sum, a) => {
+      const issue = state.issues.find(i => i.id === a.issueId);
+      return sum + (issue && issue.waveId === wave.id ? pointsFor(issue.complexity) : 0);
+    }, 0);
+  return wave.points + mine;
+}
+
 export const isOwnApplication = (a: Application) => !a.applicant;
 export const applicantName = (a: Application, profile: string) => a.applicant ?? profile;
 
@@ -151,13 +182,13 @@ export function initialState(): State {
     waves: [
       // Announced but not yet funded — the state a contributor sees before a wave
       // opens, and the one that proves `budget` and `escrowed` have to be separate.
-      { id: '4', number: 4, start: '2026-10-01', end: '2026-10-08', budget: 25000, escrowed: 0, paid: 0, claimWindow: WEEK * 2, status: 'Upcoming' },
+      { id: '4', number: 4, start: '2026-10-01', end: '2026-10-08', budget: 25000, escrowed: 0, paid: 0, points: 0, claimWindow: WEEK * 2, status: 'Upcoming' },
       // Funding still arriving mid-wave, so shares on screen are a projection.
-      { id: '3', number: 3, start: '2026-09-01', end: '2026-09-08', budget: 25000, escrowed: 18000, paid: 0, claimWindow: WEEK * 2, status: 'Active' },
+      { id: '3', number: 3, start: '2026-09-01', end: '2026-09-08', budget: 25000, escrowed: 18000, paid: 0, points: 1150, claimWindow: WEEK * 2, status: 'Active' },
       // Closed and fully claimed, bar the rounding dust flooring leaves behind.
-      { id: '2', number: 2, start: '2026-08-01', end: '2026-08-08', budget: 20000, escrowed: 20000, paid: 19999, claimWindow: WEEK * 2, status: 'Completed' },
+      { id: '2', number: 2, start: '2026-08-01', end: '2026-08-08', budget: 20000, escrowed: 20000, paid: 19999, points: 1350, claimWindow: WEEK * 2, status: 'Completed' },
       // Closed underfunded, and with a share nobody came back for.
-      { id: '1', number: 1, start: '2026-07-01', end: '2026-07-08', budget: 15000, escrowed: 12000, paid: 9000, claimWindow: WEEK * 2, status: 'Completed' },
+      { id: '1', number: 1, start: '2026-07-01', end: '2026-07-08', budget: 15000, escrowed: 12000, paid: 9000, points: 900, claimWindow: WEEK * 2, status: 'Completed' },
     ],
     issues: [
       { id: '412', repoId: 'sorobansdk', waveId: '3', title: 'Normalise contract error reporting across host calls', description: 'Storage, auth and token host calls each surface failures in a differently shaped error. Move them onto a shared error enum so integrators can branch on a stable variant.', criteria: ['Define a shared error enum covering every fallible host call.', 'Keep discriminants stable and document them on the trait.', 'Assert the variant for each failure mode in tests.'], complexity: 'Medium', created: '2026-09-05' },

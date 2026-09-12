@@ -878,3 +878,81 @@ fn an_intruder_cannot_open_a_wave_by_signing_for_themselves() {
     pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
     assert_eq!(pool.wave(&3).budget, 25_000 * USDC);
 }
+
+#[test]
+fn rotating_the_admin_moves_every_privileged_path_with_it() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let successor = setup.account();
+
+    assert_eq!(pool.config().admin, setup.admin);
+    pool.set_admin(&successor);
+    // The handover itself is authorised by the outgoing admin, so the role can
+    // only ever move to an address the incumbent signed for.
+    assert_eq!(setup.env.auths()[0].0, setup.admin);
+    assert_eq!(pool.config().admin, successor);
+
+    // Every privileged path follows, rather than only the ones that happen to
+    // re-read the config: they all go through `require_admin`.
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+    assert_eq!(setup.env.auths()[0].0, successor);
+
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+    assert_eq!(setup.env.auths()[0].0, successor);
+
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    assert_eq!(setup.env.auths()[0].0, successor);
+
+    // And the role keeps moving: the new admin can hand it on again.
+    pool.set_admin(&setup.admin);
+    assert_eq!(setup.env.auths()[0].0, successor);
+    assert_eq!(pool.config().admin, setup.admin);
+}
+
+#[test]
+fn the_previous_admin_cannot_act_after_the_handover() {
+    let (env, admin, contract) = unmocked();
+    let pool = WavePoolClient::new(&env, &contract);
+    let successor = Address::generate(&env);
+
+    env.mock_auths(&[MockAuth {
+        address: &admin,
+        invoke: &MockAuthInvoke {
+            contract: &contract,
+            fn_name: "set_admin",
+            args: (successor.clone(),).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+    pool.set_admin(&successor);
+
+    // The outgoing admin signs a wave open, correctly, and is refused — the
+    // signature is valid, it is simply no longer the one the contract asks for.
+    env.mock_auths(&[MockAuth {
+        address: &admin,
+        invoke: &MockAuthInvoke {
+            contract: &contract,
+            fn_name: "open_wave",
+            args: (3u32, WAVE_START, WAVE_END, 25_000 * USDC).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+    assert!(pool
+        .try_open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC))
+        .is_err());
+    assert!(pool.try_wave(&3).is_err());
+
+    // The successor's signature works on the same call.
+    env.mock_auths(&[MockAuth {
+        address: &successor,
+        invoke: &MockAuthInvoke {
+            contract: &contract,
+            fn_name: "open_wave",
+            args: (3u32, WAVE_START, WAVE_END, 25_000 * USDC).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+    assert_eq!(pool.wave(&3).budget, 25_000 * USDC);
+}

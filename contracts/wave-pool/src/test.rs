@@ -7,7 +7,7 @@
 //! something recognisable rather than against invented magnitudes.
 
 use soroban_sdk::{
-    testutils::Address as _,
+    testutils::{Address as _, Ledger},
     token::{StellarAssetClient, TokenClient},
     Address, Env,
 };
@@ -73,6 +73,14 @@ impl Setup {
 
     fn account(&self) -> Address {
         Address::generate(&self.env)
+    }
+
+    /// Moves the ledger clock to `timestamp`. The claim deadline is the only
+    /// thing in this contract that depends on time, so this is only ever used to
+    /// step over it — deliberately by an exact number of seconds, so the
+    /// boundary itself can be tested rather than jumped past.
+    fn advance_to(&self, timestamp: u64) {
+        self.env.ledger().with_mut(|ledger| ledger.timestamp = timestamp);
     }
 
     /// Opens wave 3 and escrows `budget` into it from a fresh sponsor.
@@ -537,4 +545,167 @@ fn points_accumulate_across_several_accepted_issues() {
     pool.close_wave(&3, &CLAIM_WINDOW);
     assert_eq!(pool.claim(&3, &busy), budget * 450 / 600);
     assert_eq!(pool.claim(&3, &single), budget * 150 / 600);
+}
+
+// --- Sweeping ---------------------------------------------------------------
+
+#[test]
+fn sweeping_is_refused_until_the_claim_deadline_passes() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let treasury = setup.account();
+    setup.advance_to(WAVE_END);
+    setup.open_and_fund(25_000 * USDC);
+
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+
+    // Not while the wave is open: `sweep` is a cleanup, not a withdrawal.
+    assert_eq!(
+        pool.try_sweep(&3, &treasury),
+        Err(Ok(Error::WaveNotClosed))
+    );
+
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    let deadline = pool.wave(&3).claim_deadline;
+    assert_eq!(deadline, WAVE_END + CLAIM_WINDOW);
+
+    // This is the assertion the escrow rests on. An admin able to sweep the
+    // moment a wave closed could take the whole pool before anyone claimed,
+    // which would make the contract custody with extra steps.
+    assert_eq!(
+        pool.try_sweep(&3, &treasury),
+        Err(Ok(Error::ClaimPeriodOpen))
+    );
+
+    // One second short of the deadline is still the contributors' window.
+    setup.advance_to(deadline - 1);
+    assert_eq!(
+        pool.try_sweep(&3, &treasury),
+        Err(Ok(Error::ClaimPeriodOpen))
+    );
+    assert_eq!(setup.token().balance(&treasury), 0);
+
+    // And the boundary itself is inclusive.
+    setup.advance_to(deadline);
+    assert_eq!(pool.sweep(&3, &treasury), 25_000 * USDC);
+    assert_eq!(setup.token().balance(&treasury), 25_000 * USDC);
+}
+
+#[test]
+fn sweeping_recovers_an_abandoned_share_but_not_a_claimed_one() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let treasury = setup.account();
+    let budget = 25_000 * USDC;
+    setup.advance_to(WAVE_END);
+    setup.open_and_fund(budget);
+
+    let claims = setup.account();
+    let vanishes = setup.account();
+    pool.award(&3, &claims, &200);
+    pool.award(&3, &vanishes, &200);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+
+    pool.claim(&3, &claims);
+    assert_eq!(setup.token().balance(&claims), budget / 2);
+
+    // The other contributor never comes back — lost key, or simply gone.
+    setup.advance_to(pool.wave(&3).claim_deadline);
+    assert_eq!(pool.sweep(&3, &treasury), budget / 2);
+
+    // Exactly the abandoned half, and the contract is empty afterwards.
+    assert_eq!(setup.token().balance(&treasury), budget / 2);
+    assert_eq!(setup.token().balance(&setup.contract), 0);
+}
+
+#[test]
+fn sweeping_recovers_the_rounding_dust_left_by_flooring_every_share() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let treasury = setup.account();
+    let budget = 25_000 * USDC;
+    setup.advance_to(WAVE_END);
+    setup.open_and_fund(budget);
+
+    // 450 points into 250,000,000,000 stroops does not divide evenly, which is
+    // the whole point of the case.
+    let high = setup.account();
+    let medium = setup.account();
+    let trivial = setup.account();
+    pool.award(&3, &high, &200);
+    pool.award(&3, &medium, &150);
+    pool.award(&3, &trivial, &100);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+
+    let paid = pool.claim(&3, &high) + pool.claim(&3, &medium) + pool.claim(&3, &trivial);
+
+    // Flooring guarantees the shares never add up to more than the pool, which
+    // is what stops the final claim reverting on an empty balance.
+    assert!(paid < budget);
+    let dust = budget - paid;
+    // Bounded by the number of points in the wave, and in practice a handful of
+    // stroops — but not zero, and not recoverable any other way.
+    assert!(dust > 0 && dust < 450);
+    assert_eq!(setup.token().balance(&setup.contract), dust);
+
+    setup.advance_to(pool.wave(&3).claim_deadline);
+    assert_eq!(pool.sweep(&3, &treasury), dust);
+    assert_eq!(setup.token().balance(&setup.contract), 0);
+}
+
+#[test]
+fn a_wave_cannot_be_swept_twice() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let treasury = setup.account();
+    setup.advance_to(WAVE_END);
+
+    // Two waves funded into the same contract account, which is what makes a
+    // repeatable sweep dangerous rather than merely untidy: the balance is
+    // there, it just belongs to wave 4.
+    let sponsor = setup.sponsor(35_000 * USDC);
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+    pool.fund_wave(&3, &sponsor, &(25_000 * USDC));
+    pool.open_wave(&4, &WAVE_END, &(WAVE_END + 604_800), &(10_000 * USDC));
+    pool.fund_wave(&4, &sponsor, &(10_000 * USDC));
+
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    setup.advance_to(pool.wave(&3).claim_deadline);
+
+    assert_eq!(pool.sweep(&3, &treasury), 25_000 * USDC);
+    assert_eq!(
+        pool.try_sweep(&3, &treasury),
+        Err(Ok(Error::NothingToClaim))
+    );
+
+    // Wave 4's escrow is untouched, and the treasury only ever received wave 3.
+    assert_eq!(setup.token().balance(&treasury), 25_000 * USDC);
+    assert_eq!(setup.token().balance(&setup.contract), 10_000 * USDC);
+    assert_eq!(pool.wave(&4).escrowed, 10_000 * USDC);
+}
+
+#[test]
+fn a_fully_claimed_wave_has_nothing_left_to_sweep() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let treasury = setup.account();
+    let budget = 25_000 * USDC;
+    setup.advance_to(WAVE_END);
+    setup.open_and_fund(budget);
+
+    // A single contributor takes the pool exactly, leaving no dust.
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    assert_eq!(pool.claim(&3, &contributor), budget);
+
+    setup.advance_to(pool.wave(&3).claim_deadline);
+    assert_eq!(
+        pool.try_sweep(&3, &treasury),
+        Err(Ok(Error::NothingToClaim))
+    );
+    assert_eq!(setup.token().balance(&treasury), 0);
 }

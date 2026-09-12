@@ -59,6 +59,53 @@ jobs:
           path: dist
           retention-days: 7
 
+  contracts:
+    name: Contracts
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v5
+
+      # rustup ships on the runner image; the toolchain file pins the channel and
+      # the wasm target, so this only has to make sure the target is present.
+      - name: Install the wasm target
+        run: rustup target add wasm32v1-none
+
+      # A cold Soroban SDK build is minutes of compile time, and the dependency
+      # set only moves when the lockfile does.
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            contracts/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('contracts/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Lint
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Test
+        run: cargo test
+
+      # The wasm build is the one that has to succeed for the contract to be
+      # deployable at all: `cargo test` compiles for the host, and the release
+      # profile the network sees differs from it in ways that can fail on their
+      # own (no_std, panic = abort, a different target).
+      - name: Build wasm
+        run: cargo build --target wasm32v1-none --release
+      - name: Upload wasm
+        uses: actions/upload-artifact@v5
+        with:
+          name: wave-pool-wasm
+          path: contracts/target/wasm32v1-none/release/wave_pool.wasm
+          retention-days: 7
+
   e2e:
     name: End-to-end
     runs-on: ubuntu-latest

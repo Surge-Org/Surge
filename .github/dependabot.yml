@@ -25,3 +25,15 @@ updates:
       # Workflow action bumps move together or not at all.
       actions:
         patterns: ['*']
+
+  - package-ecosystem: cargo
+    directory: /contracts
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # The SDK and the host it targets move together; a partial bump is a
+      # contract that builds locally and is rejected on upload.
+      soroban:
+        patterns: ['soroban-*', 'stellar-*']

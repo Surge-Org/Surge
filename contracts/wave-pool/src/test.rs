@@ -12,7 +12,7 @@ use soroban_sdk::{
     Address, Env,
 };
 
-use crate::{WavePool, WavePoolClient, WaveStatus};
+use crate::{Error, WavePool, WavePoolClient, WaveStatus};
 
 /// One USDC. Stellar assets carry seven decimal places, and using the real scale
 /// matters: the rounding behaviour under test is only visible at the smallest
@@ -177,4 +177,149 @@ fn escrowed_funds_leave_the_sponsor_and_sit_in_the_contract_until_claimed() {
     // Sole contributor, so the whole pool is theirs and nothing is left over.
     assert_eq!(setup.token().balance(&contributor), budget);
     assert_eq!(setup.token().balance(&setup.contract), 0);
+}
+
+// --- The state machine ------------------------------------------------------
+//
+// Everything a privileged caller can get wrong by working from a stale view of
+// the wave. These all assert the specific error rather than just "it failed",
+// because the operator console shows the variant and an operator who typed last
+// wave's number should not be told the budget was invalid.
+
+#[test]
+fn a_wave_number_cannot_be_reused() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+    // Reopening would reset `escrowed` and `total_points` while the tokens
+    // themselves stayed put, orphaning every point already awarded.
+    assert_eq!(
+        pool.try_open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC)),
+        Err(Ok(Error::WaveExists))
+    );
+}
+
+#[test]
+fn a_wave_needs_a_forward_window_and_a_positive_budget() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+
+    assert_eq!(
+        pool.try_open_wave(&3, &WAVE_END, &WAVE_START, &(25_000 * USDC)),
+        Err(Ok(Error::InvalidWindow))
+    );
+    // Equal timestamps are a zero-length window, which is just as much a
+    // data-entry error as an inverted one.
+    assert_eq!(
+        pool.try_open_wave(&3, &WAVE_START, &WAVE_START, &(25_000 * USDC)),
+        Err(Ok(Error::InvalidWindow))
+    );
+    assert_eq!(
+        pool.try_open_wave(&3, &WAVE_START, &WAVE_END, &0),
+        Err(Ok(Error::InvalidBudget))
+    );
+    assert_eq!(
+        pool.try_open_wave(&3, &WAVE_START, &WAVE_END, &-1),
+        Err(Ok(Error::InvalidBudget))
+    );
+}
+
+#[test]
+fn every_wave_scoped_call_reports_an_unknown_wave() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let account = setup.account();
+
+    // No wave 9 was ever opened. Each of these has its own read path, so each
+    // is checked — a missing `wave` lookup in one of them would otherwise
+    // surface as a panic on unwrapping storage.
+    assert_eq!(pool.try_wave(&9), Err(Ok(Error::WaveNotFound)));
+    assert_eq!(
+        pool.try_fund_wave(&9, &account, &USDC),
+        Err(Ok(Error::WaveNotFound))
+    );
+    assert_eq!(
+        pool.try_award(&9, &account, &200),
+        Err(Ok(Error::WaveNotFound))
+    );
+    assert_eq!(
+        pool.try_revoke(&9, &account, &200),
+        Err(Ok(Error::WaveNotFound))
+    );
+    assert_eq!(
+        pool.try_close_wave(&9, &CLAIM_WINDOW),
+        Err(Ok(Error::WaveNotFound))
+    );
+    assert_eq!(pool.try_claim(&9, &account), Err(Ok(Error::WaveNotFound)));
+    assert_eq!(pool.try_sweep(&9, &account), Err(Ok(Error::WaveNotFound)));
+    assert_eq!(pool.try_claimable(&9, &account), Err(Ok(Error::WaveNotFound)));
+}
+
+#[test]
+fn a_closed_wave_stops_accepting_funding_and_points() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    setup.open_and_fund(25_000 * USDC);
+
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+
+    let sponsor = setup.sponsor(1_000 * USDC);
+    // Money arriving now would have no claim attached to it: `pool` is already
+    // snapshotted and divided among the recorded points.
+    assert_eq!(
+        pool.try_fund_wave(&3, &sponsor, &(1_000 * USDC)),
+        Err(Ok(Error::WaveNotOpen))
+    );
+    // Points moving now would change a denominator contributors are being paid
+    // against, in either direction.
+    assert_eq!(
+        pool.try_award(&3, &contributor, &100),
+        Err(Ok(Error::WaveNotOpen))
+    );
+    assert_eq!(
+        pool.try_revoke(&3, &contributor, &100),
+        Err(Ok(Error::WaveNotOpen))
+    );
+    // And closing again would move a deadline contributors are relying on.
+    assert_eq!(
+        pool.try_close_wave(&3, &CLAIM_WINDOW),
+        Err(Ok(Error::WaveNotOpen))
+    );
+
+    // None of it touched the wave.
+    let wave = pool.wave(&3);
+    assert_eq!(wave.escrowed, 25_000 * USDC);
+    assert_eq!(wave.total_points, 200);
+    assert_eq!(wave.claim_deadline, setup.env.ledger().timestamp() + CLAIM_WINDOW);
+}
+
+#[test]
+fn zero_is_not_a_valid_transfer_or_award() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let sponsor = setup.sponsor(25_000 * USDC);
+    let contributor = setup.account();
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+
+    // Both would succeed as no-ops and emit an event that reads as a real
+    // transfer or a real credit in the audit trail.
+    assert_eq!(
+        pool.try_fund_wave(&3, &sponsor, &0),
+        Err(Ok(Error::InvalidAmount))
+    );
+    assert_eq!(
+        pool.try_fund_wave(&3, &sponsor, &-1),
+        Err(Ok(Error::InvalidAmount))
+    );
+    assert_eq!(
+        pool.try_award(&3, &contributor, &0),
+        Err(Ok(Error::InvalidPoints))
+    );
+    assert_eq!(
+        pool.try_revoke(&3, &contributor, &0),
+        Err(Ok(Error::InvalidPoints))
+    );
 }

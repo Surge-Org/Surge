@@ -742,3 +742,53 @@ a.row-title:hover { text-decoration: underline; text-underline-offset: 2px; }
 }
 .pipe-foot-k { color: var(--ink-4); letter-spacing: .05em; text-transform: uppercase; font-size: var(--t1); }
 .pipe-foot-v { color: var(--ink); font-weight: 600; }
+
+/* ---------------------------------------------------------- on-chain page */
+.onchain { position: relative; }
+
+/* The starfield sits behind the page head only, so the figures below it are read
+   on a flat surface. Fixed height rather than full-bleed for that reason. */
+.onchain-sky {
+  position: absolute;
+  inset: -24px -24px auto;
+  height: 340px;
+  z-index: 0;
+  pointer-events: none;
+}
+.onchain > *:not(.onchain-sky) { position: relative; z-index: 1; }
+
+.onchain-wave { margin-bottom: var(--s4); }
+.onchain-wave:last-child { margin-bottom: 0; }
+
+.onchain-steps {
+  display: grid;
+  gap: 1px;
+  background: var(--line-soft);
+  border: 1px solid var(--line);
+  counter-reset: step;
+}
+.onchain-steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: var(--s3);
+  padding: var(--s4) var(--s5);
+  background: var(--panel);
+  font-size: var(--t3);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.onchain-steps li::before {
+  content: counter(step);
+  font-family: 'JetBrains Mono Variable', ui-monospace, monospace;
+  font-size: var(--t2);
+  color: var(--acc);
+  padding-top: 2px;
+}
+.onchain-steps strong { color: var(--ink); font-weight: 560; }
+
+.onchain-foot {
+  margin-top: var(--s4);
+  font-size: var(--t2);
+  color: var(--ink-3);
+}

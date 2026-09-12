@@ -1,8 +1,13 @@
 #![no_std]
 
+mod events;
+
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, Env, Map,
-    Vec,
+    contract, contracterror, contractimpl, contracttype, token, Address, Env, Map, Vec,
+};
+
+use events::{
+    Allocated, Claimed, DustAllocated, Funded, PhaseChanged, Refunded, Withdrawn, WaveCreated,
 };
 
 /// Settlement and active-sponsor bounds are part of the public contract.
@@ -94,8 +99,14 @@ fn amount(env: &Env, key: &Key) -> i128 {
     env.storage().persistent().get(key).unwrap_or(0)
 }
 fn phase_event(env: &Env, id: u64, w: &Wave) {
-    env.events()
-        .publish((symbol_short!("phase"), id), w.clone());
+    let phase_num = match w.phase {
+        Phase::Funded => 0u32,
+        Phase::Open => 1u32,
+        Phase::Closed => 2u32,
+        Phase::Settled => 3u32,
+        Phase::Cancelled => 4u32,
+    };
+    PhaseChanged { id, phase: phase_num }.publish(env);
 }
 fn pay(env: &Env, from: &Address, to: &Address, value: i128) -> Result<(), EscrowError> {
     let token: Address = env.storage().instance().get(&Key::Token).unwrap();
@@ -200,8 +211,7 @@ impl WaveEscrow {
         };
         save(&env, id, &w);
         let token: Address = env.storage().instance().get(&Key::Token).unwrap();
-        env.events()
-            .publish((symbol_short!("created"), id), (token, w));
+        WaveCreated { id, token }.publish(&env);
         Ok(id)
     }
 
@@ -233,10 +243,14 @@ impl WaveEscrow {
         env.storage().persistent().set(&key, &(previous + value));
         save(&env, id, &w);
         pay(&env, &sponsor, &env.current_contract_address(), value)?;
-        env.events().publish(
-            (symbol_short!("funded"), id, sponsor),
-            (value, previous + value, w.pool),
-        );
+        Funded {
+            id,
+            sponsor: sponsor.clone(),
+            amount: value,
+            sponsor_total: previous + value,
+            pool_total: w.pool,
+        }
+        .publish(&env);
         Ok(())
     }
 
@@ -259,10 +273,14 @@ impl WaveEscrow {
         env.storage().persistent().set(&key, &(previous - value));
         save(&env, id, &w);
         pay(&env, &env.current_contract_address(), &sponsor, value)?;
-        env.events().publish(
-            (symbol_short!("withdraw"), id, sponsor),
-            (value, previous - value, w.pool),
-        );
+        Withdrawn {
+            id,
+            sponsor: sponsor.clone(),
+            amount: value,
+            sponsor_remaining: previous - value,
+            pool_total: w.pool,
+        }
+        .publish(&env);
         Ok(())
     }
 
@@ -336,18 +354,25 @@ impl WaveEscrow {
                     .persistent()
                     .set(&Key::Allocation(id, share.recipient.clone()), &value);
             }
-            env.events().publish(
-                (symbol_short!("allocated"), id, share.recipient),
-                (share.points, value),
-            );
+            Allocated {
+                id,
+                recipient: share.recipient.clone(),
+                points: share.points,
+                amount: value,
+            }
+            .publish(&env);
         }
         if dust > 0 {
             let key = Key::Allocation(id, w.dust_recipient.clone());
             env.storage()
                 .persistent()
                 .set(&key, &(amount(&env, &key) + dust));
-            env.events()
-                .publish((symbol_short!("dust"), id, w.dust_recipient.clone()), dust);
+            DustAllocated {
+                id,
+                recipient: w.dust_recipient.clone(),
+                amount: dust,
+            }
+            .publish(&env);
         }
         w.phase = Phase::Settled;
         w.total_points = total;
@@ -374,10 +399,13 @@ impl WaveEscrow {
         w.claimed += value;
         save(&env, id, &w);
         pay(&env, &env.current_contract_address(), &recipient, value)?;
-        env.events().publish(
-            (symbol_short!("claimed"), id, recipient),
-            (value, w.claimed),
-        );
+        Claimed {
+            id,
+            recipient: recipient.clone(),
+            amount: value,
+            claimed_total: w.claimed,
+        }
+        .publish(&env);
         Ok(value)
     }
 
@@ -417,10 +445,13 @@ impl WaveEscrow {
         w.refunded += value;
         save(&env, id, &w);
         pay(&env, &env.current_contract_address(), &sponsor, value)?;
-        env.events().publish(
-            (symbol_short!("refunded"), id, sponsor),
-            (value, w.refunded),
-        );
+        Refunded {
+            id,
+            sponsor: sponsor.clone(),
+            amount: value,
+            refunded_total: w.refunded,
+        }
+        .publish(&env);
         Ok(value)
     }
 

@@ -12,6 +12,7 @@ import { useRouteMenu } from './lib/hooks';
 import { canOpenRepoDashboard, formatMoney, repoName, reposOwnedBy } from './lib/model';
 import { PROGRAM } from './lib/program';
 import { Avatar, Brand, EASE } from './components/ui';
+import { NetworkBadge } from './components/chain';
 import { GooeyNav } from './components/bits';
 import { Landing } from './pages/landing';
 import { Explore } from './pages/explore';
@@ -120,6 +121,9 @@ function PublicShell({ children }: { children: ReactNode }) {
           <Brand />
           <div className="navpill-nav"><GooeyNav items={nav} /></div>
           <div className="navpill-right">
+            {/* Which network the amounts on this page refer to. First thing in the
+                group because it qualifies everything to its right. */}
+            <span className="hide-sm"><NetworkBadge /></span>
             <ThemeToggle />
             <Link className="btn sm" to="/maintainer/login">Submit your repo</Link>
             {state.session.contributor ? (

@@ -7,9 +7,9 @@
 //! something recognisable rather than against invented magnitudes.
 
 use soroban_sdk::{
-    testutils::{Address as _, Ledger},
+    testutils::{Address as _, Ledger, MockAuth, MockAuthInvoke},
     token::{StellarAssetClient, TokenClient},
-    Address, Env,
+    Address, Env, IntoVal,
 };
 
 use crate::{Error, WavePool, WavePoolClient, WaveStatus};
@@ -28,6 +28,7 @@ const CLAIM_WINDOW: u64 = 14 * 24 * 60 * 60;
 
 struct Setup {
     env: Env,
+    admin: Address,
     token: Address,
     contract: Address,
 }
@@ -51,6 +52,7 @@ impl Setup {
 
         Self {
             env,
+            admin,
             token,
             contract,
         }
@@ -746,4 +748,133 @@ fn a_share_cannot_be_claimed_out_of_another_wave_after_a_sweep() {
     assert_eq!(setup.token().balance(&setup.contract), 40_000 * USDC);
     assert_eq!(setup.token().balance(&late), 0);
     assert_eq!(pool.wave(&4).escrowed, 40_000 * USDC);
+}
+
+// --- Authorisation ----------------------------------------------------------
+//
+// These build their own environment rather than using `Setup`, because `Setup`
+// mocks every authorisation — which is what makes the arithmetic tests readable
+// and exactly what must not be in place here.
+
+/// A pool deployed with no mocked authorisations at all.
+fn unmocked() -> (Env, Address, Address) {
+    let env = Env::default();
+    let admin = Address::generate(&env);
+    let token = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
+    let contract = env.register(WavePool, (&admin, &token));
+    (env, admin, contract)
+}
+
+#[test]
+fn no_privileged_call_succeeds_without_an_authorisation() {
+    let (env, _admin, contract) = unmocked();
+    let pool = WavePoolClient::new(&env, &contract);
+    let account = Address::generate(&env);
+
+    // Nothing is signed, so `require_auth` has nothing to satisfy it. These fail
+    // as host errors rather than contract errors — authorisation is checked
+    // before the contract body runs, which is the point.
+    assert!(pool
+        .try_open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC))
+        .is_err());
+    assert!(pool.try_set_admin(&account).is_err());
+
+    // Reads stay open: nothing here moves funds or grants anything, and a client
+    // rendering a dashboard has no signature to offer.
+    assert_eq!(pool.config().admin, _admin);
+}
+
+#[test]
+fn the_admin_is_the_address_whose_authorisation_is_required() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+
+    // With every auth mocked the calls succeed, so the question is *whose*
+    // signature the host recorded as required — which is what a caller would
+    // actually have to produce on a real network.
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+    assert_eq!(setup.env.auths()[0].0, setup.admin);
+
+    // Funded so the sweep at the end has something to recover; the funder's own
+    // authorisation is covered by the next test.
+    let sponsor = setup.sponsor(25_000 * USDC);
+    pool.fund_wave(&3, &sponsor, &(25_000 * USDC));
+
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+    assert_eq!(setup.env.auths()[0].0, setup.admin);
+
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    assert_eq!(setup.env.auths()[0].0, setup.admin);
+
+    setup.advance_to(pool.wave(&3).claim_deadline);
+    pool.sweep(&3, &setup.account());
+    assert_eq!(setup.env.auths()[0].0, setup.admin);
+}
+
+#[test]
+fn funding_and_claiming_are_authorised_by_the_account_they_move_funds_for() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let budget = 25_000 * USDC;
+
+    let sponsor = setup.sponsor(budget);
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &budget);
+
+    // Funding is authorised by the funder, not the operator — that is what lets
+    // a sponsor pay in directly instead of routing through the admin's account.
+    pool.fund_wave(&3, &sponsor, &budget);
+    assert_eq!(setup.env.auths()[0].0, sponsor);
+
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+
+    // And a claim is authorised by the claimant. The admin cannot stand in for
+    // them, which is the limit that keeps the escrow from being trusted about
+    // where money goes.
+    pool.claim(&3, &contributor);
+    assert_eq!(setup.env.auths()[0].0, contributor);
+}
+
+#[test]
+fn an_intruder_cannot_open_a_wave_by_signing_for_themselves() {
+    let (env, admin, contract) = unmocked();
+    let intruder = Address::generate(&env);
+    let args = (3u32, WAVE_START, WAVE_END, 25_000 * USDC).into_val(&env);
+
+    // A perfectly valid signature — from the wrong address. The contract asks
+    // for the admin's authorisation specifically, so offering someone else's is
+    // not a near-miss that lands on a permissive branch; it simply is not the
+    // authorisation that was requested.
+    let pool = WavePoolClient::new(&env, &contract);
+    env.mock_auths(&[MockAuth {
+        address: &intruder,
+        invoke: &MockAuthInvoke {
+            contract: &contract,
+            fn_name: "open_wave",
+            args,
+            sub_invokes: &[],
+        },
+    }]);
+    assert!(pool
+        .try_open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC))
+        .is_err());
+    assert!(pool.try_wave(&3).is_err());
+
+    // The same call with the admin's signature goes through, so the refusal above
+    // is about who signed and not about the arguments.
+    env.mock_auths(&[MockAuth {
+        address: &admin,
+        invoke: &MockAuthInvoke {
+            contract: &contract,
+            fn_name: "open_wave",
+            args: (3u32, WAVE_START, WAVE_END, 25_000 * USDC).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+    assert_eq!(pool.wave(&3).budget, 25_000 * USDC);
 }

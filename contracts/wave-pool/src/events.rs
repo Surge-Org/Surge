@@ -86,3 +86,16 @@ pub struct PointsRevoked {
     pub total: u32,
     pub wave_total: u32,
 }
+
+/// Emitted when a wave stops accepting funding and points and starts paying out.
+/// Carries the two numbers every share in the wave is computed from, so a client
+/// can verify a payout it was quoted.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct WaveClosed {
+    #[topic]
+    pub number: u32,
+    pub pool: i128,
+    pub total_points: u32,
+    pub claim_deadline: u64,
+}

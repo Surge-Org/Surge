@@ -99,3 +99,9 @@ pub fn set_points(env: &Env, number: u32, contributor: &Address, points: u32) {
         .persistent()
         .extend_ttl(&key, ENTRY_THRESHOLD, ENTRY_EXTEND);
 }
+
+pub fn has_claimed(env: &Env, number: u32, contributor: &Address) -> bool {
+    env.storage()
+        .persistent()
+        .has(&DataKey::Claimed(number, contributor.clone()))
+}

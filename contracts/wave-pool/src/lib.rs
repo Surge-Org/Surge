@@ -7,6 +7,7 @@
 
 mod error;
 mod events;
+mod split;
 mod storage;
 mod types;
 
@@ -15,7 +16,9 @@ pub use types::{Config, DataKey, Wave, WaveStatus};
 
 use soroban_sdk::{contract, contractimpl, token::TokenClient, Address, Env};
 
-use events::{AdminSet, Initialized, PointsAwarded, PointsRevoked, WaveFunded, WaveOpened};
+use events::{
+    AdminSet, Initialized, PointsAwarded, PointsRevoked, WaveClosed, WaveFunded, WaveOpened,
+};
 
 #[contract]
 pub struct WavePool;
@@ -239,6 +242,80 @@ impl WavePool {
         }
         .publish(&env);
         Ok(())
+    }
+
+    /// Stops the wave accepting funding and points, and starts it paying out.
+    ///
+    /// This is the operator's signal that reviewing is finished — not the end of
+    /// the contribution window, which the contract deliberately does not gate on.
+    ///
+    /// `claim_window` is a duration in seconds, not an absolute timestamp: the
+    /// operator knows how long contributors should get, and an absolute deadline
+    /// computed off-chain against a clock that is not the ledger's is a way to
+    /// accidentally set one in the past. It is added to the ledger timestamp to
+    /// fix `claim_deadline`, after which `sweep` can recover what nobody took.
+    ///
+    /// A wave with no points recorded still closes. Refusing would be worse than
+    /// pointless: `sweep` only works on a closed wave, so a wave that took
+    /// funding and accepted no work would have no path back out and its escrow
+    /// would be locked in the contract permanently.
+    pub fn close_wave(env: Env, number: u32, claim_window: u64) -> Result<(), Error> {
+        Self::require_admin(&env);
+
+        let mut wave = storage::wave(&env, number)?;
+        // Closing twice would move `claim_deadline` — and on a wave already
+        // paying out, that means extending or retracting a window contributors
+        // are relying on.
+        if wave.status != WaveStatus::Open {
+            return Err(Error::WaveNotOpen);
+        }
+
+        // Freeze the divisor. From here the escrowed balance can still change
+        // (claims leave, a stray transfer could arrive) but `pool` cannot, so two
+        // contributors with equal points are paid equally regardless of when they
+        // claim or what order they claim in.
+        wave.pool = wave.escrowed;
+        wave.status = WaveStatus::Closed;
+        wave.claim_deadline = env
+            .ledger()
+            .timestamp()
+            .checked_add(claim_window)
+            .ok_or(Error::Overflow)?;
+
+        storage::set_wave(&env, &wave);
+
+        WaveClosed {
+            number,
+            pool: wave.pool,
+            total_points: wave.total_points,
+            claim_deadline: wave.claim_deadline,
+        }
+        .publish(&env);
+        Ok(())
+    }
+
+    /// What `contributor` would be paid for wave `number`, in the token's
+    /// smallest unit.
+    ///
+    /// While the wave is open this is a projection against the balance escrowed
+    /// so far, and it moves as funding arrives and as other contributors are
+    /// awarded points — which is what the contributor dashboard wants to show.
+    /// Once closed it is the settled figure `claim` will pay, and zero for a
+    /// contributor who has already claimed.
+    pub fn claimable(env: Env, number: u32, contributor: Address) -> Result<i128, Error> {
+        let wave = storage::wave(&env, number)?;
+        if wave.status == WaveStatus::Closed && storage::has_claimed(&env, number, &contributor) {
+            return Ok(0);
+        }
+        let basis = match wave.status {
+            WaveStatus::Open => wave.escrowed,
+            WaveStatus::Closed => wave.pool,
+        };
+        split::share(
+            basis,
+            storage::points(&env, number, &contributor),
+            wave.total_points,
+        )
     }
 
     /// Points a contributor holds in a wave. Zero for anyone never awarded.

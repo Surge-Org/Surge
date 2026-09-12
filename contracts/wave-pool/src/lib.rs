@@ -17,7 +17,7 @@ pub use types::{Config, DataKey, Wave, WaveStatus};
 use soroban_sdk::{contract, contractimpl, token::TokenClient, Address, Env};
 
 use events::{
-    AdminSet, Claimed, Initialized, PointsAwarded, PointsRevoked, WaveClosed, WaveFunded,
+    AdminSet, Claimed, Initialized, PointsAwarded, PointsRevoked, Swept, WaveClosed, WaveFunded,
     WaveOpened,
 };
 
@@ -354,6 +354,65 @@ impl WavePool {
             amount,
             paid: wave.paid,
         }
+        .publish(&env);
+        Ok(amount)
+    }
+
+    /// Recovers what a closed wave did not pay out, once the claim window has
+    /// expired.
+    ///
+    /// Two things end up unclaimed, and they are different in size but not in
+    /// kind. The first is rounding dust: flooring every share leaves up to
+    /// `total_points - 1` of the smallest unit behind, which is negligible per
+    /// wave and not negligible across a program's lifetime. The second is
+    /// abandoned shares — a contributor who loses their key, or simply never
+    /// comes back. Both would otherwise sit in the contract forever, since
+    /// nothing else in this contract can move them.
+    ///
+    /// **The deadline is what makes this safe.** Without it, an admin able to
+    /// sweep a wave the moment it closed could take the whole pool before a
+    /// single contributor claimed, which would make the escrow pointless — it
+    /// would be custody with extra steps. `claim_deadline` is fixed at close,
+    /// before anyone has claimed, and cannot be moved afterwards, so the
+    /// contributors' window is committed to in advance.
+    ///
+    /// `to` is a parameter rather than the admin address: the sweep destination
+    /// is a program treasury, and the operator key that signs for it is not
+    /// usually the account that should hold funds.
+    pub fn sweep(env: Env, number: u32, to: Address) -> Result<i128, Error> {
+        Self::require_admin(&env);
+
+        let mut wave = storage::wave(&env, number)?;
+        if wave.status != WaveStatus::Closed {
+            return Err(Error::WaveNotClosed);
+        }
+        if env.ledger().timestamp() < wave.claim_deadline {
+            return Err(Error::ClaimPeriodOpen);
+        }
+
+        // `pool - paid` is exact: `pool` is frozen and `paid` accumulates every
+        // outgoing transfer, so this is the remainder without iterating anyone.
+        let amount = wave.pool - wave.paid;
+        if amount <= 0 {
+            return Err(Error::NothingToClaim);
+        }
+
+        // Bring `paid` up to `pool` so the wave has nothing left to sweep. This
+        // is what makes a second sweep fail on `amount <= 0` rather than
+        // attempting a transfer against a balance that may belong to another
+        // wave — the contract holds every wave's escrow in one account, and a
+        // repeatable sweep would let one wave drain another's funds.
+        wave.paid = wave.pool;
+        storage::set_wave(&env, &wave);
+
+        let config = storage::config(&env);
+        TokenClient::new(&env, &config.token).transfer(
+            &env.current_contract_address(),
+            &to,
+            &amount,
+        );
+
+        Swept { number, to, amount }
         .publish(&env);
         Ok(amount)
     }

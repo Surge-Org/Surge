@@ -114,3 +114,14 @@ pub struct Claimed {
     /// Running total paid out of the wave, for reconciling against `pool`.
     pub paid: i128,
 }
+
+/// Emitted when the operator recovers what a closed wave did not pay out.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Swept {
+    #[topic]
+    pub number: u32,
+    #[topic]
+    pub to: Address,
+    pub amount: i128,
+}

@@ -40,7 +40,9 @@ pub fn share(pool: i128, points: u32, total_points: u32) -> Result<i128, Error> 
     // that awards them in hundreds, so this is far from `i128`'s ceiling in
     // practice. It is still checked: the one arithmetic operation in this
     // contract that can overflow is the one that decides how much money moves.
-    let numerator = pool.checked_mul(i128::from(points)).ok_or(Error::Overflow)?;
+    let numerator = pool
+        .checked_mul(i128::from(points))
+        .ok_or(Error::Overflow)?;
 
     // Both operands are positive here, so truncation toward zero is a floor.
     Ok(numerator / i128::from(total_points))
@@ -127,10 +129,7 @@ mod tests {
 
         for (pool, points) in cases {
             let total: u32 = points.iter().sum();
-            let paid: i128 = points
-                .iter()
-                .map(|p| share(pool, *p, total).unwrap())
-                .sum();
+            let paid: i128 = points.iter().map(|p| share(pool, *p, total).unwrap()).sum();
             assert!(paid <= pool, "paid {} exceeds pool {}", paid, pool);
             // And the leftover is bounded by the point total, not by the pool —
             // which is what makes the dust negligible at any realistic scale.

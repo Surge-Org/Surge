@@ -82,7 +82,9 @@ impl Setup {
     /// step over it — deliberately by an exact number of seconds, so the
     /// boundary itself can be tested rather than jumped past.
     fn advance_to(&self, timestamp: u64) {
-        self.env.ledger().with_mut(|ledger| ledger.timestamp = timestamp);
+        self.env
+            .ledger()
+            .with_mut(|ledger| ledger.timestamp = timestamp);
     }
 
     /// Opens wave 3 and escrows `budget` into it from a fresh sponsor.
@@ -160,7 +162,10 @@ fn a_wave_moves_from_open_to_closed_and_records_what_it_holds() {
     let wave = pool.wave(&3);
     assert_eq!(wave.status, WaveStatus::Closed);
     assert_eq!(wave.pool, budget);
-    assert_eq!(wave.claim_deadline, setup.env.ledger().timestamp() + CLAIM_WINDOW);
+    assert_eq!(
+        wave.claim_deadline,
+        setup.env.ledger().timestamp() + CLAIM_WINDOW
+    );
 }
 
 #[test]
@@ -263,7 +268,10 @@ fn every_wave_scoped_call_reports_an_unknown_wave() {
     );
     assert_eq!(pool.try_claim(&9, &account), Err(Ok(Error::WaveNotFound)));
     assert_eq!(pool.try_sweep(&9, &account), Err(Ok(Error::WaveNotFound)));
-    assert_eq!(pool.try_claimable(&9, &account), Err(Ok(Error::WaveNotFound)));
+    assert_eq!(
+        pool.try_claimable(&9, &account),
+        Err(Ok(Error::WaveNotFound))
+    );
 }
 
 #[test]
@@ -303,7 +311,10 @@ fn a_closed_wave_stops_accepting_funding_and_points() {
     let wave = pool.wave(&3);
     assert_eq!(wave.escrowed, 25_000 * USDC);
     assert_eq!(wave.total_points, 200);
-    assert_eq!(wave.claim_deadline, setup.env.ledger().timestamp() + CLAIM_WINDOW);
+    assert_eq!(
+        wave.claim_deadline,
+        setup.env.ledger().timestamp() + CLAIM_WINDOW
+    );
 }
 
 #[test]
@@ -563,10 +574,7 @@ fn sweeping_is_refused_until_the_claim_deadline_passes() {
     pool.award(&3, &contributor, &200);
 
     // Not while the wave is open: `sweep` is a cleanup, not a withdrawal.
-    assert_eq!(
-        pool.try_sweep(&3, &treasury),
-        Err(Ok(Error::WaveNotClosed))
-    );
+    assert_eq!(pool.try_sweep(&3, &treasury), Err(Ok(Error::WaveNotClosed)));
 
     pool.close_wave(&3, &CLAIM_WINDOW);
     let deadline = pool.wave(&3).claim_deadline;
@@ -739,10 +747,7 @@ fn a_share_cannot_be_claimed_out_of_another_wave_after_a_sweep() {
     // Their points and their computed share both still exist. What no longer
     // exists is wave 3's money.
     assert_eq!(pool.points(&3, &late), 200);
-    assert_eq!(
-        pool.try_claim(&3, &late),
-        Err(Ok(Error::PoolExhausted))
-    );
+    assert_eq!(pool.try_claim(&3, &late), Err(Ok(Error::PoolExhausted)));
 
     // Wave 4, still open, keeps every stroop of its escrow.
     assert_eq!(setup.token().balance(&setup.contract), 40_000 * USDC);

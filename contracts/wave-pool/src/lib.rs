@@ -136,7 +136,7 @@ impl WavePool {
         let config = storage::config(&env);
         TokenClient::new(&env, &config.token).transfer(
             &from,
-            &env.current_contract_address(),
+            env.current_contract_address(),
             &amount,
         );
         storage::set_wave(&env, &wave);
@@ -184,7 +184,10 @@ impl WavePool {
         let total = storage::points(&env, number, &contributor)
             .checked_add(points)
             .ok_or(Error::Overflow)?;
-        wave.total_points = wave.total_points.checked_add(points).ok_or(Error::Overflow)?;
+        wave.total_points = wave
+            .total_points
+            .checked_add(points)
+            .ok_or(Error::Overflow)?;
 
         storage::set_points(&env, number, &contributor, total);
         storage::set_wave(&env, &wave);
@@ -425,8 +428,7 @@ impl WavePool {
             &amount,
         );
 
-        Swept { number, to, amount }
-        .publish(&env);
+        Swept { number, to, amount }.publish(&env);
         Ok(amount)
     }
 

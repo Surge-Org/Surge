@@ -43,3 +43,54 @@
   0%, 100% { opacity: 1; }
   50%      { opacity: .35; }
 }
+
+/* ---------------------------------------------------------- asset + amount */
+.asset {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--t2);
+  font-weight: 560;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.asset-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--usdc);
+  flex-shrink: 0;
+}
+/* The native asset has no issuer and no brand, so it takes the ink colour. */
+.asset[data-native='true'] .asset-dot { background: var(--ink-3); }
+
+.asset-chip {
+  height: var(--h-xs);
+  padding: 0 8px;
+  border: 1px solid var(--usdc-line);
+  background: var(--usdc-soft);
+  color: var(--usdc);
+}
+.asset-chip[data-native='true'] {
+  border-color: var(--line);
+  background: var(--panel-2);
+  color: var(--ink-2);
+}
+
+/* Amounts align on the decimal in a column, so a list of payouts scans. */
+.amt {
+  font-family: 'JetBrains Mono Variable', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.amt-code {
+  margin-left: 5px;
+  font-size: .86em;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+/* The fractional half is dimmed: the whole units are the number, and the seven
+   decimal places are precision you should be able to check but not have to read. */
+.amt-frac { color: var(--ink-3); }
+.amt[data-zero='true'] { color: var(--ink-3); }

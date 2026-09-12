@@ -136,3 +136,49 @@ export function formatAmount(stroops: bigint): string {
  */
 export const formatStroops = (stroops: bigint): string =>
   stroops.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+export interface Asset {
+  /** Asset code as it appears on a trustline or in a contract's metadata. */
+  code: string;
+  /** Full name, for the one place per screen that spells it out. */
+  name: string;
+  /**
+   * Classic issuer for this asset on mainnet, where it has one.
+   *
+   * NOT VERIFIED FROM THIS REPOSITORY. Check it against the issuer the asset's
+   * own operator publishes before pointing anything at mainnet — an issuer is 56
+   * characters and a wrong one is a different asset that happens to share a code,
+   * which is exactly the mistake this field exists to stop people making by hand.
+   */
+  issuer?: string;
+  /** Whether this is the network's native asset rather than an issued one. */
+  native?: boolean;
+}
+
+/**
+ * The assets this program touches.
+ *
+ * USDC is the reward asset — the wave pool is denominated in it, and it is what
+ * a contributor is actually paid. XLM is here because it is what fees are paid
+ * in, so a contributor who has been paid and still cannot move the funds needs
+ * the interface to be able to name the reason.
+ */
+export const ASSETS = {
+  USDC: {
+    code: 'USDC',
+    name: 'USD Coin',
+    issuer: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN',
+  },
+  XLM: {
+    code: 'XLM',
+    name: 'Lumens',
+    native: true,
+  },
+} as const satisfies Record<string, Asset>;
+
+/** The asset a wave pool pays out in. */
+export const REWARD_ASSET = ASSETS.USDC;
+
+/** An amount with its asset, the way it should always be said out loud. */
+export const withAsset = (stroops: bigint, asset: Asset = REWARD_ASSET): string =>
+  `${formatAmount(stroops)} ${asset.code}`;

@@ -1,17 +1,30 @@
+# Soroban contracts backing the Surge preview.
+#
+# The workspace is deliberately separate from the npm project: the frontend is
+# built by Vite and never compiles Rust, and `cargo` never needs to know about
+# `package.json`. Only the generated bindings cross the boundary.
 [workspace]
-members = ["wave_escrow"]
 resolver = "2"
+members = ["wave-pool", "wave_escrow"]
 
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+soroban-sdk = "27"
+
+# Contracts ship as wasm, so size beats compile time. `opt-level = "z"` and a
+# single codegen unit let the optimiser see the whole crate; stripping debug
+# info and aborting on panic drop the unwinding tables the host never uses.
 [profile.release]
 opt-level = "z"
 overflow-checks = true
-lto = true
-codegen-units = 1
-panic = "abort"
+debug = 0
 strip = "symbols"
-
-[profile.dev]
-debug = 0
-
-[profile.test]
-debug = 0
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true

@@ -182,3 +182,49 @@ export const REWARD_ASSET = ASSETS.USDC;
 /** An amount with its asset, the way it should always be said out loud. */
 export const withAsset = (stroops: bigint, asset: Asset = REWARD_ASSET): string =>
   `${formatAmount(stroops)} ${asset.code}`;
+
+export type AddressKind = 'account' | 'contract' | 'muxed' | 'secret' | 'unknown';
+
+/**
+ * What kind of thing a strkey refers to, from its prefix.
+ *
+ * Stellar encodes the type into the first character, which means an address can
+ * be classified without a network round trip: `G` is an account, `C` a contract,
+ * `M` a muxed account, `S` a secret seed. This is a prefix and length check, not
+ * a checksum validation — enough to label and route a value, not enough to
+ * conclude it exists.
+ */
+export function addressKind(value: string): AddressKind {
+  const key = value.trim().toUpperCase();
+  if (key.length === 56 && key.startsWith('G')) return 'account';
+  if (key.length === 56 && key.startsWith('C')) return 'contract';
+  if (key.length === 69 && key.startsWith('M')) return 'muxed';
+  if (key.startsWith('S') && key.length === 56) return 'secret';
+  return 'unknown';
+}
+
+/**
+ * True if this looks like a secret seed.
+ *
+ * Exported so that anything about to render a user-supplied string can refuse.
+ * A seed is the same length and shape as an account id, so a component that
+ * displays "an address" will display a seed just as happily — and a pasted seed
+ * in a screenshot, a support thread or a shared preview is unrecoverable. The
+ * check costs nothing and the failure it prevents cannot be undone.
+ */
+export const isSecret = (value: string): boolean => addressKind(value) === 'secret';
+
+/**
+ * Truncates a strkey to its first and last characters.
+ *
+ * Both ends, never just the head. Strkeys of the same kind share their leading
+ * characters — every contract id starts with `C` and accounts cluster by
+ * encoding — so a head-only truncation makes two different addresses look
+ * identical, which is the one thing a truncation must not do. The tail is what
+ * actually distinguishes them.
+ */
+export function shortAddress(value: string, lead = 4, tail = 4): string {
+  const key = value.trim();
+  if (key.length <= lead + tail + 1) return key;
+  return `${key.slice(0, lead)}…${key.slice(-tail)}`;
+}

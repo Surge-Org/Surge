@@ -1,0 +1,17 @@
+[workspace]
+members = ["wave_escrow"]
+resolver = "2"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[profile.dev]
+debug = 0
+
+[profile.test]
+debug = 0

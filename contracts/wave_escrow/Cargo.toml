@@ -1,0 +1,19 @@
+[package]
+name = "wave-escrow"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.91"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+wasm-tests = []
+
+[dependencies]
+soroban-sdk = "=27.0.6"
+
+[dev-dependencies]
+soroban-sdk = { version = "=27.0.6", features = ["testutils"] }
+proptest = "1.6"

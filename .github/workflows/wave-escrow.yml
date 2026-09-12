@@ -1,0 +1,42 @@
+name: Wave escrow
+on:
+  push:
+    paths: ['contracts/**', '.github/workflows/wave-escrow.yml']
+  pull_request:
+    paths: ['contracts/**', '.github/workflows/wave-escrow.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: contracts
+      - name: Format check
+        working-directory: contracts
+        run: |
+          cargo fmt --all -- --check
+      - name: Compile deployable Wasm
+        working-directory: contracts
+        run: cargo build --locked --target wasm32v1-none --release
+      - name: Contract tests and property tests
+        working-directory: contracts
+        run: |
+          set -o pipefail
+          cargo test --locked --workspace --features wasm-tests -- --nocapture 2>&1 | tee test-output.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wave-escrow-evidence
+          path: |
+            contracts/formatting.patch
+            contracts/test-output.txt
+            contracts/target/wasm32v1-none/release/wave_escrow.wasm
+            contracts/Cargo.lock

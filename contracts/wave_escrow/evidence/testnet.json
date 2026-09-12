@@ -1,0 +1,790 @@
+{
+  "network": "Stellar testnet",
+  "asset": "Circle test USDC",
+  "asset_has_financial_value": false,
+  "usdc_contract": "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA",
+  "issuer": "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5",
+  "wasm_sha256": "552c564a54c1a03979c42dc8d80e6cf40b3a9f555db02db37482efabdca5941e",
+  "steps": [
+    {
+      "label": "CLI version",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "stellar 28.0.0 (300aaf69ab100536678bdb641428b06f06b318ea)\nstellar-xdr 28.0.0 (d0f1330e43c3a2c0c616da30698b24140d4eea72)\nxdr (9c9c145953e80990d6ff1ae3a6a973a0ce6d0694)\n",
+      "stderr": "",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Sponsor public address",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "keys",
+        "address",
+        "surge-sponsor"
+      ],
+      "returncode": 0,
+      "stdout": "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\n",
+      "stderr": "",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Recipient public address",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "keys",
+        "address",
+        "surge-recipient"
+      ],
+      "returncode": 0,
+      "stdout": "GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4\n",
+      "stderr": "",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Verify Circle asset binding",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "id",
+        "asset",
+        "--network",
+        "testnet",
+        "--asset",
+        "USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+      ],
+      "returncode": 0,
+      "stdout": "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA\n",
+      "stderr": "",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Read sponsor starting balance",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "balance",
+        "--id",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS"
+      ],
+      "returncode": 0,
+      "stdout": "\"200000000\"\n",
+      "stderr": "\u2139\ufe0f  Simulation identified as read-only. Send by rerunning with `--send=yes`.\n",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Deploy wave_escrow to testnet",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "deploy",
+        "--wasm",
+        "<compiled-wasm>",
+        "--optimize=false",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--",
+        "--usdc",
+        "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA"
+      ],
+      "returncode": 0,
+      "stdout": "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\n",
+      "stderr": "\u2139\ufe0f  Uploading contract WASM\u2026\n\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: e95cd635a0e0b9965da9411077c5f962a56f7fe7884327dc1fbaca8cdcbb76bc\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/e95cd635a0e0b9965da9411077c5f962a56f7fe7884327dc1fbaca8cdcbb76bc\n\u2139\ufe0f  Deploying contract using wasm hash 552c564a54c1a03979c42dc8d80e6cf40b3a9f555db02db37482efabdca5941e\n\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 78508f1483baed8a4d6b59fa7245d4fc05bb6f5f82e3b8ee14b5b93993ad697c\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/78508f1483baed8a4d6b59fa7245d4fc05bb6f5f82e3b8ee14b5b93993ad697c\n\ud83d\udd17 https://lab.stellar.org/r/testnet/contract/CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\n\u2705 Deployed!\n",
+      "transaction_hashes": [
+        "e95cd635a0e0b9965da9411077c5f962a56f7fe7884327dc1fbaca8cdcbb76bc",
+        "78508f1483baed8a4d6b59fa7245d4fc05bb6f5f82e3b8ee14b5b93993ad697c"
+      ]
+    },
+    {
+      "label": "Create funded wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "create",
+        "--manager",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS",
+        "--closes-at",
+        "1789146953",
+        "--grace-seconds",
+        "300",
+        "--dust-recipient",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS"
+      ],
+      "returncode": 0,
+      "stdout": "0\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: e35aa4223353b16bae646052e92a575959463e3c2f0347279a080796b44c9230\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/e35aa4223353b16bae646052e92a575959463e3c2f0347279a080796b44c9230\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 86852                                                                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 86752                                                         \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 10450         \u2502 Refundable: 76302                           \u2502\n\u2502                            \u2502                               \u2502                                             \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 10450 \u2502 Refundable Charged: 57933 \u2502 Refunded: 18369 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 68383                               \u2502 Refunded: 18369 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 68483                                                                     \u2502 Refunded: 18369 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"created\"},{\"u64\":\"0\"}] = {\"vec\":[{\"address\":\"CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA\"},{\"map\":[{\"key\":{\"symbol\":\"claimed\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"closes_at\"},\"val\":{\"u64\":\"1789146953\"}},{\"key\":{\"symbol\":\"dust\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"dust_recipient\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"expires_at\"},\"val\":{\"u64\":\"1789147253\"}},{\"key\":{\"symbol\":\"manager\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"phase\"},\"val\":{\"vec\":[{\"symbol\":\"Funded\"}]}},{\"key\":{\"symbol\":\"pool\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"refunded\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"sponsors\"},\"val\":{\"u32\":0}},{\"key\":{\"symbol\":\"total_points\"},\"val\":{\"i128\":\"0\"}}]}]}\n",
+      "transaction_hashes": [
+        "e35aa4223353b16bae646052e92a575959463e3c2f0347279a080796b44c9230"
+      ]
+    },
+    {
+      "label": "Fund wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "fund",
+        "--id",
+        "0",
+        "--sponsor",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS",
+        "--value",
+        "10000000"
+      ],
+      "returncode": 0,
+      "stdout": "null\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: a3316707759eb8f2fc4de3db119b8b330728e5f3b823bb4523b76efe30935156\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/a3316707759eb8f2fc4de3db119b8b330728e5f3b823bb4523b76efe30935156\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 164672                                                                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 164572                                                         \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 21331         \u2502 Refundable: 143241                           \u2502\n\u2502                            \u2502                               \u2502                                              \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                                 \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                                 \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                       \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 21331 \u2502 Refundable Charged: 116141 \u2502 Refunded: 27100 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 137472                               \u2502 Refunded: 27100 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 137572                                                                     \u2502 Refunded: 27100 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA - Success - Event: [{\"symbol\":\"transfer\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"},{\"address\":\"CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\"},{\"string\":\"USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5\"}] = {\"i128\":\"10000000\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"funded\"},{\"u64\":\"0\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"vec\":[{\"i128\":\"10000000\"},{\"i128\":\"10000000\"},{\"i128\":\"10000000\"}]}\n",
+      "transaction_hashes": [
+        "a3316707759eb8f2fc4de3db119b8b330728e5f3b823bb4523b76efe30935156"
+      ]
+    },
+    {
+      "label": "Open wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "open",
+        "--id",
+        "0"
+      ],
+      "returncode": 0,
+      "stdout": "null\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 8c97d75493f279f6356c3426b98fb5e3280436c644de6a9f1476a541626c5ddd\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/8c97d75493f279f6356c3426b98fb5e3280436c644de6a9f1476a541626c5ddd\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 19592                                                                                    \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 19492                                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 6847         \u2502 Refundable: 12645                          \u2502\n\u2502                            \u2502                              \u2502                                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m             \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m           \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                      \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                     \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 6847 \u2502 Refundable Charged: 2579 \u2502 Refunded: 10066 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 9426                              \u2502 Refunded: 10066 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 9526                                                                    \u2502 Refunded: 10066 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"phase\"},{\"u64\":\"0\"}] = {\"map\":[{\"key\":{\"symbol\":\"claimed\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"closes_at\"},\"val\":{\"u64\":\"1789146953\"}},{\"key\":{\"symbol\":\"dust\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"dust_recipient\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"expires_at\"},\"val\":{\"u64\":\"1789147253\"}},{\"key\":{\"symbol\":\"manager\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"phase\"},\"val\":{\"vec\":[{\"symbol\":\"Open\"}]}},{\"key\":{\"symbol\":\"pool\"},\"val\":{\"i128\":\"10000000\"}},{\"key\":{\"symbol\":\"refunded\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"sponsors\"},\"val\":{\"u32\":1}},{\"key\":{\"symbol\":\"total_points\"},\"val\":{\"i128\":\"0\"}}]}\n",
+      "transaction_hashes": [
+        "8c97d75493f279f6356c3426b98fb5e3280436c644de6a9f1476a541626c5ddd"
+      ]
+    },
+    {
+      "label": "Top up open wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "fund",
+        "--id",
+        "0",
+        "--sponsor",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS",
+        "--value",
+        "1"
+      ],
+      "returncode": 0,
+      "stdout": "null\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 5accea80cc6f11e72a3c4378adce5ecdad87285f5606865ae2488179ca38fe70\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/5accea80cc6f11e72a3c4378adce5ecdad87285f5606865ae2488179ca38fe70\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 31807                                                                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 31707                                                        \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 19534         \u2502 Refundable: 12173                          \u2502\n\u2502                            \u2502                               \u2502                                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 19534 \u2502 Refundable Charged: 2168 \u2502 Refunded: 10005 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 21702                              \u2502 Refunded: 10005 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 21802                                                                    \u2502 Refunded: 10005 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA - Success - Event: [{\"symbol\":\"transfer\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"},{\"address\":\"CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\"},{\"string\":\"USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5\"}] = {\"i128\":\"1\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"funded\"},{\"u64\":\"0\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"vec\":[{\"i128\":\"1\"},{\"i128\":\"10000001\"},{\"i128\":\"10000001\"}]}\n",
+      "transaction_hashes": [
+        "5accea80cc6f11e72a3c4378adce5ecdad87285f5606865ae2488179ca38fe70"
+      ]
+    },
+    {
+      "label": "Close wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "close",
+        "--id",
+        "0"
+      ],
+      "returncode": 0,
+      "stdout": "null\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 2bb4ca00a4b2d0b3470fa843ff5d0c12d6360f680a03161505d215ceb5382b37\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/2bb4ca00a4b2d0b3470fa843ff5d0c12d6360f680a03161505d215ceb5382b37\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 19767                                                                                    \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 19667                                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 6552         \u2502 Refundable: 13115                          \u2502\n\u2502                            \u2502                              \u2502                                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m             \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m           \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                      \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                     \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 6552 \u2502 Refundable Charged: 2987 \u2502 Refunded: 10128 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 9539                              \u2502 Refunded: 10128 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 9639                                                                    \u2502 Refunded: 10128 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"phase\"},{\"u64\":\"0\"}] = {\"map\":[{\"key\":{\"symbol\":\"claimed\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"closes_at\"},\"val\":{\"u64\":\"1789146953\"}},{\"key\":{\"symbol\":\"dust\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"dust_recipient\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"expires_at\"},\"val\":{\"u64\":\"1789147253\"}},{\"key\":{\"symbol\":\"manager\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"phase\"},\"val\":{\"vec\":[{\"symbol\":\"Closed\"}]}},{\"key\":{\"symbol\":\"pool\"},\"val\":{\"i128\":\"10000001\"}},{\"key\":{\"symbol\":\"refunded\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"sponsors\"},\"val\":{\"u32\":1}},{\"key\":{\"symbol\":\"total_points\"},\"val\":{\"i128\":\"0\"}}]}\n",
+      "transaction_hashes": [
+        "2bb4ca00a4b2d0b3470fa843ff5d0c12d6360f680a03161505d215ceb5382b37"
+      ]
+    },
+    {
+      "label": "Settle proportional allocations",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "settle",
+        "--id",
+        "0",
+        "--shares",
+        "[{\"recipient\":\"GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4\",\"points\":1},{\"recipient\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\",\"points\":2}]"
+      ],
+      "returncode": 0,
+      "stdout": "null\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 475e2a12558761526598058720b61edf0882a3712815e332a1090490c38301de\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/475e2a12558761526598058720b61edf0882a3712815e332a1090490c38301de\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 73560                                                                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 73460                                                         \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 15556         \u2502 Refundable: 57904                           \u2502\n\u2502                            \u2502                               \u2502                                             \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 15556 \u2502 Refundable Charged: 41934 \u2502 Refunded: 15970 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 57490                               \u2502 Refunded: 15970 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 57590                                                                     \u2502 Refunded: 15970 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"allocated\"},{\"u64\":\"0\"},{\"address\":\"GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4\"}] = {\"vec\":[{\"u64\":\"1\"},{\"i128\":\"3333333\"}]}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"allocated\"},{\"u64\":\"0\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"vec\":[{\"u64\":\"2\"},{\"i128\":\"6666667\"}]}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"dust\"},{\"u64\":\"0\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"i128\":\"1\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"phase\"},{\"u64\":\"0\"}] = {\"map\":[{\"key\":{\"symbol\":\"claimed\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"closes_at\"},\"val\":{\"u64\":\"1789146953\"}},{\"key\":{\"symbol\":\"dust\"},\"val\":{\"i128\":\"1\"}},{\"key\":{\"symbol\":\"dust_recipient\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"expires_at\"},\"val\":{\"u64\":\"1789147253\"}},{\"key\":{\"symbol\":\"manager\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"phase\"},\"val\":{\"vec\":[{\"symbol\":\"Settled\"}]}},{\"key\":{\"symbol\":\"pool\"},\"val\":{\"i128\":\"10000001\"}},{\"key\":{\"symbol\":\"refunded\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"sponsors\"},\"val\":{\"u32\":1}},{\"key\":{\"symbol\":\"total_points\"},\"val\":{\"i128\":\"3\"}}]}\n",
+      "transaction_hashes": [
+        "475e2a12558761526598058720b61edf0882a3712815e332a1090490c38301de"
+      ]
+    },
+    {
+      "label": "Read recipient allocation",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "allocation",
+        "--id",
+        "0",
+        "--recipient",
+        "GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4"
+      ],
+      "returncode": 0,
+      "stdout": "\"3333333\"\n",
+      "stderr": "\u2139\ufe0f  Simulation identified as read-only. Send by rerunning with `--send=yes`.\n",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Claim without trustline must fail distinctly",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-recipient",
+        "--network",
+        "testnet",
+        "--",
+        "claim",
+        "--id",
+        "0",
+        "--recipient",
+        "GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "\u274c error: transaction simulation failed: HostError: Error(Contract, #12)\n\nEvent log (newest first):\n   0: [Diagnostic Event] contract:CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF, topics:[error, Error(Contract, #12)], data:\"escalating Ok(ScErrorType::Contract) frame-exit to Err\"\n   1: [Diagnostic Event] contract:CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF, topics:[error, Error(Contract, #13)], data:[\"contract try_call failed\", transfer, [CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF, GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4, 3333333]]\n   2: [Failed Diagnostic Event (not emitted)] contract:CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA, topics:[error, Error(Contract, #13)], data:[\"trustline entry is missing for account\", GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4]\n   3: [Diagnostic Event] contract:CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF, topics:[fn_call, CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA, transfer], data:[CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF, GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4, 3333333]\n   4: [Diagnostic Event] topics:[fn_call, CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF, claim], data:[0, GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4]\n\n",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Verify failed claim preserved allocation",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "allocation",
+        "--id",
+        "0",
+        "--recipient",
+        "GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4"
+      ],
+      "returncode": 0,
+      "stdout": "\"3333333\"\n",
+      "stderr": "\u2139\ufe0f  Simulation identified as read-only. Send by rerunning with `--send=yes`.\n",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Recipient creates test USDC trustline",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA",
+        "--source",
+        "surge-recipient",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "trust",
+        "--addr",
+        "GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4"
+      ],
+      "returncode": 0,
+      "stdout": "\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 6d63a2ace2b6eb21ca1277d06b7461be247d7f0bca80ab3a3cd1b58dd81c44b2\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/6d63a2ace2b6eb21ca1277d06b7461be247d7f0bca80ab3a3cd1b58dd81c44b2\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 23847                                                                                  \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 23747                                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 14045         \u2502 Refundable: 9702                        \u2502\n\u2502                            \u2502                               \u2502                                         \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                  \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                    \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 14045 \u2502 Refundable Charged: 20 \u2502 Refunded: 9682 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 14065                            \u2502 Refunded: 9682 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 14165                                                                  \u2502 Refunded: 9682 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n",
+      "transaction_hashes": [
+        "6d63a2ace2b6eb21ca1277d06b7461be247d7f0bca80ab3a3cd1b58dd81c44b2"
+      ]
+    },
+    {
+      "label": "Recipient retries claim",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-recipient",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "claim",
+        "--id",
+        "0",
+        "--recipient",
+        "GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4"
+      ],
+      "returncode": 0,
+      "stdout": "\"3333333\"\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 216c1f1850a0404e543ace9381ee86bff68c9d15e7215e159a195174b88b6b06\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/216c1f1850a0404e543ace9381ee86bff68c9d15e7215e159a195174b88b6b06\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 30942                                                                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 30842                                                        \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 18691         \u2502 Refundable: 12151                          \u2502\n\u2502                            \u2502                               \u2502                                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 18691 \u2502 Refundable Charged: 2149 \u2502 Refunded: 10002 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 20840                              \u2502 Refunded: 10002 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 20940                                                                    \u2502 Refunded: 10002 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA - Success - Event: [{\"symbol\":\"transfer\"},{\"address\":\"CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\"},{\"address\":\"GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4\"},{\"string\":\"USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5\"}] = {\"i128\":\"3333333\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"claimed\"},{\"u64\":\"0\"},{\"address\":\"GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4\"}] = {\"vec\":[{\"i128\":\"3333333\"},{\"i128\":\"3333333\"}]}\n",
+      "transaction_hashes": [
+        "216c1f1850a0404e543ace9381ee86bff68c9d15e7215e159a195174b88b6b06"
+      ]
+    },
+    {
+      "label": "Sponsor pulls allocation plus dust",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "claim",
+        "--id",
+        "0",
+        "--recipient",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS"
+      ],
+      "returncode": 0,
+      "stdout": "\"6666668\"\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: fa5d31a22f61236211be370a1c63fb7a9de16d7d25647f38b29ec1aef27c7c1a\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/fa5d31a22f61236211be370a1c63fb7a9de16d7d25647f38b29ec1aef27c7c1a\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 30942                                                                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 30842                                                        \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 18691         \u2502 Refundable: 12151                          \u2502\n\u2502                            \u2502                               \u2502                                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 18691 \u2502 Refundable Charged: 2149 \u2502 Refunded: 10002 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 20840                              \u2502 Refunded: 10002 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 20940                                                                    \u2502 Refunded: 10002 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA - Success - Event: [{\"symbol\":\"transfer\"},{\"address\":\"CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"},{\"string\":\"USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5\"}] = {\"i128\":\"6666668\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"claimed\"},{\"u64\":\"0\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"vec\":[{\"i128\":\"6666668\"},{\"i128\":\"10000001\"}]}\n",
+      "transaction_hashes": [
+        "fa5d31a22f61236211be370a1c63fb7a9de16d7d25647f38b29ec1aef27c7c1a"
+      ]
+    },
+    {
+      "label": "Verify settled escrow empty",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "balance",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF"
+      ],
+      "returncode": 0,
+      "stdout": "\"0\"\n",
+      "stderr": "\u2139\ufe0f  Simulation identified as read-only. Send by rerunning with `--send=yes`.\n",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Create cancellable wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "create",
+        "--manager",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS",
+        "--closes-at",
+        "1789147113",
+        "--grace-seconds",
+        "30",
+        "--dust-recipient",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS"
+      ],
+      "returncode": 0,
+      "stdout": "1\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 393f14081f0b96215812a4095695605cee5afaa6c9112171c8a4310a9d6d172f\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/393f14081f0b96215812a4095695605cee5afaa6c9112171c8a4310a9d6d172f\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 86852                                                                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 86752                                                         \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 10450         \u2502 Refundable: 76302                           \u2502\n\u2502                            \u2502                               \u2502                                             \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 10450 \u2502 Refundable Charged: 57933 \u2502 Refunded: 18369 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 68383                               \u2502 Refunded: 18369 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 68483                                                                     \u2502 Refunded: 18369 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"created\"},{\"u64\":\"1\"}] = {\"vec\":[{\"address\":\"CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA\"},{\"map\":[{\"key\":{\"symbol\":\"claimed\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"closes_at\"},\"val\":{\"u64\":\"1789147113\"}},{\"key\":{\"symbol\":\"dust\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"dust_recipient\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"expires_at\"},\"val\":{\"u64\":\"1789147143\"}},{\"key\":{\"symbol\":\"manager\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"phase\"},\"val\":{\"vec\":[{\"symbol\":\"Funded\"}]}},{\"key\":{\"symbol\":\"pool\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"refunded\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"sponsors\"},\"val\":{\"u32\":0}},{\"key\":{\"symbol\":\"total_points\"},\"val\":{\"i128\":\"0\"}}]}]}\n",
+      "transaction_hashes": [
+        "393f14081f0b96215812a4095695605cee5afaa6c9112171c8a4310a9d6d172f"
+      ]
+    },
+    {
+      "label": "Fund cancellable wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "fund",
+        "--id",
+        "1",
+        "--sponsor",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS",
+        "--value",
+        "2000000"
+      ],
+      "returncode": 0,
+      "stdout": "null\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 307d4e56ad89b424bac746c2b1aec5643924403f7aaa17dbc9506c5e3ccb8261\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/307d4e56ad89b424bac746c2b1aec5643924403f7aaa17dbc9506c5e3ccb8261\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 52610                                                                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 52510                                                         \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 19525         \u2502 Refundable: 32985                           \u2502\n\u2502                            \u2502                               \u2502                                             \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 19525 \u2502 Refundable Charged: 20266 \u2502 Refunded: 12719 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 39791                               \u2502 Refunded: 12719 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 39891                                                                     \u2502 Refunded: 12719 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA - Success - Event: [{\"symbol\":\"transfer\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"},{\"address\":\"CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\"},{\"string\":\"USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5\"}] = {\"i128\":\"2000000\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"funded\"},{\"u64\":\"1\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"vec\":[{\"i128\":\"2000000\"},{\"i128\":\"2000000\"},{\"i128\":\"2000000\"}]}\n",
+      "transaction_hashes": [
+        "307d4e56ad89b424bac746c2b1aec5643924403f7aaa17dbc9506c5e3ccb8261"
+      ]
+    },
+    {
+      "label": "Cancel wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "cancel",
+        "--id",
+        "1"
+      ],
+      "returncode": 0,
+      "stdout": "null\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 8257ad2b402947b2d829d71ec72935a43e400d77498c7ced4192607d43437663\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/8257ad2b402947b2d829d71ec72935a43e400d77498c7ced4192607d43437663\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 20129                                                                                    \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 20029                                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 6891         \u2502 Refundable: 13138                          \u2502\n\u2502                            \u2502                              \u2502                                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m             \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m           \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                      \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                     \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 6891 \u2502 Refundable Charged: 3007 \u2502 Refunded: 10131 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 9898                              \u2502 Refunded: 10131 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 9998                                                                    \u2502 Refunded: 10131 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"phase\"},{\"u64\":\"1\"}] = {\"map\":[{\"key\":{\"symbol\":\"claimed\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"closes_at\"},\"val\":{\"u64\":\"1789147113\"}},{\"key\":{\"symbol\":\"dust\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"dust_recipient\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"expires_at\"},\"val\":{\"u64\":\"1789147143\"}},{\"key\":{\"symbol\":\"manager\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"phase\"},\"val\":{\"vec\":[{\"symbol\":\"Cancelled\"}]}},{\"key\":{\"symbol\":\"pool\"},\"val\":{\"i128\":\"2000000\"}},{\"key\":{\"symbol\":\"refunded\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"sponsors\"},\"val\":{\"u32\":1}},{\"key\":{\"symbol\":\"total_points\"},\"val\":{\"i128\":\"0\"}}]}\n",
+      "transaction_hashes": [
+        "8257ad2b402947b2d829d71ec72935a43e400d77498c7ced4192607d43437663"
+      ]
+    },
+    {
+      "label": "Refund sponsor",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "refund",
+        "--id",
+        "1",
+        "--sponsor",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS"
+      ],
+      "returncode": 0,
+      "stdout": "\"2000000\"\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: aacd16796db5c3659c7c799b1ba37d98d714b25078521c1a8a46068e24b99aee\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/aacd16796db5c3659c7c799b1ba37d98d714b25078521c1a8a46068e24b99aee\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 30929                                                                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 30829                                                        \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 18678         \u2502 Refundable: 12151                          \u2502\n\u2502                            \u2502                               \u2502                                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 18678 \u2502 Refundable Charged: 2149 \u2502 Refunded: 10002 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 20827                              \u2502 Refunded: 10002 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 20927                                                                    \u2502 Refunded: 10002 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA - Success - Event: [{\"symbol\":\"transfer\"},{\"address\":\"CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"},{\"string\":\"USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5\"}] = {\"i128\":\"2000000\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"refunded\"},{\"u64\":\"1\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"vec\":[{\"i128\":\"2000000\"},{\"i128\":\"2000000\"}]}\n",
+      "transaction_hashes": [
+        "aacd16796db5c3659c7c799b1ba37d98d714b25078521c1a8a46068e24b99aee"
+      ]
+    },
+    {
+      "label": "Create never-opened wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "create",
+        "--manager",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS",
+        "--closes-at",
+        "1789147053",
+        "--grace-seconds",
+        "1",
+        "--dust-recipient",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS"
+      ],
+      "returncode": 0,
+      "stdout": "2\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 5797e3f235ac3c90a57499b31e79847f02daae39324792aa0d6e7044528c9579\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/5797e3f235ac3c90a57499b31e79847f02daae39324792aa0d6e7044528c9579\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 86852                                                                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 86752                                                         \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 10450         \u2502 Refundable: 76302                           \u2502\n\u2502                            \u2502                               \u2502                                             \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 10450 \u2502 Refundable Charged: 57933 \u2502 Refunded: 18369 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 68383                               \u2502 Refunded: 18369 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 68483                                                                     \u2502 Refunded: 18369 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"created\"},{\"u64\":\"2\"}] = {\"vec\":[{\"address\":\"CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA\"},{\"map\":[{\"key\":{\"symbol\":\"claimed\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"closes_at\"},\"val\":{\"u64\":\"1789147053\"}},{\"key\":{\"symbol\":\"dust\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"dust_recipient\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"expires_at\"},\"val\":{\"u64\":\"1789147054\"}},{\"key\":{\"symbol\":\"manager\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"phase\"},\"val\":{\"vec\":[{\"symbol\":\"Funded\"}]}},{\"key\":{\"symbol\":\"pool\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"refunded\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"sponsors\"},\"val\":{\"u32\":0}},{\"key\":{\"symbol\":\"total_points\"},\"val\":{\"i128\":\"0\"}}]}]}\n",
+      "transaction_hashes": [
+        "5797e3f235ac3c90a57499b31e79847f02daae39324792aa0d6e7044528c9579"
+      ]
+    },
+    {
+      "label": "Fund never-opened wave",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "fund",
+        "--id",
+        "2",
+        "--sponsor",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS",
+        "--value",
+        "1000000"
+      ],
+      "returncode": 0,
+      "stdout": "null\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 621facd82c90118ae0e3e3e54997e31661e29c9548fcb224aea2916280fa01f4\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/621facd82c90118ae0e3e3e54997e31661e29c9548fcb224aea2916280fa01f4\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 52610                                                                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 52510                                                         \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 19525         \u2502 Refundable: 32985                           \u2502\n\u2502                            \u2502                               \u2502                                             \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                                \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                       \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 19525 \u2502 Refundable Charged: 20266 \u2502 Refunded: 12719 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 39791                               \u2502 Refunded: 12719 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 39891                                                                     \u2502 Refunded: 12719 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA - Success - Event: [{\"symbol\":\"transfer\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"},{\"address\":\"CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\"},{\"string\":\"USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5\"}] = {\"i128\":\"1000000\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"funded\"},{\"u64\":\"2\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"vec\":[{\"i128\":\"1000000\"},{\"i128\":\"1000000\"},{\"i128\":\"1000000\"}]}\n",
+      "transaction_hashes": [
+        "621facd82c90118ae0e3e3e54997e31661e29c9548fcb224aea2916280fa01f4"
+      ]
+    },
+    {
+      "label": "Reclaim after grace window",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "refund",
+        "--id",
+        "2",
+        "--sponsor",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS"
+      ],
+      "returncode": 0,
+      "stdout": "\"1000000\"\n",
+      "stderr": "\u2139\ufe0f  Simulating transaction\u2026\n\u2139\ufe0f  Signing transaction: 9c27a938f0546d14c99cf461a7a6d466390e6c4596ce88bbbf890aae8e09d420\n\ud83c\udf0e Sending transaction\u2026\n\u2705 Transaction submitted successfully!\n\ud83d\udd17 https://stellar.expert/explorer/testnet/tx/9c27a938f0546d14c99cf461a7a6d466390e6c4596ce88bbbf890aae8e09d420\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Fee Proposed: 34473                                                                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Resource Fee: 34373                                                        \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee: 100         \u2502 Non-Refundable: 18787         \u2502 Refundable: 15586                          \u2502\n\u2502                            \u2502                               \u2502                                            \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mcpu instructions\u001b[0m              \u2502 \u001b[0m\u001b[2mreturn value\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mstorage read/write\u001b[0m            \u2502 \u001b[0m\u001b[2mstorage rent\u001b[0m                               \u2502\n\u2502                            \u2502 \u001b[0m\u001b[2mtx size\u001b[0m                       \u2502 \u001b[0m\u001b[2mevents\u001b[0m                                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                      \ud83d\udc46 Proposed Fee  \ud83d\udc47 Final Fee                                      \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Non-Refundable Charged: 18787 \u2502 Refundable Charged: 5136 \u2502 Refunded: 10450 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Inclusion Fee Charged: 100 \u2502 Resource Fee Charged: 23923                              \u2502 Refunded: 10450 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 Fee Charged: 24023                                                                    \u2502 Refunded: 10450 \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"phase\"},{\"u64\":\"2\"}] = {\"map\":[{\"key\":{\"symbol\":\"claimed\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"closes_at\"},\"val\":{\"u64\":\"1789147053\"}},{\"key\":{\"symbol\":\"dust\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"dust_recipient\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"expires_at\"},\"val\":{\"u64\":\"1789147054\"}},{\"key\":{\"symbol\":\"manager\"},\"val\":{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}},{\"key\":{\"symbol\":\"phase\"},\"val\":{\"vec\":[{\"symbol\":\"Cancelled\"}]}},{\"key\":{\"symbol\":\"pool\"},\"val\":{\"i128\":\"1000000\"}},{\"key\":{\"symbol\":\"refunded\"},\"val\":{\"i128\":\"0\"}},{\"key\":{\"symbol\":\"sponsors\"},\"val\":{\"u32\":1}},{\"key\":{\"symbol\":\"total_points\"},\"val\":{\"i128\":\"0\"}}]}\n\ud83d\udcc5 CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA - Success - Event: [{\"symbol\":\"transfer\"},{\"address\":\"CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"},{\"string\":\"USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5\"}] = {\"i128\":\"1000000\"}\n\ud83d\udcc5 CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF - Success - Event: [{\"symbol\":\"refunded\"},{\"u64\":\"2\"},{\"address\":\"GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS\"}] = {\"vec\":[{\"i128\":\"1000000\"},{\"i128\":\"1000000\"}]}\n",
+      "transaction_hashes": [
+        "9c27a938f0546d14c99cf461a7a6d466390e6c4596ce88bbbf890aae8e09d420"
+      ]
+    },
+    {
+      "label": "Verify final escrow empty",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "balance",
+        "--id",
+        "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF"
+      ],
+      "returncode": 0,
+      "stdout": "\"0\"\n",
+      "stderr": "\u2139\ufe0f  Simulation identified as read-only. Send by rerunning with `--send=yes`.\n",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Verify recipient balance",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA",
+        "--source",
+        "surge-recipient",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "balance",
+        "--id",
+        "GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4"
+      ],
+      "returncode": 0,
+      "stdout": "\"3333333\"\n",
+      "stderr": "\u2139\ufe0f  Simulation identified as read-only. Send by rerunning with `--send=yes`.\n",
+      "transaction_hashes": []
+    },
+    {
+      "label": "Verify sponsor balance",
+      "command": [
+        "stellar",
+        "--config-dir",
+        "<private-config>",
+        "contract",
+        "invoke",
+        "--id",
+        "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA",
+        "--source",
+        "surge-sponsor",
+        "--network",
+        "testnet",
+        "--cost",
+        "--",
+        "balance",
+        "--id",
+        "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS"
+      ],
+      "returncode": 0,
+      "stdout": "\"196666667\"\n",
+      "stderr": "\u2139\ufe0f  Simulation identified as read-only. Send by rerunning with `--send=yes`.\n",
+      "transaction_hashes": []
+    }
+  ],
+  "complete": true,
+  "cli_version": "stellar 28.0.0 (300aaf69ab100536678bdb641428b06f06b318ea)\nstellar-xdr 28.0.0 (d0f1330e43c3a2c0c616da30698b24140d4eea72)\nxdr (9c9c145953e80990d6ff1ae3a6a973a0ce6d0694)",
+  "sponsor": "GDSRCKDJO53GNKZCW4QM3OCAYXLL4THSONIXS27OLPOL76JJ5GLBCIIS",
+  "recipient": "GDCGOHYHOMUGTBUZKXHATXHJ75J2IDWP6QAE3AYYII5LI3JTCBVS2XB4",
+  "contract_id": "CBWCJUXNJTHD5AJ2ADU34XAZUZBEWOIC63YPBVZBRTXENYUBYQA56IQF",
+  "final_balances": {
+    "sponsor": 196666667,
+    "recipient": 3333333,
+    "escrow": 0
+  }
+}

@@ -27,8 +27,23 @@ export interface Wave {
   number: number;
   start: string;
   end: string;
+  /** What the program announced it would pay, in whole USDC. */
   budget: number;
   status: 'Active' | 'Upcoming' | 'Completed';
+  /**
+   * Escrow mirror — the fields the wave pool contract tracks, in whole USDC so
+   * the fixtures stay readable. `src/lib/wave-pool.ts` converts to stroops at the
+   * boundary, which is the only place amounts are arithmetic.
+   *
+   * `escrowed` is what actually arrived, as opposed to `budget`, which is what was
+   * promised: an upcoming wave is announced and unfunded, and a wave can close
+   * underfunded and still pay out coherently.
+   */
+  escrowed: number;
+  /** Paid out to contributors so far. Only moves once the wave has closed. */
+  paid: number;
+  /** Seconds a contributor has to claim after the wave closes. */
+  claimWindow: number;
 }
 
 export interface Issue {
@@ -64,7 +79,7 @@ export interface Session {
 }
 
 export interface State {
-  version: 4;
+  version: 5;
   session: Session;
   repos: Repo[];
   waves: Wave[];
@@ -73,7 +88,10 @@ export interface State {
   rewards: Reward[];
 }
 
-export const storageKey = 'surge-preview-v4';
+export const storageKey = 'surge-preview-v5';
+
+/** Seconds in a week, for claim windows expressed in human terms. */
+const WEEK = 7 * 24 * 60 * 60;
 
 export const pointsFor = (complexity: Complexity) =>
   ({ Trivial: 100, Medium: 150, High: 200 })[complexity];
@@ -113,7 +131,7 @@ export const canOpenRepoDashboard = (repo: Repo | undefined, maintainer: string 
 
 export function initialState(): State {
   return {
-    version: 4,
+    version: 5,
     session: { contributor: null, maintainer: null },
     rewards: [],
     applications: [
@@ -131,10 +149,15 @@ export function initialState(): State {
       { id: 'fluttersdk', org: 'Soneso', name: 'stellar_flutter_sdk', description: 'Dart and Flutter SDK covering Horizon and Soroban.', languages: ['Dart'], stars: 180, forks: 62, topics: ['sdk', 'flutter', 'mobile'], license: 'MIT', updated: '2026-09-01', status: 'Accepted' },
     ],
     waves: [
-      { id: '4', number: 4, start: '2026-10-01', end: '2026-10-08', budget: 25000, status: 'Upcoming' },
-      { id: '3', number: 3, start: '2026-09-01', end: '2026-09-08', budget: 25000, status: 'Active' },
-      { id: '2', number: 2, start: '2026-08-01', end: '2026-08-08', budget: 20000, status: 'Completed' },
-      { id: '1', number: 1, start: '2026-07-01', end: '2026-07-08', budget: 15000, status: 'Completed' },
+      // Announced but not yet funded — the state a contributor sees before a wave
+      // opens, and the one that proves `budget` and `escrowed` have to be separate.
+      { id: '4', number: 4, start: '2026-10-01', end: '2026-10-08', budget: 25000, escrowed: 0, paid: 0, claimWindow: WEEK * 2, status: 'Upcoming' },
+      // Funding still arriving mid-wave, so shares on screen are a projection.
+      { id: '3', number: 3, start: '2026-09-01', end: '2026-09-08', budget: 25000, escrowed: 18000, paid: 0, claimWindow: WEEK * 2, status: 'Active' },
+      // Closed and fully claimed, bar the rounding dust flooring leaves behind.
+      { id: '2', number: 2, start: '2026-08-01', end: '2026-08-08', budget: 20000, escrowed: 20000, paid: 19999, claimWindow: WEEK * 2, status: 'Completed' },
+      // Closed underfunded, and with a share nobody came back for.
+      { id: '1', number: 1, start: '2026-07-01', end: '2026-07-08', budget: 15000, escrowed: 12000, paid: 9000, claimWindow: WEEK * 2, status: 'Completed' },
     ],
     issues: [
       { id: '412', repoId: 'sorobansdk', waveId: '3', title: 'Normalise contract error reporting across host calls', description: 'Storage, auth and token host calls each surface failures in a differently shaped error. Move them onto a shared error enum so integrators can branch on a stable variant.', criteria: ['Define a shared error enum covering every fallible host call.', 'Keep discriminants stable and document them on the trait.', 'Assert the variant for each failure mode in tests.'], complexity: 'Medium', created: '2026-09-05' },
@@ -151,7 +174,7 @@ export function initialState(): State {
 export function readState(): State {
   try {
     const value = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
-    const shapeOk = value?.version === 4
+    const shapeOk = value?.version === 5
       && value.session && typeof value.session === 'object'
       && ['repos', 'waves', 'issues', 'applications', 'rewards'].every(k => Array.isArray(value[k]));
     if (shapeOk) return value;

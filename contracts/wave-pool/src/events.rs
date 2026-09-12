@@ -31,3 +31,14 @@ pub struct AdminSet {
     #[topic]
     pub current: Address,
 }
+
+/// Emitted when a wave starts accepting funding and points.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct WaveOpened {
+    #[topic]
+    pub number: u32,
+    pub start: u64,
+    pub end: u64,
+    pub budget: i128,
+}

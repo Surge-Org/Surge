@@ -140,9 +140,6 @@ still renders correctly. Language dots use GitHub's own language colours.
 
 ## Boundaries
 
-Everything is local. There is no GitHub OAuth or sync, no database, no wallet, and no USDC
-transfer. Repository review is simulated because the preview has no reviewer.
-
 The seeded repositories are **real, existing open-source projects** used as reference examples so
 the directory renders with genuine avatars and plausible metadata — their star counts, topics and
 update times are fixtures, and their presence here implies no affiliation with, or participation

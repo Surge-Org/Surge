@@ -305,3 +305,28 @@ export function dustOf(pool: bigint, awards: readonly number[]): bigint {
   const paid = awards.reduce((sum, points) => sum + (shareOf(pool, points, totalPoints) ?? 0n), 0n);
   return pool - paid;
 }
+
+/**
+ * Deployed wave pool contract, per network.
+ *
+ * Every entry is `null`, because the contract in `contracts/wave-pool` has not
+ * been deployed from this repository. That is recorded here rather than left as
+ * an absent constant so the interface has a state to render — "not deployed on
+ * Testnet" is a true thing to say, and it is the thing a reader most needs to
+ * know before they trust a number on screen.
+ *
+ * Filling one in is the only change needed to point the escrow surface at a real
+ * contract; nothing else in the interface hardcodes an id.
+ */
+export const WAVE_POOL: Record<NetworkId, string | null> = {
+  public: null,
+  testnet: null,
+  futurenet: null,
+  local: null,
+};
+
+/** The wave pool id on the network this build talks about, if it has one. */
+export const wavePoolId = (network: Network = NETWORK): string | null => WAVE_POOL[network.id];
+
+/** Whether the escrow surfaces are reading a real contract or describing one. */
+export const isDeployed = (network: Network = NETWORK): boolean => wavePoolId(network) !== null;

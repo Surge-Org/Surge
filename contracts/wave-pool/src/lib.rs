@@ -11,6 +11,8 @@ mod split;
 mod storage;
 mod types;
 
+mod test;
+
 pub use error::Error;
 pub use types::{Config, DataKey, Wave, WaveStatus};
 

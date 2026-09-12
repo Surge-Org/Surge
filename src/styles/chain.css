@@ -174,3 +174,101 @@ a.addr-key:hover { color: var(--acc); }
   from { background-position: 0 0; }
   to   { background-position: var(--star-tile) 0; }
 }
+
+/* ---------------------------------------------------------- escrow panel */
+.escrow {
+  position: relative;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  overflow: hidden;
+}
+
+/* The beam sits on the top edge only, so the panel reads as chain chrome without
+   the accent competing with the figures inside it. */
+.escrow::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: var(--beam);
+}
+
+.escrow-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s5) var(--s5) var(--s4);
+  border-bottom: 1px solid var(--line-soft);
+}
+.escrow-head h3 { font-size: var(--t6); }
+.escrow-note {
+  margin-top: 3px;
+  font-size: var(--t3);
+  color: var(--ink-2);
+  max-width: 46ch;
+}
+
+/* Funding bar. The track is the announced budget; the fill is what arrived. */
+.escrow-bar {
+  position: relative;
+  height: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--line-soft);
+  margin: 0 var(--s5);
+}
+.escrow-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--beam);
+}
+/* Paid is drawn over the funding fill, in ink, so the two are readable at once:
+   how much arrived, and how much of it has left again. */
+.escrow-bar-paid {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--ink);
+  opacity: .55;
+}
+
+.escrow-figures {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line-soft);
+  margin-top: var(--s5);
+  border-top: 1px solid var(--line-soft);
+}
+@media (max-width: 700px) {
+  .escrow-figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.escrow-fig {
+  background: var(--panel);
+  padding: var(--s4) var(--s5);
+  min-width: 0;
+}
+.escrow-fig strong {
+  display: block;
+  margin-top: 5px;
+  font-size: var(--t5);
+  font-weight: 560;
+}
+.escrow-fig small {
+  display: block;
+  margin-top: 3px;
+  font-size: var(--t2);
+  color: var(--ink-3);
+}
+
+.escrow-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s4) var(--s5);
+  border-top: 1px solid var(--line-soft);
+  background: var(--panel-2);
+  font-size: var(--t2);
+  color: var(--ink-3);
+}
+.escrow-foot .spacer { flex: 1; }

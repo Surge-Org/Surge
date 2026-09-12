@@ -1,6 +1,8 @@
 /* ============================================================
    Surge — monochrome design system
    Black and white. Small type, hairline borders, quiet motion.
+   One accent ("beam", an electric azure) carries emphasis; asset
+   and chain colours are the only other colour on the page.
    ============================================================ */
 
 :root {
@@ -38,13 +40,15 @@
 
   --focus: var(--n11);
 
-  /* Accent — React Bits violet. Used for emphasis, never for body text. */
-  --acc:      #a855f7;
-  --acc-2:    #7c3aed;
-  --acc-3:    #c084fc;
-  --acc-soft: rgba(168, 85, 247, .10);
-  --acc-line: rgba(168, 85, 247, .28);
-  --glow:     0 0 0 1px rgba(168,85,247,.30), 0 8px 30px -8px rgba(168,85,247,.45);
+  /* Accent — "beam", an electric azure. Used for emphasis, never for body text.
+     Our own token, chosen to read as starlight against the neutral ramp; it is
+     not anybody's brand palette. Asset colours live in the chain block below. */
+  --acc:      #2b6fff;
+  --acc-2:    #1b3fd4;
+  --acc-3:    #7aa8ff;
+  --acc-soft: rgba(43, 111, 255, .10);
+  --acc-line: rgba(43, 111, 255, .28);
+  --glow:     0 0 0 1px rgba(43,111,255,.30), 0 8px 30px -8px rgba(43,111,255,.45);
 
   /* Type — small by default. Eight steps, nothing in between. */
   --t1: 10.5px;
@@ -108,12 +112,12 @@
   --bad:  #f87171; --bad-bg:  rgba(248,113,113,.13);
 
   --focus: #fafafa;
-  --acc:      #a855f7;
-  --acc-2:    #8b5cf6;
-  --acc-3:    #d8b4fe;
-  --acc-soft: rgba(168, 85, 247, .14);
-  --acc-line: rgba(168, 85, 247, .36);
-  --glow:     0 0 0 1px rgba(168,85,247,.35), 0 10px 40px -10px rgba(168,85,247,.55);
+  --acc:      #4d8cff;
+  --acc-2:    #2b6fff;
+  --acc-3:    #a9c8ff;
+  --acc-soft: rgba(77, 140, 255, .14);
+  --acc-line: rgba(77, 140, 255, .36);
+  --glow:     0 0 0 1px rgba(77,140,255,.35), 0 10px 40px -10px rgba(77,140,255,.55);
   --sh1: 0 1px 2px rgba(0,0,0,.4);
   --sh2: 0 2px 4px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
   --sh3: 0 12px 48px -16px rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.4);

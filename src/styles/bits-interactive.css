@@ -4,15 +4,16 @@
    ============================================================ */
 
 :root {
-  /* Fed into the MoltenMetal shader. */
-  --metal-a: #0a0812;
-  --metal-b: #2f1a63;
-  --metal-c: #a855f7;
+  /* Fed into the MoltenMetal shader. Dark void, deep indigo, beam highlight —
+     the accent ramp, so the hero reads as the same material as the rest. */
+  --metal-a: #06080f;
+  --metal-b: #16265e;
+  --metal-c: #2b6fff;
 }
 :root[data-theme='dark'] {
-  --metal-a: #07060c;
-  --metal-b: #2a1558;
-  --metal-c: #b06cf9;
+  --metal-a: #04060d;
+  --metal-b: #13215a;
+  --metal-c: #4d8cff;
 }
 
 /* ---------------------------------------------------------- MoltenMetal */
@@ -280,7 +281,7 @@
   opacity: .5;
   background:
     conic-gradient(from 210deg at var(--mx) var(--my),
-      #a855f7 0deg, #22d3ee 70deg, #f472b6 140deg, #facc15 210deg, #a855f7 300deg, #a855f7 360deg);
+      #2b6fff 0deg, #22d3ee 70deg, #a9c8ff 140deg, #facc15 210deg, #7aa8ff 300deg, #2b6fff 360deg);
   filter: blur(22px);
   transition: opacity var(--base) var(--ease);
 }

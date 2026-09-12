@@ -228,3 +228,39 @@ export function shortAddress(value: string, lead = 4, tail = 4): string {
   if (key.length <= lead + tail + 1) return key;
   return `${key.slice(0, lead)}…${key.slice(-tail)}`;
 }
+
+type ExplorerTarget =
+  | { kind: 'account' | 'contract' | 'tx' | 'ledger'; id: string }
+  | { kind: 'asset'; id: string; issuer?: string };
+
+/**
+ * A stellar.expert link for something, or `null` when this network has no
+ * explorer to link to.
+ *
+ * Nullable on purpose. Futurenet and a local standalone network have no public
+ * explorer, and the alternative to returning `null` is a link that 404s — which
+ * is worse than no link, because a contributor who follows it and lands on an
+ * error page has no way to tell whether the explorer is missing or their payout
+ * is. Callers render the value as plain text when this is `null`, so the address
+ * is still there to copy.
+ */
+export function explorerUrl(target: ExplorerTarget, network: Network = NETWORK): string | null {
+  if (!network.explorer) return null;
+  const base = `https://stellar.expert/explorer/${network.explorer}`;
+
+  if (target.kind === 'asset') {
+    // stellar.expert identifies an issued asset as CODE-ISSUER; the native asset
+    // is just its code.
+    return `${base}/asset/${target.issuer ? `${target.id}-${target.issuer}` : target.id}`;
+  }
+  return `${base}/${target.kind}/${encodeURIComponent(target.id)}`;
+}
+
+/** Explorer link for whatever kind of address this is, or `null`. */
+export function addressUrl(value: string, network: Network = NETWORK): string | null {
+  const kind = addressKind(value);
+  // Never link a seed anywhere, and never link something unidentified — both
+  // would put a user-supplied string into a URL that leaves this page.
+  if (kind !== 'account' && kind !== 'contract') return null;
+  return explorerUrl({ kind, id: value.trim() }, network);
+}

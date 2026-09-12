@@ -20,7 +20,7 @@ const settle = () => page.waitForTimeout(350);
 try {
   // ---------------------------------------------------------- public surfaces
   await go('/');
-  await page.getByRole('heading', { name: /Build Stellar/ }).waitFor();
+  await page.getByRole('heading', { name: /Build on Stellar/ }).waitFor();
   assert.equal(await page.locator('.rail').count(), 0, 'landing has no dashboard rail');
   assert.equal(await page.locator('.lanyard-badge').count(), 1, 'hero lanyard renders');
   assert.ok(await page.evaluate(() => {

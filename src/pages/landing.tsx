@@ -76,7 +76,7 @@ export function Landing() {
             )}
 
             <h1 className="hero-title">
-              <SplitText text={`Build ${PROGRAM.chain},`} />
+              <SplitText text={`Build on ${PROGRAM.chain},`} />
               <br />
               <GradientText>get paid for it.</GradientText>
             </h1>

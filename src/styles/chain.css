@@ -154,3 +154,23 @@ a.addr-key:hover { color: var(--acc); }
   font-size: var(--t2);
   font-weight: 560;
 }
+
+/* ---------------------------------------------------------- starfield */
+.starfield {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+  background-color: var(--void);
+  /* Fades out toward the bottom so content sitting over it stays readable
+     without the field needing to be so faint it disappears at the top. */
+  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .starfield[data-drift='true'] { animation: star-drift 240s linear infinite; }
+}
+@keyframes star-drift {
+  from { background-position: 0 0; }
+  to   { background-position: var(--star-tile) 0; }
+}

@@ -7,7 +7,7 @@
  * primitives stay usable on a page that has nothing to do with a chain.
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Check, Copy, ShieldAlert } from 'lucide-react';
 import {
   NETWORK, REWARD_ASSET, addressKind, addressUrl, formatAmount, formatStroops,
@@ -189,5 +189,81 @@ export function AddressPill({
         {copied ? <Check size={12} /> : <Copy size={12} />}
       </button>
     </span>
+  );
+}
+
+/**
+ * Scatters `count` stars over a `tile`-sized square, deterministically.
+ *
+ * Module scope rather than inside the component: the generator threads a mutable
+ * integer through itself, and a closure doing that across a render boundary is
+ * both a lint error under the React compiler rules and a genuine hazard — React
+ * may call a component body more than once, and a generator whose state survives
+ * the call would hand back a different sky each time.
+ *
+ * xorshift, not `Math.random`. Small, deterministic, and good enough for
+ * scattering dots; `Math.random` would reshuffle the sky on every render and every
+ * hot reload, which turns a background into a distraction and makes a visual
+ * regression impossible to review.
+ */
+function starTile(count: number, tile: number, seed: number): string {
+  let state = seed * 2654435761 || 1;
+  const next = () => {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return Math.abs(state % 100000) / 100000;
+  };
+
+  const stars: string[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const x = (next() * tile).toFixed(1);
+    const y = (next() * tile).toFixed(1);
+    // Weighted toward the faintest tier, so the bright stars read as foreground
+    // rather than as an evenly lit grid.
+    const roll = next();
+    const weight = roll > 0.92 ? 1 : roll > 0.7 ? 2 : 3;
+    const radius = weight === 1 ? 1.5 : weight === 2 ? 1.1 : 0.8;
+    stars.push(
+      `radial-gradient(circle ${radius}px at ${x}px ${y}px, var(--star-${weight}) 100%, transparent 0)`,
+    );
+  }
+  return stars.join(', ');
+}
+
+/**
+ * A deterministic starfield, drawn as one repeating background image.
+ *
+ * Zero DOM nodes and no canvas: the whole field is a list of tiny
+ * `radial-gradient` stops on a single element, which the compositor handles as one
+ * paint. A few hundred absolutely-positioned dots would look the same and cost a
+ * few hundred layout boxes on a page that already runs a WebGL hero.
+ *
+ * The three star weights come from `--star-1/2/3`, which invert between themes —
+ * on a near-black page the stars are the light source, so they carry real
+ * luminance rather than being a tint of the ink.
+ */
+export function Starfield({
+  count = 90, tile = 520, drift = true, seed = 7,
+}: {
+  count?: number;
+  /** Tile size in px. The field repeats, so this is the period of the pattern. */
+  tile?: number;
+  drift?: boolean;
+  seed?: number;
+}) {
+  const image = useMemo(() => starTile(count, tile, seed), [count, tile, seed]);
+
+  return (
+    <div
+      className="starfield"
+      data-drift={drift}
+      aria-hidden="true"
+      style={{
+        backgroundImage: image,
+        backgroundSize: `${tile}px ${tile}px`,
+        ['--star-tile' as string]: `${tile}px`,
+      }}
+    />
   );
 }

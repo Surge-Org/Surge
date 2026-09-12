@@ -5,6 +5,7 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import App from './App';
 import './styles/base.css';
+import './styles/chain.css';
 import './styles/bits.css';
 import './styles/bits-interactive.css';
 import './styles/pages.css';

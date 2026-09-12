@@ -1,0 +1,45 @@
+/* ============================================================
+   Chain chrome — the surfaces that are about the network itself.
+   Network badge, asset chips, addresses, amounts.
+   ============================================================ */
+
+/* ---------------------------------------------------------- network badge */
+.net {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: var(--h-xs);
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  background: var(--net-test-bg);
+  color: var(--net-test);
+  font-size: var(--t1);
+  font-weight: 560;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Real funds. The only element on the page that gets to be loud. */
+.net[data-live='true'] {
+  border-color: var(--net-live);
+  background: var(--net-live-bg);
+  color: var(--net-live);
+}
+
+.net-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* Only the live badge pulses, and only when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  .net[data-live='true'] .net-dot { animation: net-pulse 2s var(--ease) infinite; }
+}
+@keyframes net-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .35; }
+}

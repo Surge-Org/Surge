@@ -90,12 +90,33 @@ artboard exported from the Rive editor, so it has to be authored there. Drop one
 The landing page lays these out on a six-column bento grid (`.bento` / `.box` with `w2`/`w3`/`w4`/`w6`
 spans) — large boxes with generous padding and display-scale figures, rather than uniform small cards.
 
+## Contracts
+
+The wave pool is real now. [`contracts/wave-pool`](contracts/wave-pool) is a Soroban contract that
+escrows a wave's USDC, records the points a contributor earned for each accepted issue, and pays
+each of them `pool * points / total_points` once the wave closes — with a fixed claim window, and a
+sweep afterwards for rounding dust and abandoned shares.
+
+It is **not wired to this preview**. The frontend still runs entirely on the fixtures in
+[`src/lib/model.ts`](src/lib/model.ts), which is what keeps it runnable with no network, no wallet
+and no funded account. The contract is built and tested on its own; joining the two needs generated
+bindings and a wallet, and neither is here yet.
+
+[`contracts/README.md`](contracts/README.md) covers the model, the invariants and the deploy. The
+short version:
+
+```powershell
+cd contracts
+cargo test
+cargo build --target wasm32v1-none --release
+```
+
 ## Checks
 
 [![CI](https://github.com/Surge-Org/Surge/actions/workflows/ci.yml/badge.svg)](https://github.com/Surge-Org/Surge/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/Surge-Org/Surge/actions/workflows/codeql.yml/badge.svg)](https://github.com/Surge-Org/Surge/actions/workflows/codeql.yml)
 
-Four checks run on every push and pull request, defined in
+Five checks run on every push and pull request, defined in
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
 
 | Check | Command |
@@ -104,6 +125,12 @@ Four checks run on every push and pull request, defined in
 | Lint | `npm run lint` |
 | Build | `npm run build` |
 | End-to-end | `npm run test:e2e -- <url>` |
+| Contracts | `cargo fmt`, `cargo clippy`, `cargo test`, `cargo build --target wasm32v1-none --release` |
+
+The contracts job runs from `contracts/` and is independent of the Node ones — the two toolchains
+share no inputs. Its wasm build is separate from `cargo test` on purpose: tests compile for the
+host, and the profile that actually deploys (`no_std`, `panic = "abort"`, a different target) can
+fail on its own.
 
 CodeQL analyses the source weekly and on every pull request, and Dependabot groups dependency
 bumps into one pull request per ecosystem.
@@ -126,7 +153,7 @@ horizontal overflow across 15 routes at five widths.
 ### Branch protection
 
 `main` is covered by the **Protect main** ruleset. For contributors it means: open a pull request,
-and land it once Typecheck, Lint, Build and End-to-end are green. Force-pushes and branch deletion
+and land it once Typecheck, Lint, Build, End-to-end and Contracts are green. Force-pushes and branch deletion
 are refused outright, and review threads must be resolved before merging. No approving review is
 required, so a maintainer can merge their own pull request.
 
@@ -139,6 +166,10 @@ does not resolve falls back to a letter tile, so a repository submitted under a 
 still renders correctly. Language dots use GitHub's own language colours.
 
 ## Boundaries
+
+Everything in the preview is local. There is no GitHub OAuth or sync, no database, no wallet, and
+no USDC moves — the points and rewards on screen are fixtures, not reads of the contract in
+[`contracts/`](contracts). Repository review is simulated because the preview has no reviewer.
 
 The seeded repositories are **real, existing open-source projects** used as reference examples so
 the directory renders with genuine avatars and plausible metadata — their star counts, topics and

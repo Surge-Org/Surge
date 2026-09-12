@@ -13,9 +13,9 @@ mod types;
 pub use error::Error;
 pub use types::{Config, DataKey, Wave, WaveStatus};
 
-use soroban_sdk::{contract, contractimpl, Address, Env};
+use soroban_sdk::{contract, contractimpl, token::TokenClient, Address, Env};
 
-use events::{AdminSet, Initialized, WaveOpened};
+use events::{AdminSet, Initialized, WaveFunded, WaveOpened};
 
 #[contract]
 pub struct WavePool;
@@ -93,6 +93,53 @@ impl WavePool {
             start,
             end,
             budget,
+        }
+        .publish(&env);
+        Ok(())
+    }
+
+    /// Transfers `amount` of the reward asset from `from` into wave `number`.
+    ///
+    /// Open to anyone, not just the admin: the program's own treasury funds most
+    /// of a wave, but a sponsor topping one up is a normal thing to want, and
+    /// gating it behind the operator would mean routing sponsor funds through
+    /// the operator's own account first. The authorisation that matters is
+    /// `from`'s — nobody can move tokens out of an account that did not sign for
+    /// it — and there is no privilege attached to having funded a wave.
+    pub fn fund_wave(env: Env, number: u32, from: Address, amount: i128) -> Result<(), Error> {
+        from.require_auth();
+
+        if amount <= 0 {
+            return Err(Error::InvalidAmount);
+        }
+
+        let mut wave = storage::wave(&env, number)?;
+        // Funding a closed wave would add tokens the payout maths has already
+        // divided around them: `pool` was snapshotted at close, so the transfer
+        // would land in the contract with no claim attached to it.
+        if wave.status != WaveStatus::Open {
+            return Err(Error::WaveNotOpen);
+        }
+
+        wave.escrowed = wave.escrowed.checked_add(amount).ok_or(Error::Overflow)?;
+
+        // Transfer first, then record. The token call is the step that can fail
+        // for reasons this contract cannot see — insufficient balance, a frozen
+        // trustline, an authorisation the account declined — and a revert there
+        // must not leave `escrowed` claiming funds that never arrived.
+        let config = storage::config(&env);
+        TokenClient::new(&env, &config.token).transfer(
+            &from,
+            &env.current_contract_address(),
+            &amount,
+        );
+        storage::set_wave(&env, &wave);
+
+        WaveFunded {
+            number,
+            from,
+            amount,
+            escrowed: wave.escrowed,
         }
         .publish(&env);
         Ok(())

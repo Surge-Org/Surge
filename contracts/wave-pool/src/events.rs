@@ -42,3 +42,17 @@ pub struct WaveOpened {
     pub end: u64,
     pub budget: i128,
 }
+
+/// Emitted on every transfer into a wave. `escrowed` is the running total after
+/// this transfer, so a client can follow funding progress without re-reading
+/// the wave.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct WaveFunded {
+    #[topic]
+    pub number: u32,
+    #[topic]
+    pub from: Address,
+    pub amount: i128,
+    pub escrowed: i128,
+}

@@ -323,3 +323,218 @@ fn zero_is_not_a_valid_transfer_or_award() {
         Err(Ok(Error::InvalidPoints))
     );
 }
+
+// --- Claiming ---------------------------------------------------------------
+
+#[test]
+fn a_share_can_only_be_claimed_once() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let budget = 25_000 * USDC;
+    setup.open_and_fund(budget);
+
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+
+    assert_eq!(pool.claim(&3, &contributor), budget);
+    assert_eq!(
+        pool.try_claim(&3, &contributor),
+        Err(Ok(Error::AlreadyClaimed))
+    );
+    // The second attempt moved nothing, and `paid` still reflects one payout.
+    assert_eq!(setup.token().balance(&contributor), budget);
+    assert_eq!(pool.wave(&3).paid, budget);
+    assert!(pool.has_claimed(&3, &contributor));
+}
+
+#[test]
+fn claiming_before_the_wave_closes_is_refused_rather_than_paying_nothing() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    setup.open_and_fund(25_000 * USDC);
+
+    let contributor = setup.account();
+    pool.award(&3, &contributor, &200);
+
+    // `pool` is zero until close, so a permissive version of this would pay out
+    // nothing and consume the contributor's single claim doing it.
+    assert_eq!(
+        pool.try_claim(&3, &contributor),
+        Err(Ok(Error::WaveNotClosed))
+    );
+    assert!(!pool.has_claimed(&3, &contributor));
+
+    // And the claim still works once the wave actually closes.
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    assert_eq!(pool.claim(&3, &contributor), 25_000 * USDC);
+}
+
+#[test]
+fn a_contributor_with_no_points_is_told_so_instead_of_being_marked_claimed() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    setup.open_and_fund(25_000 * USDC);
+
+    let earner = setup.account();
+    let applicant = setup.account();
+    pool.award(&3, &earner, &200);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+
+    // Applied, never assigned. Entitled to exactly zero, and `claimable` says so
+    // without erroring, because asking is a reasonable thing for a client to do.
+    assert_eq!(pool.claimable(&3, &applicant), 0);
+    assert_eq!(
+        pool.try_claim(&3, &applicant),
+        Err(Ok(Error::NothingToClaim))
+    );
+    // Critically, the failed claim did not burn their flag.
+    assert!(!pool.has_claimed(&3, &applicant));
+}
+
+#[test]
+fn a_wave_that_accepted_no_work_has_no_denominator_to_divide_by() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    setup.open_and_fund(25_000 * USDC);
+
+    // Closing is allowed. Refusing would leave the escrow with no way out, since
+    // `sweep` only operates on a closed wave.
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    assert_eq!(pool.wave(&3).pool, 25_000 * USDC);
+    assert_eq!(pool.wave(&3).total_points, 0);
+
+    // But there is nothing to divide by, and that is a distinct condition from a
+    // contributor who earned nothing in a wave that did pay out.
+    let account = setup.account();
+    assert_eq!(
+        pool.try_claim(&3, &account),
+        Err(Ok(Error::NoPointsRecorded))
+    );
+    assert_eq!(
+        pool.try_claimable(&3, &account),
+        Err(Ok(Error::NoPointsRecorded))
+    );
+}
+
+#[test]
+fn an_underfunded_wave_pays_a_proportional_haircut() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+
+    // Announced 25,000; only 10,000 ever arrived.
+    let announced = 25_000 * USDC;
+    let escrowed = 10_000 * USDC;
+    let sponsor = setup.sponsor(escrowed);
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &announced);
+    pool.fund_wave(&3, &sponsor, &escrowed);
+
+    let high = setup.account();
+    let trivial = setup.account();
+    pool.award(&3, &high, &200);
+    pool.award(&3, &trivial, &100);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+
+    // Everyone takes the same haircut: shares divide what is held, not what was
+    // announced. Paying against `budget` instead would settle the first
+    // claimants in full and leave the last with a reverted transfer.
+    assert_eq!(pool.claim(&3, &high), escrowed * 200 / 300);
+    assert_eq!(pool.claim(&3, &trivial), escrowed * 100 / 300);
+
+    // The shortfall stays visible rather than being absorbed: the wave records
+    // what it promised alongside what it held.
+    let wave = pool.wave(&3);
+    assert_eq!(wave.budget, announced);
+    assert_eq!(wave.pool, escrowed);
+    assert!(wave.paid <= wave.pool);
+}
+
+#[test]
+fn claimable_projects_while_open_and_settles_at_close() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let contributor = setup.account();
+    let other = setup.account();
+
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+    pool.award(&3, &contributor, &200);
+
+    // Nothing escrowed yet: sole contributor, but no pool to take a share of.
+    assert_eq!(pool.claimable(&3, &contributor), 0);
+
+    let sponsor = setup.sponsor(25_000 * USDC);
+    pool.fund_wave(&3, &sponsor, &(10_000 * USDC));
+    // The projection tracks the escrowed balance, which is what the contributor
+    // dashboard needs mid-wave.
+    assert_eq!(pool.claimable(&3, &contributor), 10_000 * USDC);
+
+    // And it moves down as other contributors earn points. The projection is
+    // honest about being a moving target.
+    pool.award(&3, &other, &200);
+    assert_eq!(pool.claimable(&3, &contributor), 5_000 * USDC);
+
+    pool.fund_wave(&3, &sponsor, &(15_000 * USDC));
+    pool.close_wave(&3, &CLAIM_WINDOW);
+
+    // Settled, and equal to what `claim` actually pays.
+    let quoted = pool.claimable(&3, &contributor);
+    assert_eq!(quoted, 12_500 * USDC);
+    assert_eq!(pool.claim(&3, &contributor), quoted);
+    // Zero afterwards, so a client need not special-case a claimed share to
+    // avoid offering a second claim.
+    assert_eq!(pool.claimable(&3, &contributor), 0);
+}
+
+#[test]
+fn revoking_points_redistributes_the_pool_to_everyone_else() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let budget = 25_000 * USDC;
+    setup.open_and_fund(budget);
+
+    let kept = setup.account();
+    let withdrawn = setup.account();
+    pool.award(&3, &kept, &200);
+    pool.award(&3, &withdrawn, &200);
+    assert_eq!(pool.claimable(&3, &kept), budget / 2);
+
+    // Accepted in error, or the submission was withdrawn after review.
+    pool.revoke(&3, &withdrawn, &200);
+    assert_eq!(pool.points(&3, &withdrawn), 0);
+    assert_eq!(pool.wave(&3).total_points, 200);
+    assert_eq!(pool.claimable(&3, &kept), budget);
+
+    // Revoking more than is held is refused rather than clamped: clamping would
+    // leave the wave denominator out of step with the sum of its entries.
+    assert_eq!(
+        pool.try_revoke(&3, &kept, &300),
+        Err(Ok(Error::PointsUnderflow))
+    );
+    assert_eq!(pool.wave(&3).total_points, 200);
+
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    assert_eq!(pool.claim(&3, &kept), budget);
+}
+
+#[test]
+fn points_accumulate_across_several_accepted_issues() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let budget = 25_000 * USDC;
+    setup.open_and_fund(budget);
+
+    let busy = setup.account();
+    let single = setup.account();
+    // Three issues in one wave, awarded as each is reviewed.
+    pool.award(&3, &busy, &200);
+    pool.award(&3, &busy, &150);
+    pool.award(&3, &busy, &100);
+    pool.award(&3, &single, &150);
+
+    assert_eq!(pool.points(&3, &busy), 450);
+    assert_eq!(pool.wave(&3).total_points, 600);
+
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    assert_eq!(pool.claim(&3, &busy), budget * 450 / 600);
+    assert_eq!(pool.claim(&3, &single), budget * 150 / 600);
+}

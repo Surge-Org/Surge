@@ -14,7 +14,8 @@
  * is wrong by one.
  */
 
-import { REWARD_ASSET, formatAmount, shareOf, withAsset } from './stellar';
+import type { Wave as ProgramWave } from './model';
+import { REWARD_ASSET, formatAmount, shareOf, toStroops, withAsset } from './stellar';
 
 /** `WaveStatus` in the contract. There is no transition back to `Open`. */
 export type WaveStatus = 'Open' | 'Closed';
@@ -145,3 +146,85 @@ export function fundedFraction(wave: Wave): number {
 /** `escrowed` against `budget`, for the one line that says where funding stands. */
 export const fundingLabel = (wave: Wave): string =>
   `${formatAmount(wave.escrowed)} of ${withAsset(wave.budget, REWARD_ASSET)}`;
+
+/**
+ * Projects a program wave onto the contract's shape.
+ *
+ * The preview's fixtures and the contract's storage describe the same thing at
+ * different altitudes: the fixture holds whole USDC and a human status, the
+ * contract holds stroops and a two-state machine. This is the one place that
+ * translation happens, so every escrow surface reads contract-shaped data and no
+ * component has to know that the numbers behind it came from a fixture.
+ *
+ * `totalPoints` is passed in rather than derived here, because points live on
+ * issues and applications — reaching into those from this module would couple the
+ * chain layer to the program's review model, which is exactly the coupling the
+ * contract itself refuses (it takes a point count and knows nothing about issues).
+ */
+export function contractWave(wave: ProgramWave, totalPoints: number): Wave {
+  // 'Completed' is the fixture's word for a wave that has closed. The contract has
+  // no third state: 'Upcoming' and 'Active' are both `Open`, since a wave that has
+  // not started yet is simply one nobody has funded or awarded points in.
+  const closed = wave.status === 'Completed';
+
+  const start = unixSeconds(wave.start);
+  const end = unixSeconds(wave.end);
+  const escrowed = toStroops(wave.escrowed);
+
+  return {
+    number: wave.number,
+    start,
+    end,
+    budget: toStroops(wave.budget),
+    escrowed,
+    total_points: totalPoints,
+    status: closed ? 'Closed' : 'Open',
+    // `pool` is zero until close, exactly as in the contract — which is what makes
+    // `claimable` a projection against `escrowed` while the wave is open.
+    pool: closed ? escrowed : 0n,
+    paid: toStroops(wave.paid),
+    claim_deadline: closed ? end + BigInt(wave.claimWindow) : 0n,
+  };
+}
+
+/** A `YYYY-MM-DD` fixture date as a ledger-style unix timestamp. */
+const unixSeconds = (date: string): bigint =>
+  BigInt(Math.floor(new Date(`${date}T12:00:00Z`).getTime() / 1000));
+
+/** Whether the claim window on a closed wave has expired, as of `now`. */
+export function claimWindowClosed(wave: Wave, now = new Date()): boolean {
+  if (wave.status !== 'Closed' || wave.claim_deadline === 0n) return false;
+  return BigInt(Math.floor(now.getTime() / 1000)) >= wave.claim_deadline;
+}
+
+/**
+ * Where a wave is in its lifecycle, as one value a component can switch on.
+ *
+ * The contract has two states and the interface needs five, because `Open` covers
+ * both "announced, nothing in escrow" and "funding arriving", and `Closed` covers
+ * paying out, still claimable, and past the deadline. Deriving it once here keeps
+ * five different components from each inventing their own version of the same
+ * conditional — and getting the boundary between claimable and swept wrong in
+ * three different ways.
+ */
+export type WavePhase = 'announced' | 'funding' | 'paying' | 'expired';
+
+export function wavePhase(wave: Wave, now = new Date()): WavePhase {
+  if (wave.status === 'Open') return wave.escrowed > 0n ? 'funding' : 'announced';
+  return claimWindowClosed(wave, now) ? 'expired' : 'paying';
+}
+
+export const PHASE_LABEL: Record<WavePhase, string> = {
+  announced: 'Announced',
+  funding: 'Accepting work',
+  paying: 'Claimable',
+  expired: 'Closed out',
+};
+
+/** One sentence explaining what the phase means for a contributor. */
+export const PHASE_NOTE: Record<WavePhase, string> = {
+  announced: 'The budget is published. Nothing is in escrow yet.',
+  funding: 'Points are still being awarded, so shares shown here are a projection.',
+  paying: 'Shares are settled. Claim yours before the window closes.',
+  expired: 'The claim window has passed and unclaimed funds went back to the program.',
+};

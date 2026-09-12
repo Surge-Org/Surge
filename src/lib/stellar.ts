@@ -264,3 +264,44 @@ export function addressUrl(value: string, network: Network = NETWORK): string | 
   if (kind !== 'account' && kind !== 'contract') return null;
   return explorerUrl({ kind, id: value.trim() }, network);
 }
+
+/**
+ * A contributor's share of a pool, mirroring `split::share` in the contract.
+ *
+ * **The contract is the authority; this is a quote.** The number a contributor is
+ * actually paid comes out of `contracts/wave-pool`, and this exists so the
+ * interface can show the same figure before a transaction is ever built. Keeping
+ * the two in agreement matters more than either being individually clever, so
+ * this is a deliberate transliteration of the Rust — same guard order, same
+ * flooring, same `null` for the no-denominator case — rather than an independent
+ * implementation of the same idea.
+ *
+ * `bigint` division truncates toward zero and both operands are non-negative
+ * here, which makes it the floor, matching Rust's integer division on the same
+ * inputs. Multiplication happens before division for the reason the contract
+ * documents: dividing first floors the per-point rate and throws away a fraction
+ * on every point a contributor holds.
+ *
+ * Returns `null` when the wave has no points at all — the same distinction the
+ * contract draws between "this wave has no valid payout" and "you earned
+ * nothing", which a caller has to be able to tell apart to render either.
+ */
+export function shareOf(pool: bigint, points: number, totalPoints: number): bigint | null {
+  if (totalPoints <= 0) return null;
+  if (points <= 0 || pool <= 0n) return 0n;
+  return (pool * BigInt(points)) / BigInt(totalPoints);
+}
+
+/**
+ * What flooring every share leaves behind in the contract.
+ *
+ * Bounded above by the wave's point total, so it is a handful of stroops — but it
+ * is not zero, and the escrow surface should be able to account for the whole
+ * pool rather than leaving a few stroops unexplained.
+ */
+export function dustOf(pool: bigint, awards: readonly number[]): bigint {
+  const totalPoints = awards.reduce((sum, points) => sum + points, 0);
+  if (totalPoints <= 0) return pool > 0n ? pool : 0n;
+  const paid = awards.reduce((sum, points) => sum + (shareOf(pool, points, totalPoints) ?? 0n), 0n);
+  return pool - paid;
+}

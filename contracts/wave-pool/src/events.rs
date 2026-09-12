@@ -99,3 +99,18 @@ pub struct WaveClosed {
     pub total_points: u32,
     pub claim_deadline: u64,
 }
+
+/// Emitted when a contributor is paid. The contributor is a topic so a wallet or
+/// a dashboard can watch for one person's payout without following the wave.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Claimed {
+    #[topic]
+    pub number: u32,
+    #[topic]
+    pub contributor: Address,
+    pub points: u32,
+    pub amount: i128,
+    /// Running total paid out of the wave, for reconciling against `pool`.
+    pub paid: i128,
+}

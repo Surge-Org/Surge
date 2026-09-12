@@ -17,7 +17,8 @@ pub use types::{Config, DataKey, Wave, WaveStatus};
 use soroban_sdk::{contract, contractimpl, token::TokenClient, Address, Env};
 
 use events::{
-    AdminSet, Initialized, PointsAwarded, PointsRevoked, WaveClosed, WaveFunded, WaveOpened,
+    AdminSet, Claimed, Initialized, PointsAwarded, PointsRevoked, WaveClosed, WaveFunded,
+    WaveOpened,
 };
 
 #[contract]
@@ -292,6 +293,74 @@ impl WavePool {
         }
         .publish(&env);
         Ok(())
+    }
+
+    /// Pays `contributor` their points-weighted share of a closed wave.
+    ///
+    /// Requires the contributor's own authorisation, and pays the address that
+    /// authorised — there is no recipient parameter. Letting a caller nominate
+    /// where a share goes would make this contract a route for redirecting
+    /// someone else's payout the moment the admin key, or any future privileged
+    /// path, could call it on their behalf. A contributor who wants the funds
+    /// elsewhere can move them afterwards.
+    ///
+    /// Anyone can call this for themselves; the operator cannot claim on a
+    /// contributor's behalf. That is a deliberate limit — it means the escrow
+    /// never needs to be trusted about *where* money goes, only about how much.
+    pub fn claim(env: Env, number: u32, contributor: Address) -> Result<i128, Error> {
+        contributor.require_auth();
+
+        let mut wave = storage::wave(&env, number)?;
+        // Before close, `pool` is zero and `total_points` is still moving. A
+        // claim here would pay nothing and burn the one-shot flag doing it.
+        if wave.status != WaveStatus::Closed {
+            return Err(Error::WaveNotClosed);
+        }
+        if storage::has_claimed(&env, number, &contributor) {
+            return Err(Error::AlreadyClaimed);
+        }
+
+        let points = storage::points(&env, number, &contributor);
+        let amount = split::share(wave.pool, points, wave.total_points)?;
+        // Distinguish "earned nothing" from a successful zero-value transfer.
+        // Marking the flag for a zero payout would spend a contributor's single
+        // claim on nothing; failing tells a client the share has not settled and
+        // a retry after the wave is funded is worth making.
+        if amount <= 0 {
+            return Err(Error::NothingToClaim);
+        }
+
+        wave.paid = wave.paid.checked_add(amount).ok_or(Error::Overflow)?;
+
+        // State before transfer. Soroban's host already forbids re-entering a
+        // contract that is mid-call, so this ordering is not what stops a
+        // malicious token from calling back into `claim` — but it means the
+        // guarantee does not rest on that host behaviour, and it keeps `paid`
+        // consistent with the flag no matter which step fails.
+        storage::mark_claimed(&env, number, &contributor);
+        storage::set_wave(&env, &wave);
+
+        let config = storage::config(&env);
+        TokenClient::new(&env, &config.token).transfer(
+            &env.current_contract_address(),
+            &contributor,
+            &amount,
+        );
+
+        Claimed {
+            number,
+            contributor,
+            points,
+            amount,
+            paid: wave.paid,
+        }
+        .publish(&env);
+        Ok(amount)
+    }
+
+    /// Whether a contributor has already been paid for a wave.
+    pub fn has_claimed(env: Env, number: u32, contributor: Address) -> bool {
+        storage::has_claimed(&env, number, &contributor)
     }
 
     /// What `contributor` would be paid for wave `number`, in the token's

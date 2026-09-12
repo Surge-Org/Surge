@@ -105,3 +105,14 @@ pub fn has_claimed(env: &Env, number: u32, contributor: &Address) -> bool {
         .persistent()
         .has(&DataKey::Claimed(number, contributor.clone()))
 }
+
+/// Records a claim.
+///
+/// Written before the transfer it authorises, never after — see `claim`.
+pub fn mark_claimed(env: &Env, number: u32, contributor: &Address) {
+    let key = DataKey::Claimed(number, contributor.clone());
+    env.storage().persistent().set(&key, &true);
+    env.storage()
+        .persistent()
+        .extend_ttl(&key, ENTRY_THRESHOLD, ENTRY_EXTEND);
+}

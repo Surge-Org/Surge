@@ -20,3 +20,14 @@ pub struct Initialized {
     pub admin: Address,
     pub token: Address,
 }
+
+/// Emitted when the operator role moves. Both addresses are topics so the
+/// outgoing and incoming admin can each find the handover.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AdminSet {
+    #[topic]
+    pub previous: Address,
+    #[topic]
+    pub current: Address,
+}

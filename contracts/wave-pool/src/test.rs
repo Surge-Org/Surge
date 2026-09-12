@@ -709,3 +709,41 @@ fn a_fully_claimed_wave_has_nothing_left_to_sweep() {
     );
     assert_eq!(setup.token().balance(&treasury), 0);
 }
+
+#[test]
+fn a_share_cannot_be_claimed_out_of_another_wave_after_a_sweep() {
+    let setup = Setup::new();
+    let pool = setup.pool();
+    let treasury = setup.account();
+    setup.advance_to(WAVE_END);
+
+    // Wave 4 is deliberately the larger of the two. The contract holds every
+    // wave's escrow in one token account, so wave 4's 40,000 is more than enough
+    // to cover a stale claim against wave 3 — which is what makes this reachable
+    // rather than something the token's own balance check would refuse.
+    let sponsor = setup.sponsor(65_000 * USDC);
+    pool.open_wave(&3, &WAVE_START, &WAVE_END, &(25_000 * USDC));
+    pool.fund_wave(&3, &sponsor, &(25_000 * USDC));
+    pool.open_wave(&4, &WAVE_END, &(WAVE_END + 604_800), &(40_000 * USDC));
+    pool.fund_wave(&4, &sponsor, &(40_000 * USDC));
+
+    // Sole contributor to wave 3, who lets the claim window lapse.
+    let late = setup.account();
+    pool.award(&3, &late, &200);
+    pool.close_wave(&3, &CLAIM_WINDOW);
+    setup.advance_to(pool.wave(&3).claim_deadline);
+    assert_eq!(pool.sweep(&3, &treasury), 25_000 * USDC);
+
+    // Their points and their computed share both still exist. What no longer
+    // exists is wave 3's money.
+    assert_eq!(pool.points(&3, &late), 200);
+    assert_eq!(
+        pool.try_claim(&3, &late),
+        Err(Ok(Error::PoolExhausted))
+    );
+
+    // Wave 4, still open, keeps every stroop of its escrow.
+    assert_eq!(setup.token().balance(&setup.contract), 40_000 * USDC);
+    assert_eq!(setup.token().balance(&late), 0);
+    assert_eq!(pool.wave(&4).escrowed, 40_000 * USDC);
+}

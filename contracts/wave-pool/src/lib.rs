@@ -332,6 +332,17 @@ impl WavePool {
             return Err(Error::NothingToClaim);
         }
 
+        // The wave cannot pay out more than it holds. This is a real guard, not
+        // a belt-and-braces assertion: after `sweep`, `paid` is saturated at
+        // `pool` but a contributor who never claimed still has points and still
+        // computes a non-zero share. Without this check their transfer would be
+        // attempted against the contract's balance — which holds *every* wave's
+        // escrow — and would succeed by paying them out of a different, possibly
+        // still-open wave.
+        if amount > wave.pool - wave.paid {
+            return Err(Error::PoolExhausted);
+        }
+
         wave.paid = wave.paid.checked_add(amount).ok_or(Error::Overflow)?;
 
         // State before transfer. Soroban's host already forbids re-entering a

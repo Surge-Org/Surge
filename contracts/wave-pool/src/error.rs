@@ -46,4 +46,8 @@ pub enum Error {
     ClaimPeriodOpen = 13,
     /// Payout arithmetic overflowed `i128`.
     Overflow = 14,
+    /// The wave has nothing left to pay this share out of — in practice, it was
+    /// swept after the claim window expired. Distinct from `AlreadyClaimed`: the
+    /// share was never paid to this contributor, it is simply no longer here.
+    PoolExhausted = 15,
 }

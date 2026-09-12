@@ -15,7 +15,7 @@ pub use types::{Config, DataKey, Wave, WaveStatus};
 
 use soroban_sdk::{contract, contractimpl, token::TokenClient, Address, Env};
 
-use events::{AdminSet, Initialized, WaveFunded, WaveOpened};
+use events::{AdminSet, Initialized, PointsAwarded, PointsRevoked, WaveFunded, WaveOpened};
 
 #[contract]
 pub struct WavePool;
@@ -143,6 +143,107 @@ impl WavePool {
         }
         .publish(&env);
         Ok(())
+    }
+
+    /// Credits `contributor` with `points` in wave `number`.
+    ///
+    /// The contract takes a raw point count rather than an issue complexity: the
+    /// Trivial/Medium/High to 100/150/200 mapping is program policy that has
+    /// changed before and will change again, and baking a policy table into a
+    /// deployed contract means a redeploy to adjust it. What has to be on-chain
+    /// is the number the payout divides.
+    ///
+    /// Additive, so a contributor landing three issues in a wave is three calls
+    /// and the sum is kept by the contract. Passing an absolute total instead
+    /// would make every award depend on the caller having read the current value
+    /// first, and two operators reviewing different issues concurrently would
+    /// silently overwrite each other.
+    pub fn award(env: Env, number: u32, contributor: Address, points: u32) -> Result<(), Error> {
+        Self::require_admin(&env);
+
+        // A zero award is a no-op that would still emit an event and read as a
+        // real credit in the audit trail.
+        if points == 0 {
+            return Err(Error::InvalidPoints);
+        }
+
+        let mut wave = storage::wave(&env, number)?;
+        // The denominator is frozen at close and contributors are paid against
+        // it. Awarding afterwards would dilute shares already paid out, so the
+        // contract would owe more than it holds.
+        if wave.status != WaveStatus::Open {
+            return Err(Error::WaveNotOpen);
+        }
+
+        let total = storage::points(&env, number, &contributor)
+            .checked_add(points)
+            .ok_or(Error::Overflow)?;
+        wave.total_points = wave.total_points.checked_add(points).ok_or(Error::Overflow)?;
+
+        storage::set_points(&env, number, &contributor, total);
+        storage::set_wave(&env, &wave);
+
+        PointsAwarded {
+            number,
+            contributor,
+            points,
+            total,
+            wave_total: wave.total_points,
+        }
+        .publish(&env);
+        Ok(())
+    }
+
+    /// Walks back `points` of a contributor's credit in wave `number`.
+    ///
+    /// Needed because acceptance is a human judgement that gets revised — an
+    /// issue marked accepted in error, or a submission withdrawn after review.
+    /// Without this the only correction available would be to close the wave,
+    /// sweep it, and open a replacement, which penalises everyone else in it.
+    ///
+    /// Only while the wave is open. After close, a contributor's share is a
+    /// number they can act on, and some of them will already have claimed
+    /// against the same denominator.
+    pub fn revoke(env: Env, number: u32, contributor: Address, points: u32) -> Result<(), Error> {
+        Self::require_admin(&env);
+
+        if points == 0 {
+            return Err(Error::InvalidPoints);
+        }
+
+        let mut wave = storage::wave(&env, number)?;
+        if wave.status != WaveStatus::Open {
+            return Err(Error::WaveNotOpen);
+        }
+
+        let held = storage::points(&env, number, &contributor);
+        // Refuse rather than saturate at zero. Revoking more than a contributor
+        // holds means the operator is working from a stale figure, and clamping
+        // would leave the wave denominator out of step with the sum of its
+        // entries — which is the one invariant every payout depends on.
+        let total = held.checked_sub(points).ok_or(Error::PointsUnderflow)?;
+        wave.total_points = wave
+            .total_points
+            .checked_sub(points)
+            .ok_or(Error::PointsUnderflow)?;
+
+        storage::set_points(&env, number, &contributor, total);
+        storage::set_wave(&env, &wave);
+
+        PointsRevoked {
+            number,
+            contributor,
+            points,
+            total,
+            wave_total: wave.total_points,
+        }
+        .publish(&env);
+        Ok(())
+    }
+
+    /// Points a contributor holds in a wave. Zero for anyone never awarded.
+    pub fn points(env: Env, number: u32, contributor: Address) -> u32 {
+        storage::points(&env, number, &contributor)
     }
 
     /// The full state of one wave, for clients rendering its progress.

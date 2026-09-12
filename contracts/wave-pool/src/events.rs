@@ -56,3 +56,33 @@ pub struct WaveFunded {
     pub amount: i128,
     pub escrowed: i128,
 }
+
+/// Emitted when a contributor is credited for an accepted issue. `total` is the
+/// contributor's new balance in the wave and `wave_total` the new denominator,
+/// so a client can recompute an in-flight share from events alone.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PointsAwarded {
+    #[topic]
+    pub number: u32,
+    #[topic]
+    pub contributor: Address,
+    pub points: u32,
+    pub total: u32,
+    pub wave_total: u32,
+}
+
+/// Emitted when an award is walked back. Separate from `PointsAwarded` with a
+/// negative delta: a correction is a different event in the audit trail than an
+/// award, and a client should not have to inspect a sign to tell them apart.
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PointsRevoked {
+    #[topic]
+    pub number: u32,
+    #[topic]
+    pub contributor: Address,
+    pub points: u32,
+    pub total: u32,
+    pub wave_total: u32,
+}

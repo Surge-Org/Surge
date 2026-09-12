@@ -4,7 +4,7 @@
 //! evicted `Points` entry is a contributor who can no longer prove what they
 //! earned, so every read path that matters bumps the entry it touched.
 
-use soroban_sdk::{unwrap::UnwrapOptimized, Env};
+use soroban_sdk::{unwrap::UnwrapOptimized, Address, Env};
 
 use crate::error::Error;
 use crate::types::{Config, DataKey, Wave};
@@ -69,4 +69,33 @@ pub fn wave(env: &Env, number: u32) -> Result<Wave, Error> {
         .persistent()
         .extend_ttl(&key, ENTRY_THRESHOLD, ENTRY_EXTEND);
     Ok(wave)
+}
+
+/// Points a contributor holds in a wave. Absent means zero, so a contributor
+/// who never earned anything in a wave costs the contract no storage.
+pub fn points(env: &Env, number: u32, contributor: &Address) -> u32 {
+    let key = DataKey::Points(number, contributor.clone());
+    match env.storage().persistent().get(&key) {
+        Some(points) => {
+            env.storage()
+                .persistent()
+                .extend_ttl(&key, ENTRY_THRESHOLD, ENTRY_EXTEND);
+            points
+        }
+        None => 0,
+    }
+}
+
+pub fn set_points(env: &Env, number: u32, contributor: &Address, points: u32) {
+    let key = DataKey::Points(number, contributor.clone());
+    if points == 0 {
+        // Revoked back to nothing: drop the entry rather than keep paying rent
+        // on a stored zero that reads the same as an absent one.
+        env.storage().persistent().remove(&key);
+        return;
+    }
+    env.storage().persistent().set(&key, &points);
+    env.storage()
+        .persistent()
+        .extend_ttl(&key, ENTRY_THRESHOLD, ENTRY_EXTEND);
 }

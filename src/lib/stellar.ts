@@ -81,3 +81,58 @@ export const NETWORKS: Record<NetworkId, Network> = {
  * only the labels, which is worse than no control at all.
  */
 export const NETWORK = NETWORKS.testnet;
+
+/**
+ * Stroops per whole unit. Every Stellar asset carries seven decimal places —
+ * classic assets and Soroban tokens alike — so this is one constant, not a
+ * per-asset field.
+ */
+export const STROOPS = 10_000_000n;
+
+/**
+ * Amounts are `bigint`, not `number`.
+ *
+ * The contract stores them as `i128`, and a wave budget in stroops is already
+ * eleven digits before anything interesting happens. That fits in a double
+ * today, but `number` arithmetic on money is how you get a payout that is a
+ * fraction of a stroop off and a total that does not reconcile — and the
+ * reconciliation is the whole point of an escrow. Converting at the edges keeps
+ * every intermediate exact.
+ */
+export const toStroops = (units: number): bigint =>
+  BigInt(Math.round(units * Number(STROOPS)));
+
+/** Whole units, for the rare case that wants a float (chart geometry, widths). */
+export const toUnits = (stroops: bigint): number => Number(stroops) / Number(STROOPS);
+
+/**
+ * Formats an amount for display: grouped thousands, and only as many decimal
+ * places as the amount actually has.
+ *
+ * Trailing zeros are trimmed because a wave budget is a round number and
+ * rendering it as `25,000.0000000` reads as false precision. Dust, on the other
+ * hand, is *only* visible in the last places, so nothing is rounded away — the
+ * two cases are the same function because the alternative is a component
+ * guessing which one it is holding.
+ */
+export function formatAmount(stroops: bigint): string {
+  const negative = stroops < 0n;
+  const absolute = negative ? -stroops : stroops;
+  const whole = absolute / STROOPS;
+  const fraction = absolute % STROOPS;
+
+  const grouped = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const decimals = fraction.toString().padStart(7, '0').replace(/0+$/, '');
+
+  return `${negative ? '-' : ''}${grouped}${decimals ? `.${decimals}` : ''}`;
+}
+
+/**
+ * The exact stroop count, grouped.
+ *
+ * Used where the smallest unit is the subject rather than an implementation
+ * detail — rounding dust, a share that floored to nothing. Anything that says
+ * "stroops" on screen should be showing this, not a formatted decimal.
+ */
+export const formatStroops = (stroops: bigint): string =>
+  stroops.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

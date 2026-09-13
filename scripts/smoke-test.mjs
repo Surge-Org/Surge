@@ -210,9 +210,24 @@ try {
   await page.reload();
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
 
+  // ---------------------------------------------------------------- on-chain
+  await go('/on-chain');
+  await page.locator('.escrow').first().waitFor();
+  const waveCount = await page.evaluate(() => window.__preview().waves.length);
+  assert.equal(await page.locator('.escrow').count(), waveCount,
+    'one escrow panel per recorded wave');
+  // Newest first: the wave being funded or claimed is what the page is opened for.
+  assert.match(await page.locator('.escrow h3').first().innerText(), /Wave 4/);
+  // With nothing deployed, the page has to say so rather than implying the figures
+  // are reads of a contract.
+  assert.equal(await page.getByText(/Not deployed/).count() > 0, true,
+    'the page states that no contract is deployed');
+  assert.equal(await page.locator('.onchain-steps li').count(), 5,
+    'the settlement walkthrough lists all five steps');
+
   // ------------------------------------------------------------- responsive
   const routes = [
-    '/', '/explore', '/explore/repos', '/explore/orgs', '/issue/707',
+    '/', '/explore', '/explore/repos', '/explore/orgs', '/issue/707', '/on-chain',
     '/login', '/maintainer/login', '/maintainer', '/maintainer/submit',
     '/maintainer/repo/jssdk', '/maintainer/repo/jssdk/issues',
     '/maintainer/repo/jssdk/settings', '/me', '/me/points', '/me/settings',
@@ -238,7 +253,7 @@ try {
   await page.waitForURL('**/maintainer/submit');
 
   assert.deepEqual(errors, []);
-  console.log('Passed: public explore (no dashboard chrome), search/tabs/filters, contributor apply and persistence, separate maintainer sign-in, submit-then-review gate, per-repo dashboards scoped by owner and acceptance, proposal assignment, theme persistence, 15 routes at 5 widths with no overflow, and the mobile drawer.');
+  console.log(`Passed: public explore (no dashboard chrome), search/tabs/filters, contributor apply and persistence, separate maintainer sign-in, submit-then-review gate, per-repo dashboards scoped by owner and acceptance, proposal assignment, theme persistence, the on-chain escrow surface, ${routes.length} routes at 5 widths with no overflow, and the mobile drawer.`);
 } catch (error) {
   console.log(await page.locator('body').innerText());
   await page.screenshot({ path: 'reference/test-failure.png', fullPage: true });

@@ -1,8 +1,18 @@
 # Contracts
 
-Soroban contracts for the Surge reward waves. One crate today: [`wave-pool`](wave-pool),
-the escrow that holds a wave's USDC and pays it out in proportion to the points
-contributors earned.
+Soroban contracts for the Surge reward waves.
+
+**Two crates, and they overlap.** [`wave-pool`](wave-pool) and
+[`wave_escrow`](wave_escrow) are both escrows that hold a wave's USDC and pay it out
+in proportion to points earned. CI builds and tests both — `ci.yml` runs the whole
+workspace and uploads both wasm modules, and `wave-escrow.yml` covers the second
+crate again with its own property tests.
+
+That duplication is unresolved and should be settled before anything is deployed.
+The interface reads a single contract id out of
+[`src/lib/stellar.ts`](../src/lib/stellar.ts), so two live pools would mean two sets
+of figures for one wave and no way to tell which a contributor is owed from. The
+document below describes `wave-pool`.
 
 The frontend still runs on the fixtures in [`src/lib/model.ts`](../src/lib/model.ts).
 This workspace is the on-chain half those fixtures stand in for, built and tested

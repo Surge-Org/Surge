@@ -16,6 +16,7 @@ import { NetworkBadge } from './components/chain';
 import { GooeyNav } from './components/bits';
 import { Landing } from './pages/landing';
 import { Explore } from './pages/explore';
+import { ProgramPage } from './pages/program';
 import { IssuePage } from './pages/issue';
 import { ContributorLogin, MaintainerLogin } from './pages/auth';
 import { ContributorWork, ContributorPoints, ContributorSettings } from './pages/contributor';
@@ -110,6 +111,7 @@ function PublicShell({ children }: { children: ReactNode }) {
     { to: '/explore', label: 'Explore', end: true },
     { to: '/explore/repos', label: 'Repositories' },
     { to: '/explore/orgs', label: 'Organizations' },
+    { to: '/on-chain', label: 'On-chain' },
   ];
 
   return (
@@ -365,6 +367,7 @@ function Routed() {
       <Route path="/explore/repos" element={<PublicShell><Explore tab="repos" /></PublicShell>} />
       <Route path="/explore/orgs" element={<PublicShell><Explore tab="orgs" /></PublicShell>} />
       <Route path="/issue/:issueId" element={<PublicShell><IssuePage /></PublicShell>} />
+      <Route path="/on-chain" element={<PublicShell><ProgramPage /></PublicShell>} />
 
       <Route path="/login" element={<ContributorLogin />} />
       <Route path="/maintainer/login" element={<MaintainerLogin />} />

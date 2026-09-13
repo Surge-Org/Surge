@@ -25,6 +25,7 @@ Two clearly separate kinds of screen:
 | --- | --- |
 | `/` | Landing |
 | `/explore`, `/explore/repos`, `/explore/orgs` | Browse issues, repositories, organizations |
+| `/on-chain` | The escrow behind the waves — network, contract, and each wave's funding and payout |
 | `/issue/:id` | Issue detail and proposals |
 
 **Workspaces** — fixed left rail, scoped to one role or one repository.
@@ -54,8 +55,14 @@ dashboard, or to a repository owned by a different maintainer, redirects away.
 
 ## Design
 
-Dark by default, with a violet accent. One neutral ramp plus one accent drives both themes, so
-light and dark come from the same tokens.
+Dark by default, with a single accent — "beam", an electric azure (`#2b6fff` light, `#4d8cff` dark).
+One neutral ramp plus that accent drives both themes, so light and dark come from the same tokens.
+The accent is our own token, not anybody's brand palette.
+
+Beyond it, colour appears only on chrome that is about the network: USDC keeps the issuer's blue so
+an asset chip is recognisable in a column of amounts, a live-network badge takes the same red as
+destructive state, and the starfield inverts between themes rather than tinting — on a near-black
+page the stars are the light source, so they carry real luminance.
 
 **Sharp edges.** Every radius token is `0`, so buttons, cards, chips, inputs, modals and avatars
 are square. Only true dots (status indicators, language dots, aurora blobs) stay circular.
@@ -111,12 +118,19 @@ cargo test
 cargo build --target wasm32v1-none --release
 ```
 
+**The workspace currently holds two escrow contracts** — `wave-pool` and `wave_escrow` — which
+solve the same problem for the same waves and are both built and tested by CI. Which one the
+program deploys is an open question, and it should be settled before either one is: the `/on-chain`
+surface reads a single contract id from
+[`src/lib/stellar.ts`](src/lib/stellar.ts), so two deployed pools would mean two sets of figures and
+no way to tell which a contributor is owed from.
+
 ## Checks
 
 [![CI](https://github.com/Surge-Org/Surge/actions/workflows/ci.yml/badge.svg)](https://github.com/Surge-Org/Surge/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/Surge-Org/Surge/actions/workflows/codeql.yml/badge.svg)](https://github.com/Surge-Org/Surge/actions/workflows/codeql.yml)
 
-Five checks run on every push and pull request, defined in
+Six checks run on every push and pull request, defined in
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
 
 | Check | Command |
@@ -124,6 +138,7 @@ Five checks run on every push and pull request, defined in
 | Typecheck | `npm run typecheck` |
 | Lint | `npm run lint` |
 | Build | `npm run build` |
+| Unit tests | `npm run test:unit` |
 | End-to-end | `npm run test:e2e -- <url>` |
 | Contracts | `cargo fmt`, `cargo clippy`, `cargo test`, `cargo build --target wasm32v1-none --release` |
 
@@ -134,6 +149,13 @@ fail on its own.
 
 CodeQL analyses the source weekly and on every pull request, and Dependabot groups dependency
 bumps into one pull request per ecosystem.
+
+The unit tests need nothing but `npm ci` — they run on Node's own test runner with its built-in
+type stripping, so `src/lib/stellar.ts` is imported directly with no build step:
+
+```powershell
+npm.cmd run test:unit
+```
 
 Locally, the end-to-end suite needs a running server and a browser. It uses Playwright's own
 Chromium (`npx playwright install chromium`), or an installed browser if `CHROME_PATH` is set:
@@ -153,7 +175,7 @@ horizontal overflow across 15 routes at five widths.
 ### Branch protection
 
 `main` is covered by the **Protect main** ruleset. For contributors it means: open a pull request,
-and land it once Typecheck, Lint, Build, End-to-end and Contracts are green. Force-pushes and branch deletion
+and land it once Typecheck, Lint, Build, Unit tests, End-to-end and Contracts are green. Force-pushes and branch deletion
 are refused outright, and review threads must be resolved before merging. No approving review is
 required, so a maintainer can merge their own pull request.
 

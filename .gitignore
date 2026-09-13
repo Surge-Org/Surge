@@ -17,3 +17,6 @@ contracts/test-output.txt
 # Local capture output and server logs
 output/
 pitch-server*.log
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat

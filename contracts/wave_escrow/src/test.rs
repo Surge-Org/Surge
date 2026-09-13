@@ -4,7 +4,7 @@ use proptest::prelude::*;
 use soroban_sdk::{
     symbol_short,
     testutils::{Address as _, Events as _, Ledger as _},
-    xdr, IntoVal, TryFromVal, Val,
+    xdr, IntoVal, TryFromVal,
 };
 
 struct Fixture {

@@ -7,7 +7,7 @@ use soroban_sdk::{
 };
 
 use events::{
-    Allocated, Claimed, DustAllocated, Funded, PhaseChanged, Refunded, Withdrawn, WaveCreated,
+    Allocated, Claimed, DustAllocated, Funded, PhaseChanged, Refunded, WaveCreated, Withdrawn,
 };
 
 /// Settlement and active-sponsor bounds are part of the public contract.
@@ -106,7 +106,11 @@ fn phase_event(env: &Env, id: u64, w: &Wave) {
         Phase::Settled => 3u32,
         Phase::Cancelled => 4u32,
     };
-    PhaseChanged { id, phase: phase_num }.publish(env);
+    PhaseChanged {
+        id,
+        phase: phase_num,
+    }
+    .publish(env);
 }
 fn pay(env: &Env, from: &Address, to: &Address, value: i128) -> Result<(), EscrowError> {
     let token: Address = env.storage().instance().get(&Key::Token).unwrap();

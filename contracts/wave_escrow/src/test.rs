@@ -306,14 +306,15 @@ fn every_transition_publishes_the_complete_wave_state() {
     let id = f.funded(10);
     c.open(&id);
     // After opening, we expect one phase_changed event
-    let open_event_count = f.env
+    let open_event_count = f
+        .env
         .events()
         .all()
         .filter_by_contract(&f.escrow)
         .events()
         .len();
     assert_eq!(open_event_count, 1, "Should emit one phase event on open");
-    
+
     f.env.ledger().set_timestamp(200);
     c.close(&id);
     // After closing, we expect just one additional phase_changed event (still only 1 shown)
@@ -329,13 +330,18 @@ fn every_transition_publishes_the_complete_wave_state() {
     );
     c.settle(&id, &f.shares(&[1, 2]));
     // After settling: one allocated event, one dust event, one phase_changed event
-    let settle_events = f.env
+    let settle_events = f
+        .env
         .events()
         .all()
         .filter_by_contract(&f.escrow)
         .events()
         .len();
-    assert!(settle_events >= 3, "Should emit allocation, dust, and phase events on settle, got {}", settle_events);
+    assert!(
+        settle_events >= 3,
+        "Should emit allocation, dust, and phase events on settle, got {}",
+        settle_events
+    );
 }
 
 mod hostile {

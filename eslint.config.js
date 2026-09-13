@@ -34,6 +34,21 @@ export default tseslint.config(
     },
   },
 
+  // Unit tests run on Node's own runner with its type stripping, so they are
+  // TypeScript with Node globals and none of the React rules apply.
+  {
+    files: ['tests/**/*.ts'],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: globals.node,
+    },
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
   // Node-side scripts print to stdout by design, and the callbacks they hand to
   // page.evaluate() are serialised and run inside the browser, so both global
   // sets are legitimately in scope in these files.

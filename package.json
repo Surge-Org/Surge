@@ -10,6 +10,7 @@
     "test:smoke": "node scripts/smoke-test.mjs",
     "visual:check": "node scripts/visual-check.mjs",
     "typecheck": "tsc -b --pretty false",
+    "test:unit": "node --test \"tests/**/*.test.ts\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test:e2e": "node scripts/smoke-test.mjs"

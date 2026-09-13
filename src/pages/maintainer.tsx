@@ -5,11 +5,13 @@ import {
   ArrowRight, Check, Clock, Plus, ShieldCheck, Star, X,
 } from 'lucide-react';
 import {
-  applicantName, dateLabel, isOwnApplication, pointsFor, repoName, reposOwnedBy,
-  type Application, type Repo,
+  applicantName, awardedPoints, dateLabel, isOwnApplication, pointsFor, repoName,
+  reposOwnedBy, type Application, type Repo,
 } from '../lib/model';
+import { contractWave } from '../lib/wave-pool';
 import { useApp } from '../lib/store';
 import { PROGRAM } from '../lib/program';
+import { EscrowPanel } from '../components/escrow';
 import { Avatar, Chip, EASE, Empty, Item, ModalHost, Page, PageHead, Stagger } from '../components/ui';
 
 const STATUS_TONE: Record<Repo['status'], string> = { Pending: 'warn', Accepted: 'ok', Rejected: 'bad' };
@@ -203,6 +205,18 @@ export function RepoDashboard() {
   const assigned = proposals.filter(a => ['Assigned', 'PR submitted'].includes(a.status)).length;
   const done = proposals.filter(a => a.status === 'Accepted').length;
 
+  /**
+   * The wave this repository's issues are actually posted to.
+   *
+   * Taken from the issues rather than from "whichever wave is Active", because a
+   * repository with nothing in the current wave has no escrow to show — and showing
+   * the active wave regardless would put a pool on the dashboard that none of this
+   * maintainer's work is paid from.
+   */
+  const waveIds = new Set(issues.map(i => i.waveId));
+  const activeWave = state.waves.find(w => waveIds.has(w.id) && w.status === 'Active')
+    ?? state.waves.find(w => waveIds.has(w.id));
+
   return (
     <Page>
       <PageHead
@@ -225,6 +239,20 @@ export function RepoDashboard() {
           </Item>
         ))}
       </Stagger>
+
+      {/* The escrow behind the wave this repository's issues are posted to. A
+          maintainer awarding points is spending from this pool, so it belongs on the
+          dashboard where the awarding happens rather than only on the public page. */}
+      {activeWave && (
+        <section className="section">
+          <div className="row section-head">
+            <h2>Wave {activeWave.number}</h2>
+            <span className="spacer" />
+            <Link className="btn xs ghost" to="/on-chain">All waves</Link>
+          </div>
+          <EscrowPanel wave={contractWave(activeWave, awardedPoints(activeWave, state))} />
+        </section>
+      )}
 
       <section className="section">
         <div className="row section-head">

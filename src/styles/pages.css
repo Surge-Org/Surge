@@ -792,3 +792,13 @@ a.row-title:hover { text-decoration: underline; text-underline-offset: 2px; }
   font-size: var(--t2);
   color: var(--ink-3);
 }
+
+/* Phase note under the issue reward breakdown — explains that the figure moves. */
+.side-note {
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--line-soft);
+  font-size: var(--t2);
+  line-height: 1.5;
+  color: var(--ink-3);
+}

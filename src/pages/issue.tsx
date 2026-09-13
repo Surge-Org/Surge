@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ArrowUpRight, Check, GitPullRequest } from 'lucide-react';
-import { applicantName, isOwnApplication, pointsFor, repoName } from '../lib/model';
+import { applicantName, awardedPoints, isOwnApplication, pointsFor, repoName } from '../lib/model';
+import { PHASE_NOTE, claimable, contractWave, wavePhase } from '../lib/wave-pool';
 import { useApp } from '../lib/store';
 import { Avatar, Chip, Crumbs, Empty, ModalHost, Page } from '../components/ui';
+import { Amount } from '../components/chain';
 
 export function IssuePage() {
   const { issueId } = useParams();
@@ -23,6 +25,22 @@ export function IssuePage() {
   const mine = proposals.find(isOwnApplication);
   const taken = proposals.find(a => ['Assigned', 'PR submitted', 'Accepted'].includes(a.status));
   const canApply = !mine && !taken && wave.status === 'Active';
+
+  /**
+   * What landing this issue would pay, at the wave's current funding and points.
+   *
+   * The issue's own points are added to the denominator before dividing, because
+   * they are not recorded on-chain until the work is accepted — quoting against the
+   * current total would overstate the share by leaving out the very award being
+   * quoted. It moves as the wave fills and as others earn, which is what the phase
+   * note underneath says.
+   */
+  const issuePoints = pointsFor(issue.complexity);
+  const chainWave = contractWave(wave, awardedPoints(wave, state));
+  const issueShare = claimable(
+    { ...chainWave, total_points: chainWave.total_points + issuePoints },
+    issuePoints,
+  ) ?? 0n;
 
   const submit = () => {
     if (message.trim().length < 30) { setErr('Add at least 30 characters so the maintainer can judge your plan.'); return; }
@@ -109,6 +127,25 @@ export function IssuePage() {
               <div className="side-row"><span className="muted">Base</span><span className="num">100</span></div>
               <div className="side-row"><span className="muted">Complexity</span><span className="num">+{pointsFor(issue.complexity) - 100}</span></div>
               <div className="side-row total"><span>Total</span><span className="num">{pointsFor(issue.complexity)}</span></div>
+            </div>
+            {/* What those points are worth in this wave, right now. The points
+                number on its own is only meaningful against a pool and a
+                denominator, both of which live on the wave. */}
+            <div className="card side-card">
+              <p className="label">Worth today</p>
+              <div className="side-row">
+                <span className="muted">Wave pool</span>
+                <Amount stroops={chainWave.escrowed} code={false} />
+              </div>
+              <div className="side-row">
+                <span className="muted">Points in wave</span>
+                <span className="num">{chainWave.total_points + issuePoints}</span>
+              </div>
+              <div className="side-row total">
+                <span>This issue</span>
+                <strong><Amount stroops={issueShare} /></strong>
+              </div>
+              <p className="side-note">{PHASE_NOTE[wavePhase(chainWave)]}</p>
             </div>
             <div className="card side-card">
               <p className="label">Repository</p>

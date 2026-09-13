@@ -13,3 +13,7 @@ reference/
 contracts/target/
 contracts/**/test_snapshots/
 contracts/test-output.txt
+
+# Local capture output and server logs
+output/
+pitch-server*.log

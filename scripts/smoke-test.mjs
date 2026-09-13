@@ -10,6 +10,27 @@ const browser = await chromium.launch({
   ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
 });
 const page = await browser.newPage({ viewport: { width: 1440, height: 940 } });
+/**
+ * Reach the preview's stored state without naming its version.
+ *
+ * `src/lib/model.ts` versions the storage key and bumps it whenever the state
+ * shape changes, which is how a stale local preview gets discarded instead of
+ * loaded into code that expects new fields. A hardcoded key here does not fail
+ * loudly on a bump — `getItem` returns null, and the first property access on it
+ * throws, so the suite reports a broken page when the only thing that moved was a
+ * schema version. Discovering the key by prefix means a bump is invisible to the
+ * tests, which is the correct amount of attention for it.
+ */
+await page.addInitScript(() => {
+  const key = () => Object.keys(localStorage).find(k => k.startsWith('surge-preview-'));
+  window.__preview = () => {
+    const k = key();
+    if (!k) throw new Error('no surge-preview-* key in localStorage');
+    return JSON.parse(localStorage.getItem(k));
+  };
+  window.__savePreview = state => localStorage.setItem(key(), JSON.stringify(state));
+});
+
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
@@ -62,7 +83,7 @@ try {
   await page.waitForURL('**/explore/orgs');
   await page.locator('.repo-tile').first().waitFor();
   const orgCount = await page.evaluate(() => new Set(
-    JSON.parse(localStorage.getItem('surge-preview-v4')).repos
+    window.__preview().repos
       .filter(r => r.status === 'Accepted').map(r => r.org)).size);
   // Repository and organization tiles share a class, so the repositories from
   // the previous tab satisfy the wait above. Let the grid actually swap before
@@ -129,7 +150,7 @@ try {
     'no dashboard link while the repository is pending');
 
   const repoId = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem('surge-preview-v4')).repos.find(r => r.ownerId === 'ada-org').id);
+    window.__preview().repos.find(r => r.ownerId === 'ada-org').id);
 
   // the gate also holds against a direct URL
   await page.goto(`${base}/maintainer/repo/${repoId}`);
@@ -162,9 +183,9 @@ try {
   await page.getByRole('button', { name: 'Enter maintainer area' }).click();
   await page.waitForURL('**/maintainer');
   await page.evaluate(() => {
-    const s = JSON.parse(localStorage.getItem('surge-preview-v4'));
+    const s = window.__preview();
     s.repos = s.repos.map(r => (r.id === 'jssdk' ? { ...r, ownerId: 'ada-org' } : r));
-    localStorage.setItem('surge-preview-v4', JSON.stringify(s));
+    window.__savePreview(s);
   });
   await go('/maintainer/repo/jssdk/issues');
   await page.getByRole('button', { name: /Add a resilient event subscription/ }).click();

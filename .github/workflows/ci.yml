@@ -29,6 +29,20 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
 
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      # Node's own runner with type stripping, so there is no build step to wait on
+      # and nothing to install beyond what `npm ci` already fetched.
+      - run: npm run test:unit
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -99,11 +113,17 @@ jobs:
       # own (no_std, panic = abort, a different target).
       - name: Build wasm
         run: cargo build --target wasm32v1-none --release
+      # Both crates, not just one. The workspace builds two contracts and uploading
+      # only `wave_pool` made the artifact silently incomplete — a deploy taking
+      # "the bytes CI verified" would have found half of them missing.
       - name: Upload wasm
         uses: actions/upload-artifact@v5
         with:
-          name: wave-pool-wasm
-          path: contracts/target/wasm32v1-none/release/wave_pool.wasm
+          name: contracts-wasm
+          path: |
+            contracts/target/wasm32v1-none/release/wave_pool.wasm
+            contracts/target/wasm32v1-none/release/wave_escrow.wasm
+          if-no-files-found: error
           retention-days: 7
 
   e2e:

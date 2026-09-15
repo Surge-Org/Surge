@@ -4,13 +4,18 @@
 
 use soroban_sdk::{contractevent, Address};
 
+use crate::Wave;
+
 /// Emitted when a wave's phase changes (Funded -> Open -> Closed -> Settled/Cancelled).
 #[contractevent]
 #[derive(Clone, Debug)]
 pub struct PhaseChanged {
     #[topic]
     pub id: u64,
-    pub phase: u32, // Phase as u32
+    /// Snapshot after the transition. Keeping this in the event lets an indexer
+    /// rebuild deadlines, authority, accounting totals, and the lifecycle from
+    /// the event stream without reading contract storage.
+    pub wave: Wave,
 }
 
 /// Emitted when a wave is created.
@@ -20,6 +25,9 @@ pub struct WaveCreated {
     #[topic]
     pub id: u64,
     pub token: Address,
+    /// The complete initial state, including manager, deadlines, and dust
+    /// destination.
+    pub wave: Wave,
 }
 
 /// Emitted when a sponsor funds a wave.

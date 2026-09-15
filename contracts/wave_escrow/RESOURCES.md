@@ -7,19 +7,19 @@ positive dust allocation. The one-recipient comparison has one sponsor and no du
 
 | Invocation | Point recipients / sponsors | Instructions | Memory bytes | Disk reads | Memory reads | Writes | Disk read bytes | Write bytes | Event bytes |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| fund | 1 / 1 | 873,577 | 1,275,770 | 1 | 9 | 5 | 92 | 1,208 | 428 |
-| settle | 1 / 1 | 819,846 | 1,254,894 | 0 | 6 | 3 | 0 | 764 | 688 |
-| claim | 1 / 1 | 864,865 | 1,272,069 | 1 | 9 | 5 | 0 | 1,212 | 408 |
-| fund | 64 / 64 | 1,351,570 | 1,489,634 | 0 | 9 | 5 | 0 | 1,208 | 428 |
-| settle | 64 / 64 | 16,522,468 | 4,864,258 | 0 | 70 | 67 | 0 | 11,004 | 11,408 |
-| claim | 64 / 64 | 864,865 | 1,272,069 | 1 | 9 | 5 | 0 | 1,212 | 408 |
+| fund | 1 / 1 | 881,090 | 1,278,345 | 1 | 9 | 5 | 92 | 1,208 | 488 |
+| settle | 1 / 1 | 831,660 | 1,257,547 | 0 | 6 | 3 | 0 | 764 | 752 |
+| claim | 1 / 1 | 870,463 | 1,274,506 | 1 | 9 | 5 | 0 | 1,212 | 448 |
+| fund | 64 / 64 | 1,359,083 | 1,492,209 | 0 | 9 | 5 | 0 | 1,208 | 488 |
+| settle | 64 / 64 | 16,703,288 | 4,873,285 | 0 | 70 | 67 | 0 | 11,004 | 13,528 |
+| claim | 64 / 64 | 870,463 | 1,274,506 | 1 | 9 | 5 | 0 | 1,212 | 448 |
 
 The SDK enforces its default mainnet resource-limit snapshot on every invocation.
 A live `stellar network settings --network testnet` reading on 2026-09-11 is stored
 in [evidence/testnet-settings.json](evidence/testnet-settings.json). Both allow
 400 million instructions, 41,943,040 memory bytes, 200 disk reads, 200 writes,
 200,000 disk-read bytes, 132,096 write bytes and 16,384 event bytes per transaction.
-All measured calls fit. The deployed Wasm is 35,414 bytes against the 131,072-byte
+All measured calls fit. The measured Wasm is 39,029 bytes against the 131,072-byte
 contract-code limit. This is a stated 64-recipient bound, not a claim of unbounded
 settlement capacity.
 

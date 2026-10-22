@@ -99,16 +99,9 @@ fn amount(env: &Env, key: &Key) -> i128 {
     env.storage().persistent().get(key).unwrap_or(0)
 }
 fn phase_event(env: &Env, id: u64, w: &Wave) {
-    let phase_num = match w.phase {
-        Phase::Funded => 0u32,
-        Phase::Open => 1u32,
-        Phase::Closed => 2u32,
-        Phase::Settled => 3u32,
-        Phase::Cancelled => 4u32,
-    };
     PhaseChanged {
         id,
-        phase: phase_num,
+        wave: w.clone(),
     }
     .publish(env);
 }
@@ -215,7 +208,12 @@ impl WaveEscrow {
         };
         save(&env, id, &w);
         let token: Address = env.storage().instance().get(&Key::Token).unwrap();
-        WaveCreated { id, token }.publish(&env);
+        WaveCreated {
+            id,
+            token,
+            wave: w,
+        }
+        .publish(&env);
         Ok(id)
     }
 

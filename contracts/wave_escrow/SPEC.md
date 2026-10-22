@@ -67,9 +67,10 @@ instance map makes individual withdrawals constant-cost in recipient count.
 TTL extensions, restore workflows and upgrades belong to issue #3; production
 operators must preserve/restore archived persistent entries before use.
 
-`created` publishes the token and full initial Wave. Every lifecycle transition
-publishes `phase` with the full Wave. Funding and withdrawal events include the
-sponsor, delta, new contribution and pool; allocation events include each
+`created` publishes the token and full initial `Wave` snapshot. Every lifecycle
+transition publishes `phase` with the full post-transition `Wave` snapshot.
+Funding and withdrawal events include the sponsor, delta, new contribution and
+pool; allocation events include each
 recipient's points and amount; dust events identify the recipient and amount;
 claim/refund events include their recipient, amount and running paid/refunded
 total. These events contain the identities and values needed to rebuild state,

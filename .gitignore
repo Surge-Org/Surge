@@ -2,8 +2,6 @@ node_modules/
 dist/
 *.tsbuildinfo
 .DS_Store
-.env
-.env.*
 *.local
 .final-snapshot/
 _history.py
@@ -20,3 +18,4 @@ pitch-server*.log
 branch_structure.json
 temp_auto_push.bat
 temp_interactive_push.bat
+config.bat

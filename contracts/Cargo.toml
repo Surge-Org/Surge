@@ -14,7 +14,7 @@ license = "Apache-2.0"
 publish = false
 
 [workspace.dependencies]
-soroban-sdk = "27"
+soroban-sdk = "29"
 
 # Contracts ship as wasm, so size beats compile time. `opt-level = "z"` and a
 # single codegen unit let the optimiser see the whole crate; stripping debug
